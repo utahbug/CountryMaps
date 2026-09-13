@@ -1,0 +1,26 @@
+{
+  "id": "africa",
+  "name": "Africa",
+  "expectedCount": 54,
+  "projection": "Spherical Lambert azimuthal equal-area, centered at 15 E, 0 N",
+  "countries": [
+    ["DZA","Algeria"],["AGO","Angola"],["BEN","Benin"],["BWA","Botswana"],
+    ["BFA","Burkina Faso"],["BDI","Burundi"],["CPV","Cabo Verde"],["CMR","Cameroon"],
+    ["CAF","Central African Republic"],["TCD","Chad"],["COM","Comoros"],
+    ["COD","Democratic Republic of the Congo"],["COG","Republic of the Congo"],
+    ["CIV","Côte d’Ivoire"],["DJI","Djibouti"],["EGY","Egypt"],["GNQ","Equatorial Guinea"],
+    ["ERI","Eritrea"],["SWZ","Eswatini"],["ETH","Ethiopia"],["GAB","Gabon"],
+    ["GMB","The Gambia"],["GHA","Ghana"],["GIN","Guinea"],["GNB","Guinea-Bissau"],
+    ["KEN","Kenya"],["LSO","Lesotho"],["LBR","Liberia"],["LBY","Libya"],
+    ["MDG","Madagascar"],["MWI","Malawi"],["MLI","Mali"],["MRT","Mauritania"],
+    ["MUS","Mauritius"],["MAR","Morocco"],["MOZ","Mozambique"],["NAM","Namibia"],
+    ["NER","Niger"],["NGA","Nigeria"],["RWA","Rwanda"],["STP","São Tomé and Príncipe"],
+    ["SEN","Senegal"],["SYC","Seychelles"],["SLE","Sierra Leone"],["SOM","Somalia"],
+    ["ZAF","South Africa"],["SSD","South Sudan"],["SDN","Sudan"],["TZA","Tanzania"],
+    ["TGO","Togo"],["TUN","Tunisia"],["UGA","Uganda"],["ZMB","Zambia"],["ZWE","Zimbabwe"]
+  ],
+  "sourceGroups": { "SSD": ["SDS"], "SOM": ["SOM","SOL"] },
+  "insets": ["BEN","BDI","CPV","COM","DJI","GNQ","SWZ","GMB","GNB","LSO","MUS","RWA","STP","SYC","TGO"],
+  "context": [["SAH","Western Sahara (disputed)"]],
+  "aliases": { "CIV": ["Ivory Coast", "Cote d'Ivoire"], "CPV": ["Cape Verde"], "SWZ": ["Swaziland"], "COD": ["DR Congo", "DRC", "Congo Kinshasa"], "COG": ["Congo Brazzaville"], "TZA": ["United Republic of Tanzania"] }
+}

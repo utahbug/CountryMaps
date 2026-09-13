@@ -1,0 +1,16 @@
+{
+  "name": "countrymaps",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Dependency-free static Africa geography activities",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs",
+    "preview": "node scripts/serve.mjs dist",
+    "build": "node scripts/build-static.mjs",
+    "data:build": "node scripts/build-map.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check js/app.js && node --check lib/maps.js"
+  }
+}
