@@ -128,3 +128,7 @@ The green/cream globe with a gold location marker is supplied as favicon.svg, fa
 ## Territory identification
 
 Western Sahara, Bir Tawil and Somaliland are distinct labeled, searchable context in Explorer/Reveal, styled with neutral hatching and dashed boundaries. They never count toward the 54-country score. The unchanged Somalia Puzzle piece includes the Somaliland geometry; the map legend makes that scoring convention explicit. See [the source audit](docs/TERRITORIES.md) for details and all other omitted African/overseas source components.
+
+## Phone Reveal study mode
+
+At the existing phone breakpoint (650px and below), Reveal stays fitted to Africa. Country taps only toggle independent name visibility; they never change the geographic view. Map pan/zoom and directional controls are unavailable in phone Reveal; swiping can scroll the page. The map readout reserves a fixed height so long names do not move the map. Reveal All shows all names in the numbered country list, and the active revealed country keeps its adjacent map label. Reset hides all names and restores Fit. Explorer remains available for close inspection; tablet/desktop Reveal retains its existing controls and view toggles.

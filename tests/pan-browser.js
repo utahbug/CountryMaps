@@ -1,3 +1,4 @@
+import {runPhoneRevealChecks} from './phone-reveal-browser.js';
 // Test-only harness, excluded from dist. Uses the real app DOM and event handlers.
 // Synthetic PointerEvents cannot acquire native capture, so only capture is stubbed.
 const frame=document.querySelector('iframe'),results=document.querySelector('#results');
@@ -16,6 +17,10 @@ document.querySelector('#run').onclick=()=>{
   const clean=()=>assert(!svg.hasAttribute('data-pan-pointer')&&!svg.classList.contains('is-panning')&&!captured.size&&!q('.drag-preview'),'no stranded gesture state');
   const reset=()=>q('[data-action="reset"]').click();
   try{
+   if(w.innerWidth<=650&&new URL(w.location.href).searchParams.get('mode')==='reveal'){
+    runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box});
+    results.textContent='PASS: '+checks+' stable phone Reveal checks at '+w.innerWidth+' × '+w.innerHeight+'. Touch PointerEvents; capture stubbed.';return;
+   }
    reset();assert(w.getComputedStyle(svg).touchAction==='none','one-finger map gesture owns touch');
    assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');
    start();send('pointermove',svg,71,153,152);send('pointerup',svg,71,153,152);assert(selected()==='Algeria','tap jitter selects original country');assert(box()==='0 0 800 730','tap does not pan');clean();

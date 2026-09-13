@@ -18,9 +18,10 @@ class CountryMaps {
     this.byId=new Map([...data.countries,...data.context].map(c=>[c.id,c]));
     this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];
     this.view={...fit};this.suppressClick=false;this.query='';this.message='';
-    this.pan=new PanController(view=>{this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
+    this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
     this.drag=new DragController(state=>this.paintDrag(state),(c,x,y,stationary)=>this.drop(c,x,y,stationary));
   }
+  get phoneReveal(){return this.mode==='reveal'&&window.matchMedia('(max-width: 650px)').matches;}
   get preview(){return this.mode==='puzzle'&&this.engines.puzzle.preview;}
   get isPuzzle(){return this.mode==='puzzle'&&!this.preview;}
   get revealed(){return this.mode==='reveal'?this.engines.reveal.revealed:this.preview?new Set(this.data.countries.map(c=>c.id)):this.engines.puzzle.placed;}
@@ -71,14 +72,16 @@ class CountryMaps {
   }
   paint(){
     if(this.mode==='home')return;
+    if(this.phoneReveal)this.view={...fit};
     const revealed=this.revealed,current=this.byId.get(this.currentId),chosen=this.byId.get(this.selected);
     const inset=this.isPuzzle&&current?.inset?current:null;
     const identified=chosen&&(this.mode!=='reveal'||chosen.classification||revealed.has(chosen.id));
     q('.workspace').classList.toggle('puzzle-workspace',this.isPuzzle);
-    q('#instructions').textContent=this.mode==='explorer'?'Select a country in the full map. Select it again to switch between focus and the continent.':this.mode==='reveal'?'Tap a country to reveal or hide its name. Repeated taps also switch focus and continent views.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location.';
+    q('.workspace').classList.toggle('phone-reveal',this.phoneReveal);
+    q('#instructions').textContent=this.phoneReveal?'Tap a country to reveal or hide its name. Africa stays fitted while you study.':this.mode==='explorer'?'Select a country in the full map. Select it again to switch between focus and the continent.':this.mode==='reveal'?'Tap a country to reveal or hide its name. Repeated taps also switch focus and continent views.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location.';
     q('.map-readout strong').textContent=(identified?chosen.name:null)||inset?.name||this.data.name;
     q('.map-readout span').textContent=this.mode==='explorer'?this.data.countries.length+' countries':revealed.size+' / '+this.data.countries.length+(this.mode==='reveal'||this.preview?' revealed':' placed');
-    q('.map-tools').hidden=this.isPuzzle;
+    q('.map-tools').hidden=this.isPuzzle||this.phoneReveal;
     this.svg.classList.toggle('puzzle-map',this.isPuzzle);
     this.svg.classList.toggle('explorer-map',this.mode==='explorer');
     this.svg.classList.toggle('navigable-map',this.mode==='explorer'||this.mode==='reveal');
@@ -115,7 +118,7 @@ class CountryMaps {
       const row=q('[data-list-country="'+territory.id+'"]');if(row){row.classList.toggle('active',selected);row.setAttribute('aria-pressed',String(selected));}
     }
     this.paintInset(inset);
-    q('.map-caption').textContent=this.isPuzzle?(inset?'Drop inside the enlarged inset box. The ring marks its real location.':'Pieces snap when dropped inside their matching country.'):this.mode==='explorer'?'Drag to pan · Repeat a selection to toggle focus / full map.':'Tap to reveal / hide · Drag to pan · Fit map restores the continent.';
+    q('.map-caption').textContent=this.phoneReveal?'Tap to reveal / hide. Use Explorer for zooming and closer inspection.':this.isPuzzle?(inset?'Drop inside the enlarged inset box. The ring marks its real location.':'Pieces snap when dropped inside their matching country.'):this.mode==='explorer'?'Drag to pan · Repeat a selection to toggle focus / full map.':'Tap to reveal / hide · Drag to pan · Fit map restores the continent.';
     if(this.isPuzzle){
       q('.panel-title span').textContent=this.engines.puzzle.placed.size+' / '+this.data.countries.length;
       q('progress').value=this.engines.puzzle.placed.size;
@@ -167,7 +170,7 @@ class CountryMaps {
   }
   select(c){
     if(this.drag.active||this.pan.active)return;
-    const focusSelection=this.selected===c.id&&this.view.w===fit.w;
+    const focusSelection=!this.phoneReveal&&this.selected===c.id&&this.view.w===fit.w;
     if(this.isPuzzle){
       if(this.armed){this.place(this.byId.get(this.armed),this.armed===c.id);return;}
       this.selected=c.id;this.message=this.engines.puzzle.placed.has(c.id)?c.name+' is placed.':'Choose a piece from the tray first.';
@@ -181,6 +184,7 @@ class CountryMaps {
     this.paint();
   }
   focus(c){
+    if(this.phoneReveal){this.view={...fit};return;}
     const [x0,y0,x1,y1]=c.bounds,factor=Math.min(12,Math.max(1,Math.min(600/(x1-x0),500/(y1-y0)))),w=800/factor,h=730/factor;
     this.view={x:Math.max(0,Math.min(800-w,(x0+x1-w)/2)),y:Math.max(0,Math.min(730-h,(y0+y1-h)/2)),w,h};
   }
@@ -221,6 +225,7 @@ class CountryMaps {
   }
   action(action){
     this.pan.cancel();
+    if(this.phoneReveal&&['zoom-in','zoom-out','fit','left','right','up','down'].includes(action)){this.view={...fit};this.paint();return;}
     if(action==='reset'){this.reset();return;}
     if(action==='preview'){
       this.drag.cancel();this.armed=null;this.selected=null;this.query='';this.view={...fit};
@@ -317,7 +322,7 @@ document.addEventListener('keydown',event=>{
 });
 function abandon(){app?.pan.cancel();if(app?.drag.active){app.drag.cancel();app.message='Drag cancelled. Try again.';app.paint();}}
 for(const type of ['blur','resize'])window.addEventListener(type,abandon);
-window.addEventListener('resize',()=>app?.positionLabel());
+window.addEventListener('resize',()=>{if(app?.mode==='reveal')app.paint();else app?.positionLabel();});
 window.addEventListener('scroll',abandon,true);
 document.addEventListener('visibilitychange',abandon);
 window.addEventListener('popstate',navigate);
