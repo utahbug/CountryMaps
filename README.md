@@ -31,7 +31,7 @@ All application assets, modules, and map-data URLs are relative. The same files 
 
 The root contains .nojekyll so GitHub Pages serves static files directly. The review site is published from the main branch root at https://utahbug.github.io/CountryMaps/.
 
-The optional command below copies just the sixteen publishable files into dist/; it does not compile code, install anything, or publish:
+The optional command below copies just the seventeen publishable files into dist/; it does not compile code, install anything, or publish:
 
     npm run build
 
@@ -82,15 +82,15 @@ Future approved continents or regional submaps can be registered with the same s
 
 ## Activities
 
-Explorer: select a map shape or search/list entry. The country name appears above the map. The first selection preserves the current map scale and center. Selecting the same country again centers/zooms it; selecting a different country preserves the view. This applies to map, list and search selections. Drag directly with a mouse or one finger to pan. Movement of at least 6 CSS pixels counts as a pan and cannot select a country; ordinary clicks/taps still select. Zoom, keyboard-accessible pan arrows and Fit map remain available. Pan gestures clean up on release, cancellation, lost capture, Reset and interrupted navigation. Scroll the page outside the map.
+Explorer: select a map shape or search/list entry. The country name appears above the map. A new country selection returns to the fitted full-continent view. Repeated selection alternates country focus and full-continent Fit while retaining the highlight. Map, list and search use the same behavior. If manually zoomed in, the next repeated selection returns to Fit; at full scale, it focuses the country. Drag directly with a mouse or one finger to pan. Movement of at least 6 CSS pixels counts as a pan and cannot select a country; ordinary clicks/taps still select. Zoom, keyboard-accessible pan arrows and Fit map remain available. Pan gestures clean up on release, cancellation, lost capture, Reset and interrupted navigation. Scroll the page outside the map.
 
-Reveal: starts with an unlabeled map. Reveal individual shapes or use the country list. Revealed shapes gain color and an index number corresponding to the country list. Reveal All and Reset are repeatable. Like Explorer, first selections preserve the view and repeated selection of the same country focuses it. Direct dragging pans without revealing or selecting a country.
+Reveal: starts with an unlabeled map. Reveal individual shapes or use the country list. Revealed shapes gain color and an index number corresponding to the country list. Reveal All and Reset are repeatable. Each country toggles independently between revealed and hidden on activation. Hidden names are removed from the adjacent overlay, top readout, sidebar text and map tooltip/accessibility name; numbered placeholders remain in the list. Repeated selection also alternates country focus and Fit, while selecting a different country returns to Fit. Direct dragging pans without changing selection, name visibility or click-toggle state. Reset hides all names and restores Fit.
 
 Puzzle: all countries begin in the external piece tray. Drag to the matching geographic shape; small countries use an enlarged inset drop box. Wrong drops return cleanly. A tap selects a piece, then a map tap places it. Keyboard users select a piece with Enter, then focus a location and press Enter. Escape clears selection/drag. Reveal temporarily shows the answer map; Return to Puzzle preserves placed pieces.
 
 At phone widths the map stays visible as the tray scrolls. Previous pieces / More pieces buttons make every piece reachable without requiring touch scrolling on a draggable card. Unexpected scrolling/resizing during a drag cancels cleanly. Reset clears progress and all temporary drag state.
 
-Explorer and Reveal also display the selected name inside the lower-left of the map viewport. This wrapping, non-interactive overlay stays fixed during map navigation; the original top name remains visible. Reset clears the overlay.
+Explorer and Reveal display the selected name near the rendered country bounds. The wrapping, non-interactive label evaluates neighboring positions, avoids covering the selected country where space permits, prefers open space, and stays inside the viewport. Placement updates on pan, zoom, Fit and resize; the original top name remains visible. Reset clears the label.
 
 Refreshing the page starts a new session. There is no account, analytics, persistence, or remote geographic-data service. The one JSON map file is loaded from the same static folder.
 
@@ -123,3 +123,8 @@ Site: https://utahbug.github.io/CountryMaps/
 Every HTML entry point has `noindex, nofollow`. The project root contains `robots.txt` with `Disallow: /`. These are indexing requests, not access control; anyone knowing the URL can open the site. Crawlers normally read robots.txt at the host root, so the noindex HTML directive is the operative page-level exclusion for this project-hosted site. No other repository or host-root policy was changed.
 
 The green/cream globe with a gold location marker is supplied as favicon.svg, favicon-32x32.png, apple-touch-icon.png (180px), icon-192.png and icon-512.png. Artwork is inset from the edges for Home Screen masking. All icon/manifest links, start_url and scope are relative to the project path. PNGs were rasterized from the SVG using an already-installed development utility; the app has no added dependencies.
+
+
+## Territory identification
+
+Western Sahara, Bir Tawil and Somaliland are distinct labeled, searchable context in Explorer/Reveal, styled with neutral hatching and dashed boundaries. They never count toward the 54-country score. The unchanged Somalia Puzzle piece includes the Somaliland geometry; the map legend makes that scoring convention explicit. See [the source audit](docs/TERRITORIES.md) for details and all other omitted African/overseas source components.

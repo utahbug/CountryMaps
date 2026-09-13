@@ -27,8 +27,8 @@ The manifest lists 54 African UN member states by name and stable ISO-style ID. 
 
 - Seychelles and Mauritius are explicitly included regardless of their source continent classification.
 - Source SDS maps to the public ID SSD for South Sudan.
-- Source SOM and SOL are combined as Somalia. Their shared internal boundary is dissolved. Somaliland is not a separate piece.
-- Western Sahara is a dashed, neutral context polygon labeled disputed and excluded from the 54-country score. This is an educational inclusion convention, not a determination of sovereignty.
+- The unchanged Somalia Puzzle piece combines source SOM and SOL. Explorer/Reveal overlay the separate SOL boundary as labeled disputed/breakaway context, and the UI explains the Puzzle grouping. Somaliland is not a separate scored piece.
+- Western Sahara, Bir Tawil and Somaliland are labeled, hatched neutral context with explicit status metadata, outside the 54-country score. Western Sahara is not merged into Morocco or Mauritania. Bir Tawil fills a previously omitted mainland gap. This is an educational inclusion convention, not a determination of sovereignty.
 - Source boundaries generally follow Natural Earth's de facto view; no new territorial assertions are drawn. Morocco retains the geometry in this pinned source snapshot.
 - Dependencies and overseas territories are not independent puzzle entries. Mayotte, Réunion, Saint Helena and other non-manifest territories are not added.
 - All polygons belonging to each selected source country remain one logical country. Egypt includes Sinai; island groups and disconnected parts are retained at their source locations.
@@ -40,7 +40,7 @@ The final generated IDs must exactly equal the 54 manifest IDs. The test suite e
 
 The data:build script reads the local source; it does not download anything.
 
-1. Select only each country's explicit source ID/group and the context shape.
+1. Select only each country's explicit source ID/group and the explicitly configured context shapes in data/africa.territories.json.
 2. Project coordinates with a spherical Lambert azimuthal equal-area projection centered at 15 degrees E, 0 degrees N.
 3. Dissolve shared edges within the Somalia grouping.
 4. Fit the full selected geography uniformly into an 800 by 730 coordinate canvas. Remote islands remain at their real projected locations.
@@ -59,3 +59,5 @@ Explorer/Reveal preserve the geographic map. Selection centers/zooms the selecte
 
 The inset frame is the accessible drop zone, so a user does not have to hit a tiny island pixel. Successful placement colors the country's original geographic path and counts exactly one country. The inset disappears when the next piece is selected. This policy is driven by data and can support microstates in future approved datasets.
 
+
+See [the full territory audit](TERRITORIES.md) for all displayed non-manifest records and omitted offshore/overseas source components.

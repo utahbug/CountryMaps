@@ -1,6 +1,7 @@
 import {loadMap,modes,titles,findCountries,insetTransform,pieceViewBox,escapeHTML as esc} from '../lib/maps.js';
 import {ExplorerEngine,RevealEngine,PuzzleEngine} from '../lib/engines/activities.mjs';
 import {DragController} from '../lib/engines/drag-controller.mjs';
+import {placeCountryLabel} from '../lib/label-placement.mjs';
 import {PanController,clampPan} from '../lib/engines/pan-controller.mjs';
 
 const root=document.querySelector('#main');
@@ -14,15 +15,15 @@ class CountryMaps {
     this.data=data;
     const ids=data.countries.map(c=>c.id);
     this.engines={explorer:new ExplorerEngine(ids),reveal:new RevealEngine(ids),puzzle:new PuzzleEngine(ids)};
-    this.byId=new Map(data.countries.map(c=>[c.id,c]));
+    this.byId=new Map([...data.countries,...data.context].map(c=>[c.id,c]));
     this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];
     this.view={...fit};this.suppressClick=false;this.query='';this.message='';
-    this.pan=new PanController(view=>{this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
+    this.pan=new PanController(view=>{this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
     this.drag=new DragController(state=>this.paintDrag(state),(c,x,y,stationary)=>this.drop(c,x,y,stationary));
   }
   get preview(){return this.mode==='puzzle'&&this.engines.puzzle.preview;}
   get isPuzzle(){return this.mode==='puzzle'&&!this.preview;}
-  get revealed(){return this.mode==='reveal'?this.engines.reveal.revealed:this.preview?new Set(this.byId.keys()):this.engines.puzzle.placed;}
+  get revealed(){return this.mode==='reveal'?this.engines.reveal.revealed:this.preview?new Set(this.data.countries.map(c=>c.id)):this.engines.puzzle.placed;}
   href(mode){return '?map='+this.data.id+(mode==='home'?'':'&mode='+mode);}
   enter(mode) {
     this.pan.cancel();this.drag.cancel();this.toolLifecycle?.abort();
@@ -43,10 +44,10 @@ class CountryMaps {
     root.innerHTML='<div class="activity-heading"><div><a class="back-link" href="'+this.href('home')+'">← '+name+'</a><h1>'+name+' <span>/ '+titles[this.mode]+'</span></h1></div><nav class="mode-links" aria-label="'+name+' activities">'+modes.map(m=>'<a href="'+this.href(m)+'"'+(m===this.mode?' aria-current="page"':'')+'>'+titles[m]+'</a>').join('')+'</nav></div>'+
     '<div class="toolbar"><p id="instructions"></p><div class="toolbar-actions">'+(this.mode==='reveal'?'<button data-action="reveal-all">Reveal All</button>':'')+(this.mode==='puzzle'?'<button data-action="preview">Reveal</button>':'')+'<button data-action="reset">Reset</button></div></div>'+
     '<div class="workspace"><section class="map-panel" aria-label="'+name+' map"><div class="map-readout"><strong></strong><span></span></div><div class="map-viewport"><div class="selected-country-overlay" hidden aria-hidden="true"></div><svg id="africa-map" class="map-canvas" viewBox="0 0 800 730" role="group" aria-label="Interactive '+name+' country map">'+
-    this.data.context.map(c=>'<path d="'+c.path+'" class="context-region"><title>'+esc(c.name)+'</title></path>').join('')+
+    '<defs><pattern id="territory-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#e6e2d7"/><path d="M0 8L8 0" stroke="#aaa391" stroke-width="1"/></pattern></defs>'+
     this.data.countries.map((c,i)=>'<g><path data-country="'+c.id+'" data-name="'+esc(c.name)+'" data-anchor-x="'+((c.anchor[0]-c.bounds[0])/(c.bounds[2]-c.bounds[0]))+'" data-anchor-y="'+((c.anchor[1]-c.bounds[1])/(c.bounds[3]-c.bounds[1]))+'" class="country" d="'+c.path+'" role="button" tabindex="0" aria-pressed="false"><title></title></path><text hidden data-number="'+c.id+'" class="country-number" x="'+c.anchor[0]+'" y="'+c.anchor[1]+'">'+(i+1)+'</text></g>').join('')+
-    '<circle hidden class="location-marker"/><g id="inset-layer"></g></svg></div><div class="map-tools" aria-label="Map view controls">'+
-    '<button data-action="zoom-in" aria-label="Zoom in">+</button><button data-action="zoom-out" aria-label="Zoom out">−</button><button data-action="fit">Fit map</button><button data-action="left" aria-label="Pan left">←</button><button data-action="up" aria-label="Pan up">↑</button><button data-action="down" aria-label="Pan down">↓</button><button data-action="right" aria-label="Pan right">→</button></div><div class="map-caption"></div></section><aside class="side-panel"></aside></div>'+
+    this.data.context.map(c=>'<g class="territory-geometry"><path data-territory="'+c.id+'" d="'+c.path+'" class="context-region" role="button" tabindex="0" aria-label="'+esc(c.name+' — '+c.classification)+'" aria-pressed="false"><title>'+esc(c.name+' — '+c.classification)+'</title></path><text data-territory-label="'+c.id+'" class="territory-map-label" text-anchor="middle" x="'+c.anchor[0]+'" y="'+(c.anchor[1]-8)+'">'+esc(c.name)+'</text></g>').join('')+'<circle hidden class="location-marker"/><g id="inset-layer"></g></svg></div><div class="map-tools" aria-label="Map view controls">'+
+    '<button data-action="zoom-in" aria-label="Zoom in">+</button><button data-action="zoom-out" aria-label="Zoom out">−</button><button data-action="fit">Fit map</button><button data-action="left" aria-label="Pan left">←</button><button data-action="up" aria-label="Pan up">↑</button><button data-action="down" aria-label="Pan down">↓</button><button data-action="right" aria-label="Pan right">→</button></div><div class="map-caption"></div><p class="territory-legend"><span aria-hidden="true"></span>Hatched areas: territories / disputed areas, outside the 54-country score. Somaliland is identified separately; its geometry belongs to the Somalia puzzle piece.</p></section><aside class="side-panel"></aside></div>'+
     '<p role="status" aria-live="polite" class="status" data-active-pointer=""></p><div class="completion" hidden><h2>'+name+', complete.</h2><p>All '+this.data.countries.length+' countries are in place.</p><button data-action="reset">Play again</button></div>';
     this.svg=q('#africa-map');
     this.renderSide();this.paint();
@@ -56,7 +57,7 @@ class CountryMaps {
       q('.side-panel').innerHTML='<div class="panel-title"><h2>Country pieces</h2><span></span></div><progress max="'+this.data.countries.length+'" value="0" aria-label="Countries placed"></progress><p class="piece-help">Drag a piece, or tap it and then tap its map location. Use the arrows to browse.</p><div class="active-piece"><strong></strong><button data-action="arm">Select piece</button></div><div class="tray-scroll" aria-label="Browse country pieces"><button data-action="previous-pieces" aria-controls="piece-tray">↑ Previous pieces</button><button data-action="more-pieces" aria-controls="piece-tray">↓ More pieces</button></div><div id="piece-tray" class="piece-tray" aria-label="Unplaced countries">'+
       this.data.countries.map(c=>'<button data-piece="'+c.id+'" class="piece" aria-label="Piece: '+esc(c.name)+'" aria-pressed="false"><svg aria-hidden="true" viewBox="'+pieceViewBox(c)+'"><path d="'+c.path+'" fill="'+c.color+'"/></svg><span>'+esc(c.name)+'</span></button>').join('')+'</div>';
     }else{
-      q('.side-panel').innerHTML='<h2>'+(this.mode==='explorer'?'Find a country':'Country names')+'</h2><label for="country-search">Search countries</label><input id="country-search" type="search" placeholder="Country name…" autocomplete="off"><div class="country-list"></div>';
+      q('.side-panel').innerHTML='<h2>'+(this.mode==='explorer'?'Find a country':'Country names')+'</h2><label for="country-search">Search countries</label><input id="country-search" type="search" placeholder="Country name…" autocomplete="off"><div class="country-list"></div><section class="territory-section" aria-label="Territories and disputed areas"><h3>Territories &amp; disputed areas</h3><p>Hatched areas are geographic context, separate from the 54-country score.</p><div class="territory-list"></div></section>';
       q('#country-search').value=this.query;this.renderList();
     }
   }
@@ -64,27 +65,29 @@ class CountryMaps {
     const matches=findCountries(this.data,this.query),revealed=this.revealed;
     q('.country-list').innerHTML=matches.length?matches.map(c=>{
       const i=this.data.countries.indexOf(c),known=this.mode==='explorer'||revealed.has(c.id);
-      return '<button data-list-country="'+c.id+'" class="'+(this.selected===c.id?'active':'')+'" aria-label="'+esc(this.mode==='reveal'&&!known?'Reveal '+c.name:c.name)+'"><span class="list-number">'+(i+1)+'</span><span>'+esc(c.name)+'</span>'+(this.mode!=='explorer'?'<span class="reveal-state">'+(known?'✓':'Reveal')+'</span>':'')+'</button>';
+      return '<button data-list-country="'+c.id+'" class="'+(this.selected===c.id?'active':'')+'" aria-label="'+esc(this.mode==='reveal'?(known?'Hide '+c.name:'Reveal country '+(i+1)):c.name)+'"><span class="list-number">'+(i+1)+'</span><span class="list-name">'+esc(known?c.name:'Country '+(i+1))+'</span>'+(this.mode!=='explorer'?'<span class="reveal-state">'+(known?'Hide':'Reveal')+'</span>':'')+'</button>';
     }).join(''):'<p>No countries found.</p>';
+    q('.territory-list').innerHTML=findCountries({countries:this.data.context},this.query).map(c=>'<button data-list-country="'+c.id+'" class="territory-choice" aria-pressed="'+(this.selected===c.id)+'"><strong>'+esc(c.name)+'</strong><span>'+esc(c.classification)+'</span></button>').join('')||'<p>No matching territories.</p>';
   }
   paint(){
     if(this.mode==='home')return;
     const revealed=this.revealed,current=this.byId.get(this.currentId),chosen=this.byId.get(this.selected);
     const inset=this.isPuzzle&&current?.inset?current:null;
+    const identified=chosen&&(this.mode!=='reveal'||chosen.classification||revealed.has(chosen.id));
     q('.workspace').classList.toggle('puzzle-workspace',this.isPuzzle);
-    q('#instructions').textContent=this.mode==='explorer'?'Drag to pan. Select a country to see its name; select it again to zoom.':this.mode==='reveal'?'Select to reveal a country; select it again to zoom. Drag to pan.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location.';
-    q('.map-readout strong').textContent=chosen?.name||inset?.name||this.data.name;
+    q('#instructions').textContent=this.mode==='explorer'?'Select a country in the full map. Select it again to switch between focus and the continent.':this.mode==='reveal'?'Tap a country to reveal or hide its name. Repeated taps also switch focus and continent views.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location.';
+    q('.map-readout strong').textContent=(identified?chosen.name:null)||inset?.name||this.data.name;
     q('.map-readout span').textContent=this.mode==='explorer'?this.data.countries.length+' countries':revealed.size+' / '+this.data.countries.length+(this.mode==='reveal'||this.preview?' revealed':' placed');
     q('.map-tools').hidden=this.isPuzzle;
     this.svg.classList.toggle('puzzle-map',this.isPuzzle);
     this.svg.classList.toggle('explorer-map',this.mode==='explorer');
     this.svg.classList.toggle('navigable-map',this.mode==='explorer'||this.mode==='reveal');
     const overlay=q('.selected-country-overlay');
-    overlay.textContent=chosen?.name||'';
-    overlay.hidden=!chosen||!(this.mode==='explorer'||this.mode==='reveal');
+    overlay.textContent=identified?(chosen.classification?chosen.name+' — '+chosen.classification:chosen.name):'';
+    overlay.hidden=!identified||!(this.mode==='explorer'||this.mode==='reveal');
     this.svg.setAttribute('viewBox',[this.view.x,this.view.y,this.view.w,this.view.h].join(' '));
     for(const [i,c] of this.data.countries.entries()){
-      const path=q('[data-country="'+c.id+'"]'),shown=this.mode==='explorer'?this.selected===c.id:revealed.has(c.id);
+      const path=q('[data-country="'+c.id+'"],[data-territory="'+c.id+'"]'),shown=this.mode==='explorer'?this.selected===c.id:revealed.has(c.id);
       path.classList.toggle('shown',shown);path.classList.toggle('selected',this.selected===c.id);path.classList.toggle('puzzle-country',this.isPuzzle);
       path.style.fill=shown?c.color:'';
       path.setAttribute('aria-pressed',String(shown));
@@ -97,14 +100,22 @@ class CountryMaps {
         piece.setAttribute('aria-pressed',String(this.armed===c.id));piece.querySelector('span').textContent=(placed?'✓ ':'')+c.name;
       }else{
         const row=q('[data-list-country="'+c.id+'"]');
-        if(row){row.classList.toggle('active',this.selected===c.id);const state=row.querySelector('.reveal-state');if(state)state.textContent=revealed.has(c.id)?'✓':'Reveal';}
+        if(row){row.classList.toggle('active',this.selected===c.id);const state=row.querySelector('.reveal-state');if(state){const known=revealed.has(c.id);state.textContent=known?'Hide':'Reveal';row.querySelector('.list-name').textContent=known?c.name:'Country '+(i+1);row.setAttribute('aria-label',known?'Hide '+c.name:'Reveal country '+(i+1));}}
       }
     }
     const marker=q('.location-marker');
     marker.toggleAttribute('hidden',!chosen||this.isPuzzle);
     if(chosen){marker.setAttribute('cx',chosen.anchor[0]);marker.setAttribute('cy',chosen.anchor[1]);marker.setAttribute('r',Math.max(2,this.view.w/140));}
+    for(const territory of this.data.context){
+      const shape=q('[data-territory="'+territory.id+'"]'),selected=this.selected===territory.id;
+      shape.classList.toggle('selected',selected);shape.setAttribute('aria-pressed',String(selected));
+      shape.style.pointerEvents=this.mode==='puzzle'?'none':'';
+      shape.parentElement.classList.toggle('puzzle-context-hidden',this.mode==='puzzle'&&territory.puzzleGroup==='SOM');
+      shape.setAttribute('tabindex',this.mode==='puzzle'?'-1':'0');
+      const row=q('[data-list-country="'+territory.id+'"]');if(row){row.classList.toggle('active',selected);row.setAttribute('aria-pressed',String(selected));}
+    }
     this.paintInset(inset);
-    q('.map-caption').textContent=this.isPuzzle?(inset?'Drop inside the enlarged inset box. The ring marks its real location.':'Pieces snap when dropped inside their matching country.'):this.mode==='explorer'?'Drag to pan · Tap to select · Use + to zoom or Fit map to reset the view.':'Select again to zoom · Drag to pan · Fit map restores the continent.';
+    q('.map-caption').textContent=this.isPuzzle?(inset?'Drop inside the enlarged inset box. The ring marks its real location.':'Pieces snap when dropped inside their matching country.'):this.mode==='explorer'?'Drag to pan · Repeat a selection to toggle focus / full map.':'Tap to reveal / hide · Drag to pan · Fit map restores the continent.';
     if(this.isPuzzle){
       q('.panel-title span').textContent=this.engines.puzzle.placed.size+' / '+this.data.countries.length;
       q('progress').value=this.engines.puzzle.placed.size;
@@ -115,6 +126,24 @@ class CountryMaps {
     for(const action of ['zoom-out','left','right','up','down'])q('[data-action="'+action+'"]').disabled=this.view.w===800&&(action==='zoom-out'||!(this.mode==='explorer'||this.mode==='reveal'));
     q('.completion').hidden=!(this.isPuzzle&&this.engines.puzzle.placed.size===this.data.countries.length);
     q('.status').textContent=this.message;
+    this.positionLabel();
+  }
+  positionLabel(){
+    if(this.svg&&this.mode!=='home'){
+      const b=this.svg.getBoundingClientRect(),unit=Math.min(b.width/this.view.w,b.height/this.view.h);
+      for(const label of this.svg.querySelectorAll('.territory-map-label'))label.style.fontSize=(11/Math.max(unit,.01))+'px';
+    }
+    if(!this.selected||!(this.mode==='explorer'||this.mode==='reveal'))return;
+    const label=q('.selected-country-overlay');
+    if(!label||label.hidden)return;
+    const frame=q('.map-viewport').getBoundingClientRect();
+    if(!frame.width||!frame.height)return;
+    const rect=element=>{const b=element.getBoundingClientRect();return {x:b.left-frame.left,y:b.top-frame.top,w:b.width,h:b.height};};
+    const c=this.byId.get(this.selected),path=q('[data-country="'+c.id+'"],[data-territory="'+c.id+'"]'),matrix=this.svg.getScreenCTM();
+    if(!matrix)return;
+    const point=new DOMPoint(...c.anchor).matrixTransform(matrix);
+    const position=placeCountryLabel({viewport:{w:frame.width,h:frame.height},label:{w:label.offsetWidth,h:label.offsetHeight},country:rect(path),anchor:{x:point.x-frame.left,y:point.y-frame.top},neighbors:[...this.svg.querySelectorAll('path[data-country],.context-region')].filter(p=>p!==path).map(rect)});
+    label.style.left=position.x+'px';label.style.top=position.y+'px';
   }
   paintInset(c){
     const layer=q('#inset-layer');if(layer.dataset.country===(c?.id||''))return;
@@ -138,15 +167,16 @@ class CountryMaps {
   }
   select(c){
     if(this.drag.active||this.pan.active)return;
-    const focusSelection=this.selected===c.id;
+    const focusSelection=this.selected===c.id&&this.view.w===fit.w;
     if(this.isPuzzle){
       if(this.armed){this.place(this.byId.get(this.armed),this.armed===c.id);return;}
       this.selected=c.id;this.message=this.engines.puzzle.placed.has(c.id)?c.name+' is placed.':'Choose a piece from the tray first.';
     }else{
-      if(this.mode==='reveal')this.engines.reveal.reveal(c.id);
-      if(this.mode==='explorer')this.engines.explorer.select(c.id);
-      this.selected=c.id;this.message=c.name;
-      if(focusSelection)this.focus(c);
+      if(this.mode==='reveal'&&!c.classification)this.engines.reveal.toggle(c.id);
+      if(this.mode==='explorer'&&!c.classification)this.engines.explorer.select(c.id);
+      this.selected=c.id;this.message=c.classification?c.name+' — '+c.classification+'. '+c.description:c.name;
+      if(this.mode==='reveal'&&!c.classification&&!this.engines.reveal.revealed.has(c.id))this.message='Country name hidden. Select it again to reveal.';
+      if(focusSelection)this.focus(c);else this.view={...fit};
     }
     this.paint();
   }
@@ -255,7 +285,7 @@ document.addEventListener('click',event=>{
   // Pointer taps are completed by PanController because capture retargets click.
   // Keyboard/assistive activation (detail 0, no physical pointer) stays available.
   if((app.mode==='explorer'||app.mode==='reveal')&&event.target.closest('.navigable-map')&&(event.detail>0||(typeof event.pointerId==='number'&&event.pointerId>=0)))return;
-  const path=event.target.closest('[data-country]');if(path)app.select(app.byId.get(path.dataset.country));
+  const path=event.target.closest('[data-country],[data-territory]');if(path)app.select(app.byId.get(path.dataset.country||path.dataset.territory));
 });
 root.addEventListener('input',event=>{
   if(event.target.id==='country-search'){app.query=event.target.value;app.renderList();}
@@ -263,7 +293,7 @@ root.addEventListener('input',event=>{
 root.addEventListener('pointerdown',event=>{
   if((app?.mode==='explorer'||app?.mode==='reveal')&&event.target.closest('.navigable-map')){
     const matrix=app.svg.getScreenCTM();
-    if(app.pan.begin(event,app.svg,app.view,matrix?.inverse(),event.target.closest('[data-country]')?.dataset.country))event.preventDefault();
+    if(app.pan.begin(event,app.svg,app.view,matrix?.inverse(),(event.target.closest('[data-country],[data-territory]')?.dataset.country||event.target.closest('[data-territory]')?.dataset.territory)))event.preventDefault();
     return;
   }
   const source=event.target.closest('[data-piece]');
@@ -282,16 +312,14 @@ document.addEventListener('keydown',event=>{
   if(event.key==='Escape'){
     app.pan.cancel();app.drag.cancel();app.armed=null;app.message='Selection cancelled.';app.paint();return;
   }
-  const target=event.target.closest('[data-country],[data-inset-hit]');
+  const target=event.target.closest('[data-country],[data-territory],[data-inset-hit]');
   if(target&&(event.key==='Enter'||event.key===' ')){event.preventDefault();target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}
 });
 function abandon(){app?.pan.cancel();if(app?.drag.active){app.drag.cancel();app.message='Drag cancelled. Try again.';app.paint();}}
 for(const type of ['blur','resize'])window.addEventListener(type,abandon);
+window.addEventListener('resize',()=>app?.positionLabel());
 window.addEventListener('scroll',abandon,true);
 document.addEventListener('visibilitychange',abandon);
 window.addEventListener('popstate',navigate);
 window.addEventListener('pagehide',()=>{app?.pan.cancel();app?.drag.cancel();});
 navigate();
-
-
-

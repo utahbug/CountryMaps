@@ -34,22 +34,52 @@ document.querySelector('#run').onclick=()=>{
    q('[data-country="EGY"]').dispatchEvent(new w.KeyboardEvent('keydown',{bubbles:true,key:'Enter'}));assert(selected()==='Egypt','keyboard country activation');reset();clean();
    start();send('pointerup');assert(box()==='0 0 800 730','first map tap retains full continent');
    start();send('pointerup');assert(Number(box().split(' ')[2])<800,'second map tap focuses country');
-   const focused=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()===focused&&selected()==='Egypt','different country preserves zoom and center');
-   q('[data-list-country="EGY"]').click();assert(box()!==focused,'repeat via list focuses same country');
+   const focused=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()==='0 0 800 730'&&selected()==='Egypt','different country returns to continent');
+   q('[data-list-country="EGY"]').click();assert(Number(box().split(' ')[2])<800,'repeat via list focuses same country');
    q('[data-action="fit"]').click();start();send('pointerup');assert(box()==='0 0 800 730','new selection after Fit preserves fit');
    start();send('pointermove',svg,71,175,165);send('pointerup',svg,71,175,165);assert(box().split(' ')[2]==='800','pan on selected country does not focus');clean();
-   const panned=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()===panned,'first selection preserves manual pan');reset();
+   const panned=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()==='0 0 800 730','new country selection resets manual pan');reset();
    for(const id of ['CAF','COD']){
     q('[data-list-country="'+id+'"]').click();
     const label=q('.selected-country-overlay'),before=label.getBoundingClientRect(),map=svg.getBoundingClientRect();
     assert(!label.hidden&&label.textContent===selected(),'overlay agrees with top name');
     assert(w.getComputedStyle(label).pointerEvents==='none','overlay cannot intercept input');
-    assert(before.left>=map.left&&before.right<=map.right&&before.top>map.top+map.height/2&&before.bottom<=map.bottom,'long label fits lower map viewport');
+    assert(before.left>=map.left&&before.right<=map.right&&before.top>=map.top&&before.bottom<=map.bottom,'long label stays inside map viewport');
     assert(label.scrollWidth<=label.clientWidth,'long name wraps without overflow');
     q('[data-action="zoom-in"]').click();q('[data-action="right"]').click();
-    const after=label.getBoundingClientRect();assert(before.x===after.x&&before.y===after.y,'label stays fixed during zoom and pan');
+    const after=label.getBoundingClientRect();assert(before.x!==after.x||before.y!==after.y,'label follows country during zoom and pan');
+    assert(after.left>=map.left&&after.right<=map.right&&after.top>=map.top&&after.bottom<=map.bottom,'moved label remains inside viewport');
    }
    reset();assert(q('.selected-country-overlay').hidden,'Reset hides selected label');
+   reset();const revealMode=new URL(w.location.href).searchParams.get('mode')==='reveal';
+   for(let i=0;i<10;i++){
+    start();send('pointerup');
+    assert((Number(box().split(' ')[2])===800)===(i%2===0),'repeated taps alternate Fit and focus');
+    if(revealMode){
+     const visible=i%2===0;assert(q('[data-country="DZA"]').getAttribute('aria-pressed')===String(visible),'Reveal independently toggles name state');
+     assert(q('.selected-country-overlay').hidden===!visible,'hidden name removed from adjacent overlay');
+     assert(q('.map-readout strong').textContent===(visible?'Algeria':'Africa'),'top name follows Reveal visibility');
+     assert(q('[data-list-country="DZA"] .list-name').textContent===(visible?'Algeria':'Country 1'),'list does not leak hidden name');
+    }else assert(selected()==='Algeria','Explorer selection survives every focus toggle');
+   }
+   if(revealMode){
+    reset();q('[data-list-country="DZA"]').click();q('[data-list-country="EGY"]').click();q('[data-list-country="DZA"]').click();
+    assert(q('[data-country="DZA"]').getAttribute('aria-pressed')==='false'&&q('[data-country="EGY"]').getAttribute('aria-pressed')==='true','country visibility toggles independently');
+    q('[data-action="reveal-all"]').click();assert(d.querySelectorAll('path[data-country][aria-pressed="true"]').length===54,'Reveal All shows all 54');
+    q('[data-list-country="DZA"]').click();assert(d.querySelectorAll('path[data-country][aria-pressed="true"]').length===53,'revealed country can hide after Reveal All');
+    reset();assert(d.querySelectorAll('path[data-country][aria-pressed="true"]').length===0&&box()==='0 0 800 730','Reset hides all names and restores Fit');
+   }
+   reset();const countryCount=d.querySelectorAll('path[data-country]').length;assert(countryCount===54,'exactly 54 scored country paths');
+   const score=q('.map-readout span').textContent;
+   for(const id of ['SAH','BRT','SOL']){
+    reset();const shape=q('[data-territory="'+id+'"]');assert(!!shape&&w.getComputedStyle(shape).pointerEvents!=='none','territory map can receive pointer input');
+    send('pointerdown',shape);send('pointerup');assert(shape.getAttribute('aria-pressed')==='true','territory tap identifies it');
+    assert(box()==='0 0 800 730','territory first selection preserves Fit');assert(q('.map-readout span').textContent===score,'territory does not affect country score');
+    assert(q('.selected-country-overlay').textContent.includes('territory')||id==='SOL','territory classified in selected label');
+    q('[data-list-country="'+id+'"]').click();assert(Number(box().split(' ')[2])<800,'repeat territory selection focuses');
+    assert(!q('[data-piece="'+id+'"]'),'territory has no puzzle piece');
+   }
+   reset();
    results.textContent='PASS: '+checks+' checks at '+w.innerWidth+' × '+w.innerHeight+' in '+new URL(w.location.href).searchParams.get('mode')+'. Touch PointerEvents through actual activity; capture stubbed. Hardware touch not tested.';
   }finally{['setPointerCapture','hasPointerCapture','releasePointerCapture'].forEach((k,i)=>svg[k]=originals[i]);}
  }catch(error){results.textContent='FAIL after '+checks+' checks: '+error.message;}

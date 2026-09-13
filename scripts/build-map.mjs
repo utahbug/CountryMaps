@@ -3,6 +3,8 @@ import crypto from 'node:crypto';
 const manifest = JSON.parse(
   fs.readFileSync(new URL('../data/africa.manifest.json', import.meta.url)),
 );
+const territoryPolicy=JSON.parse(fs.readFileSync(new URL('../data/africa.territories.json',import.meta.url))).territories;
+const contextEntries=territoryPolicy.map(t=>[t.id,t.name]);
 const sourceBytes = fs.readFileSync(
   new URL('../source-data/ne_10m_admin_0_countries.geojson', import.meta.url),
 );
@@ -16,7 +18,7 @@ const project = ([lon, lat]) => {
 };
 const polygons = (geometry) =>
   geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
-const records = [...manifest.countries, ...manifest.context].map(
+const records = [...manifest.countries, ...contextEntries].map(
   ([id, name]) => ({
     id,
     name,
@@ -168,7 +170,7 @@ const countries = records.map((c, i) => {
     color: ['#94b9aa', '#d7bc76', '#b9afcd', '#99bcd0', '#d9aa8d'][i % 5],
   };
 });
-if (countries.length - manifest.context.length !== manifest.expectedCount)
+if (countries.length - contextEntries.length !== manifest.expectedCount)
   throw Error('Manifest count mismatch');
 const data = {
   id: manifest.id,
@@ -176,7 +178,7 @@ const data = {
   width: 800,
   height: 730,
   countries: countries.slice(0, manifest.expectedCount),
-  context: countries.slice(manifest.expectedCount),
+  context: countries.slice(manifest.expectedCount).map(c=>({...c,...territoryPolicy.find(t=>t.id===c.id)})),
   sourceSha256: crypto.createHash('sha256').update(sourceBytes).digest('hex'),
 };
 fs.writeFileSync(

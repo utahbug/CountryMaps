@@ -1,0 +1,7 @@
+{
+  "territories": [
+    {"id":"SAH","name":"Western Sahara","classification":"Disputed territory","description":"Shown separately from Morocco and Mauritania. Not part of the 54-country score."},
+    {"id":"BRT","name":"Bir Tawil","classification":"Indeterminate territory","description":"Natural Earth maps this area separately between Egypt and Sudan. Not part of the 54-country score."},
+    {"id":"SOL","name":"Somaliland","classification":"Disputed / breakaway area","description":"Shown with its separate Natural Earth boundary. The 54-country puzzle groups this geometry with Somalia; this scoring convention does not resolve its status.","puzzleGroup":"SOM"}
+  ]
+}

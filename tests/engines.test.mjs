@@ -62,7 +62,7 @@ test('explicit 54-country manifest exactly matches generated geometry', () => {
     ids,
     manifest.countries.map((c) => c[0]),
   );
-  assert.equal(data.context.length, 1);
+  assert.equal(data.context.length, 3);
   assert.equal(data.context[0].id, 'SAH');
   assert.equal(ids.includes('SOL'), false);
   assert.equal(ids.includes('SAH'), false);
