@@ -42,4 +42,10 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
   row.click();assert(row.getAttribute('aria-pressed')==='false','whole row hides');
  }
 
+ assert(q('.map-readout #practice-region'),'region selector belongs to map header');
+ assert(!q('.activity-commandbar #practice-region'),'no detached region control');
+ assert(d.querySelectorAll('#practice-region').length===1,'single region selector');
+ assert(q('#practice-region').getBoundingClientRect().height>=44,'region touch target');
+ assert(q('.map-readout').getBoundingClientRect().height<=50,'compact map header');
+
 }
