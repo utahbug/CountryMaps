@@ -1,4 +1,4 @@
-import {referenceFilters,learningCard,historySection} from '../lib/learning-reference.mjs?v=below-map';
+import {referenceFilters,learningCard,historySection} from '../lib/learning-reference.mjs?v=map-pin';
 import {MnemonicPlayer} from '../lib/mnemonics.mjs?v=piece-card';
 import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
