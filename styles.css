@@ -1228,3 +1228,17 @@ body:has(.compact-heading) main { margin-top:2px; }
 .puzzle-top-shell .icon-control[aria-current="page"] { background:var(--accent); box-shadow:inset 0 -2px #7fa99b; }
 .map-readout.puzzle-readout { min-height:44px; height:auto; padding:0 8px; }
 .puzzle-readout .icon-control { flex:0 0 44px; width:44px; min-width:44px; height:44px; min-height:44px; }
+
+/* Brief non-interactive sketches are independent of canonical map geometry. */
+.map-readout.puzzle-readout { padding-right:18px; }
+.map-readout.puzzle-readout button[data-action="clue"] { background:transparent; border-color:transparent; box-shadow:none; }
+.map-readout.puzzle-readout button[data-action="clue"]:hover { background:var(--accent); }
+.mnemonic-overlay { position:absolute; left:8px; top:8px; width:176px; max-width:44%; z-index:8; padding:7px; border:1px solid #b2c5ba; border-radius:8px; background:#fffdf8f5; color:#284c48; pointer-events:none; }
+.mnemonic-overlay * { pointer-events:none; }
+.mnemonic-tag { display:block; font-size:.62rem; line-height:1.2; color:#61766b; }
+.mnemonic-overlay svg { display:block; width:100%; height:auto; overflow:hidden; }
+.mnemonic-overlay p { margin:1px 0 0; font-size:.72rem; line-height:1.25; }
+.mnemonic-part { fill:#aacbbd; stroke:#386353; stroke-width:.8; transform-box:fill-box; transform-origin:center; }
+.mnemonic-part path { vector-effect:non-scaling-stroke; }
+.mnemonic-decoration { fill:none; stroke:#98652f; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+@media(max-width:650px){.mnemonic-overlay { width:144px; padding:5px; }.mnemonic-overlay p{font-size:.65rem}.map-readout.puzzle-readout { padding-right:14px; }}
