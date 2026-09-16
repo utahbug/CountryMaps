@@ -615,7 +615,7 @@ document.addEventListener('click',event=>{
   const action=event.target.closest('[data-action]');if(action){app.action(action.dataset.action);return;}
   const ref=event.target.closest('[data-reference-unit],[data-focus-unit]');if(ref){app.selectReference(ref.dataset.referenceUnit||ref.dataset.focusUnit,!!ref.dataset.focusUnit);q('.map-panel').scrollIntoView({block:'start',behavior:'smooth'});return;}
   const cardSummary=event.target.closest('[data-card-country]');if(cardSummary){app.selectReference(cardSummary.dataset.cardCountry,false,false);return;}
-  const row=event.target.closest('[data-list-country]');if(row){if(app.mode==='explorer'&&app.data.reference?.units[row.dataset.listCountry])app.selectReference(row.dataset.listCountry);else app.select(app.byId.get(row.dataset.listCountry));return;}
+  const row=event.target.closest('[data-list-country]');if(row){if(app.mode==='explorer'&&app.data.reference?.units[row.dataset.listCountry])app.selectReference(row.dataset.listCountry,false,false);else app.select(app.byId.get(row.dataset.listCountry));return;}
   const island=event.target.closest('[data-island-hit]');if(island){if(app.armed===island.dataset.islandHit)app.drop(app.byId.get(app.armed),event.clientX,event.clientY,false);return;}
   const inset=event.target.closest('[data-inset-hit]');if(inset){if(app.armed===inset.dataset.insetHit)app.place(app.byId.get(app.armed),true);return;}
   // Pointer taps are completed by PanController because capture retargets click.
