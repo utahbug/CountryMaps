@@ -1192,3 +1192,11 @@ body:has(.compact-heading) .site-header > a:first-child { font-size:1.45rem; }
   .puzzle-commandbar { justify-content:space-between; gap:4px; }
   .puzzle-commandbar .region-control select { max-width:170px; font-size:.8rem; }
 }
+
+.filter-popover { width:min(290px,calc(100vw - 32px)); max-height:70svh; overflow:auto; padding:8px; border:1px solid var(--line); border-radius:9px; background:var(--panel); color:var(--ink); box-shadow:0 8px 30px #183b3233; }
+.filter-popover > div { display:grid; gap:3px; }
+.filter-popover button { min-height:44px; text-align:left; padding:8px 12px; }
+.filter-popover button[aria-pressed="true"] { background:var(--accent); border-color:var(--primary); }
+.subset-progress { margin:0 0 5px; font-size:.75rem; line-height:1.35; color:var(--subtle); }
+.panel-title .icon-control { width:44px; height:44px; min-width:44px; padding:0; }
+.piece[hidden] { display:none!important; }

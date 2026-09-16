@@ -1,3 +1,4 @@
+import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
 import {terminology,mapDefinitions} from '../lib/map-configs.mjs';
 import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop} from '../lib/drop-validation.mjs';
@@ -18,6 +19,7 @@ const q=(selector,scope=root)=>scope.querySelector(selector);
 let app=null;
 let navigationVersion=0;
 const controlIcons={
+  filter:'<path d="M3 5h18M6 12h12M9 19h6"/><circle cx="8" cy="5" r="2"/><circle cx="16" cy="12" r="2"/>',
   explorer:'<circle cx="10" cy="10" r="5.5"/><path d="m14.5 14.5 5 5"/>',
   reveal:'<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/>',
   puzzle:'<path d="M4 4h6a2.3 2.3 0 1 0 4 0h6v6a2.3 2.3 0 1 0 0 4v6h-6a2.3 2.3 0 1 0-4 0H4v-6a2.3 2.3 0 1 0 0-4Z"/>',
@@ -39,11 +41,12 @@ class CountryMaps {
     const ids=data.units.map(c=>c.id);
     this.engines={explorer:new ExplorerEngine(ids),reveal:new RevealEngine(ids),puzzle:new PuzzleEngine(ids)};
     this.byId=new Map([...data.units,...data.context].map(c=>[c.id,c]));
-    this.listOrder='az';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
+    this.pieceFilter='az';this.listOrder='az';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
     this.view={...this.fitView};this.suppressClick=false;this.query='';this.message='';
     this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
     this.drag=new DragController(state=>this.paintDrag(state),(c,x,y,stationary)=>this.drop(c,x,y,stationary));
   }
+  get puzzleUnits(){return filteredUnits(this.data.units,learningFilters(this.config)[this.pieceFilter]);}
   get phoneReveal(){return this.mode==='reveal'&&this.config.activities.reveal.phoneNavigation===false&&window.matchMedia('(max-width: 650px)').matches;}
   get preview(){return this.mode==='puzzle'&&this.engines.puzzle.preview;}
   get isPuzzle(){return this.mode==='puzzle'&&!this.preview;}
@@ -62,7 +65,7 @@ class CountryMaps {
     const revealIds=subset.units.map(c=>c.id);
     if(revealIds.length!==this.engines.reveal.ids.size||revealIds.some(id=>!this.engines.reveal.ids.has(id)))this.engines.reveal=new RevealEngine(revealIds);
     this.region=nextRegion;this.openRegion=nextRegion==='all'?null:nextRegion;this.currentId=this.data.units[0].id;
-    this.mode=mode;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};this.panelHidden=false;
+    this.mode=mode;if(mode==='puzzle'&&!this.puzzleUnits.some(c=>c.id===this.currentId))this.currentId=this.puzzleUnits[0].id;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};this.panelHidden=false;
     this.engines.puzzle.preview=false;
     this.message=mode==='explorer'?'Choose a '+this.terms.singular+' on the map or in the list.':mode==='reveal'?'Tap a '+this.terms.singular+' to reveal its name.':'Drag a piece onto its matching shape.';
     document.title='CountryMaps · '+this.data.name+(this.config.mapOnly?' · Map view':titles[mode]?' · '+titles[mode]:'');
@@ -96,8 +99,9 @@ class CountryMaps {
   }
   renderSide() {
     if(this.isPuzzle){
-      q('.side-panel').innerHTML='<div class="panel-title"><h2>'+this.terms.title+' pieces</h2><span></span></div><progress max="'+this.data.units.length+'" value="0" aria-label="'+this.terms.pluralTitle+' placed"></progress><div class="active-piece"><strong></strong><div class="piece-controls"><span class="piece-position"></span>'+compactButton('arm','Select current piece','activate')+compactButton('previous-pieces','Previous pieces','previous','aria-controls="piece-tray"')+compactButton('more-pieces','More pieces','next','aria-controls="piece-tray"')+'</div></div><div id="piece-tray" class="piece-tray" aria-label="Unplaced '+this.terms.plural+'">'+
-      this.data.units.map(c=>'<button data-piece="'+c.id+'" class="piece'+(usesPieceScaleFrame(c)?' small-scale-piece':'')+'" aria-label="Piece: '+esc(c.name)+(usesPieceScaleFrame(c)?'. Map-scale shape with large touch area.':'')+'" aria-pressed="false"><svg aria-hidden="true" viewBox="'+pieceDisplayViewBox(c)+'"><path d="'+c.path+'" '+unitSvgAttributes(this.config,c)+'/></svg><span>'+esc(c.name)+'</span>'+(usesPieceScaleFrame(c)?'<small>Map-scale shape · large touch area</small>':'')+'</button>').join('')+'</div>';
+      const trayUnits=this.puzzleUnits;
+      q('.side-panel').innerHTML='<div class="panel-title"><h2>'+this.terms.title+' pieces</h2><button class="icon-control" type="button" popovertarget="piece-filter-menu" aria-label="Filter or sort pieces" title="Filter or sort pieces">'+icon('filter')+'</button></div><p class="subset-progress" aria-live="polite"></p><div id="piece-filter-menu" class="filter-popover" popover aria-label="Piece filters"><div role="group" aria-label="Choose pieces">'+Object.entries(learningFilters(this.config)).map(([id,f])=>'<button type="button" data-piece-filter="'+id+'" aria-pressed="'+(this.pieceFilter===id)+'">'+esc(f.name)+'</button>').join('')+'</div></div><progress max="'+this.data.units.length+'" value="0" aria-label="'+this.terms.pluralTitle+' placed"></progress><div class="active-piece"><strong></strong><div class="piece-controls"><span class="piece-position"></span>'+compactButton('arm','Select current piece','activate')+compactButton('previous-pieces','Previous pieces','previous','aria-controls="piece-tray"')+compactButton('more-pieces','More pieces','next','aria-controls="piece-tray"')+'</div></div><div id="piece-tray" class="piece-tray" aria-label="Unplaced '+this.terms.plural+'">'+
+      trayUnits.concat(this.data.units.filter(c=>!trayUnits.includes(c))).map(c=>'<button data-piece="'+c.id+'" class="piece'+(usesPieceScaleFrame(c)?' small-scale-piece':'')+'" aria-label="Piece: '+esc(c.name)+(usesPieceScaleFrame(c)?'. Map-scale shape with large touch area.':'')+'" aria-pressed="false"><svg aria-hidden="true" viewBox="'+pieceDisplayViewBox(c)+'"><path d="'+c.path+'" '+unitSvgAttributes(this.config,c)+'/></svg><span>'+esc(c.name)+'</span>'+(usesPieceScaleFrame(c)?'<small>Map-scale shape · large touch area</small>':'')+'</button>').join('')+'</div>';
     }else{
       q('.side-panel').innerHTML='<h2>'+(this.mode==='explorer'?'Find a '+this.terms.singular+'':''+this.terms.title+' names')+'</h2>'+(this.mode==='explorer'?'<div class="list-order" role="group" aria-label="'+this.terms.title+' list organization"><button data-list-order="az">A–Z</button><button data-list-order="region"'+(this.config.regions?'':' hidden disabled')+'>By region</button></div><p class="list-help" hidden>Select a heading to fit its region. Use + / − to expand or collapse the list.</p>':'')+'<label for="country-search">Search '+this.terms.plural+'</label><input id="country-search" type="search" placeholder="'+this.terms.title+' name…" autocomplete="off"><div class="country-list"></div><section class="territory-section" aria-label="Territories and disputed areas"><h3>Territories &amp; disputed areas</h3><p>Hatched areas are geographic context, separate from the '+this.fullData.units.length+'-'+this.terms.singular+' score.</p><div class="territory-list"></div></section>';
       q('#country-search').value=this.query;this.renderList();
@@ -132,6 +136,7 @@ class CountryMaps {
   paint(){
     if(this.mode==='home')return;
     if(this.phoneReveal)this.view={...this.fitView};
+    const trayIds=this.isPuzzle?new Set(this.puzzleUnits.map(c=>c.id)):null;
     const revealed=this.revealed,current=this.byId.get(this.currentId),chosen=this.byId.get(this.selected);
     const inset=this.isPuzzle&&current?.inset?current:null;
     const identified=chosen&&(this.mode!=='reveal'||chosen.classification||revealed.has(chosen.id));
@@ -178,7 +183,7 @@ class CountryMaps {
       q('[data-number="'+c.id+'"]').toggleAttribute('hidden',this.mode==='puzzle'||!shown||this.mode==='explorer');
       if(this.isPuzzle){
         const piece=q('[data-piece="'+c.id+'"]'),placed=this.engines.puzzle.placed.has(c.id);
-        piece.disabled=placed;piece.classList.toggle('current-piece',this.currentId===c.id);
+        piece.hidden=!trayIds.has(c.id);piece.disabled=placed;piece.classList.toggle('current-piece',this.currentId===c.id);
         piece.setAttribute('aria-pressed',String(this.armed===c.id));piece.querySelector('span').textContent=(placed?'✓ ':'')+c.name+(presentation.label?' — '+presentation.label:'');
       }else{
         const row=q('[data-list-country="'+c.id+'"]');
@@ -200,12 +205,13 @@ class CountryMaps {
     this.paintClue();
     q('.map-caption').textContent=this.phoneReveal?'Tap to reveal / hide. Use Explorer for zooming and closer inspection.':this.isPuzzle?(inset?'Drop inside the enlarged helper inset. The ring marks its real location.':'Pieces snap when dropped inside their matching '+this.terms.singular+'.'):this.mode==='explorer'?(this.region==='all'?'Drag to pan · Repeat a selection to toggle focus / full map.':this.regions[this.region].name+' · '+this.terms.title+' selections keep your zoom and pan.'):'Tap to reveal / hide · Drag to pan · Fit map restores the practice area.';
     if(this.isPuzzle){
-      q('.panel-title span').textContent=this.engines.puzzle.placed.size+' / '+this.data.units.length;
+      const subset=this.puzzleUnits,subsetPlaced=subset.filter(c=>this.engines.puzzle.placed.has(c.id)).length;
+      q('.subset-progress').textContent=learningFilters(this.config)[this.pieceFilter].name+' · '+subsetPlaced+' / '+subset.length+(this.pieceFilter==='az'?' placed':' · '+this.engines.puzzle.placed.size+' / '+this.data.units.length+' total');
       q('progress').value=this.engines.puzzle.placed.size;
       q('.active-piece strong').textContent=current.name;
-      const position=this.data.units.findIndex(c=>c.id===current.id)+1;
-      q('.piece-position').textContent=position+' / '+this.data.units.length;
-      q('.piece-position').setAttribute('aria-label','Piece '+position+' of '+this.data.units.length);
+      const position=this.puzzleUnits.findIndex(c=>c.id===current.id)+1;
+      q('.piece-position').textContent=position+' / '+this.puzzleUnits.length;
+      q('.piece-position').setAttribute('aria-label','Piece '+position+' of '+this.puzzleUnits.length);
       q('[data-action="arm"]').setAttribute('aria-pressed',String(this.armed===current.id));
       q('[data-action="arm"]').disabled=this.engines.puzzle.placed.has(current.id);
     }
@@ -414,15 +420,21 @@ class CountryMaps {
     if(this.engines.puzzle.place(c.id,correct)){
       this.selected=c.id;
       this.message=this.engines.puzzle.placed.size===this.data.units.length?'Complete! All '+this.data.units.length+' '+this.terms.plural+' are placed.':c.name+' placed.';
-      const next=this.data.units.find(n=>!this.engines.puzzle.placed.has(n.id));if(next)this.currentId=next.id;
+      const next=this.puzzleUnits.find(n=>!this.engines.puzzle.placed.has(n.id));if(next)this.currentId=next.id;
     }else this.message='Not quite. '+c.name+' returned to the tray.';
     this.paint();
   }
   reset(){
     this.clearClue();this.pan.cancel();this.drag.cancel();this.suppressClick=false;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};
-    this.engines[this.mode].reset();this.currentId=this.data.units[0].id;
+    this.engines[this.mode].reset();this.currentId=(this.mode==='puzzle'?this.puzzleUnits:this.data.units)[0].id;
     this.message='Reset. Ready to begin again.';
     this.renderSide();this.paint();
+  }
+  setPieceFilter(id){
+    if(!this.isPuzzle||!Object.hasOwn(learningFilters(this.config),id))return;
+    this.drag.cancel();this.clearClue();this.armed=null;this.suppressClick=false;this.pieceFilter=id;
+    if(!this.puzzleUnits.some(c=>c.id===this.currentId))this.currentId=(this.puzzleUnits.find(c=>!this.engines.puzzle.placed.has(c.id))||this.puzzleUnits[0]).id;
+    this.renderSide();this.paint();q('[popovertarget="piece-filter-menu"]').focus({preventScroll:true});
   }
   action(action){
     this.pan.cancel();
@@ -503,6 +515,7 @@ document.addEventListener('click',event=>{
     if(app.suppressClick&&event.detail!==0){app.suppressClick=false;return;}
     app.suppressClick=false;app.arm(app.byId.get(piece.dataset.piece));return;
   }
+  const pieceFilter=event.target.closest('[data-piece-filter]');if(pieceFilter){app.setPieceFilter(pieceFilter.dataset.pieceFilter);return;}
   const order=event.target.closest('[data-list-order]');if(order){app.listOrder=order.dataset.listOrder;app.renderList();return;}
   const regionFocus=event.target.closest('[data-focus-region]');if(regionFocus){const id=regionFocus.dataset.focusRegion;app.focusRegion(id);q('[data-focus-region="'+id+'"]')?.focus({preventScroll:true});return;}
   const regionToggle=event.target.closest('[data-toggle-region]');if(regionToggle){const id=regionToggle.dataset.toggleRegion;app.openRegion=app.openRegion===id?null:id;app.renderList();q('[data-toggle-region="'+id+'"]')?.focus({preventScroll:true});return;}
