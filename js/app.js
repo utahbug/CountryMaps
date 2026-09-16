@@ -1,4 +1,4 @@
-import {referenceFilters,learningCard,historySection} from '../lib/learning-reference.mjs?v=map-pin';
+import {referenceFilters,learningCard,historySection,activityLearningCard} from '../lib/learning-reference.mjs?v=activity-recap';
 import {MnemonicPlayer} from '../lib/mnemonics.mjs?v=piece-card';
 import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
@@ -45,7 +45,7 @@ class CountryMaps {
     this.engines={explorer:new ExplorerEngine(ids),reveal:new RevealEngine(ids),puzzle:new PuzzleEngine(ids)};
     this.byId=new Map([...data.units,...data.context].map(c=>[c.id,c]));
     this.mnemonics=new MnemonicPlayer();this.pieceFilter='az';this.listOrder='az';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
-    this.view={...this.fitView};this.suppressClick=false;this.query='';this.message='';
+    this.lastLearning={reveal:null,puzzle:null};this.view={...this.fitView};this.suppressClick=false;this.query='';this.message='';
     this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
     this.drag=new DragController(state=>this.paintDrag(state),(c,x,y,stationary)=>this.drop(c,x,y,stationary));
   }
@@ -72,7 +72,7 @@ class CountryMaps {
       this.engines.explorer=new ExplorerEngine(this.fullData.units.map(c=>c.id));
     }
     const revealIds=subset.units.map(c=>c.id);
-    if(revealIds.length!==this.engines.reveal.ids.size||revealIds.some(id=>!this.engines.reveal.ids.has(id)))this.engines.reveal=new RevealEngine(revealIds);
+    if(revealIds.length!==this.engines.reveal.ids.size||revealIds.some(id=>!this.engines.reveal.ids.has(id))){this.engines.reveal=new RevealEngine(revealIds);this.lastLearning.reveal=null;}
     this.region=nextRegion;this.openRegion=nextRegion==='all'?null:nextRegion;this.currentId=this.data.units[0].id;
     this.mode=mode;if(mode==='puzzle'&&!this.puzzleUnits.some(c=>c.id===this.currentId))this.currentId=this.puzzleUnits[0].id;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};this.panelHidden=false;
     this.engines.puzzle.preview=false;
@@ -115,6 +115,7 @@ class CountryMaps {
       q('.workspace').classList.add('learning-workspace');
       q('.workspace').insertAdjacentHTML('afterend','<section class="current-country-reference" aria-labelledby="current-countries-heading"><h2 id="current-countries-heading">Current countries · '+this.data.units.length+'</h2><div class="learning-grid"></div></section>');
     }
+    if(['reveal','puzzle'].includes(this.mode)&&this.data.reference)q('.map-panel').insertAdjacentHTML('beforeend','<div class="activity-learning-slot" aria-live="polite" aria-atomic="true"></div>');
     this.renderSide();this.paint();
     if(this.mode==='explorer'&&this.data.reference)root.insertAdjacentHTML('beforeend',historySection(this.data.reference,this.byId,esc));
   }
@@ -291,7 +292,16 @@ class CountryMaps {
     q('.completion').hidden=!(this.isPuzzle&&this.engines.puzzle.placed.size===this.data.units.length);
     if(this.config.mapOnly){q('.back-link').hidden=true;q('.region-control').hidden=true;q('.list-order').hidden=true;const legend=q('.territory-legend');if(this.data.context.length)legend.innerHTML='French Guiana — France · Overseas department/region, separate from the 12 sovereign countries.';const section=q('.territory-section');if(section){section.querySelector('h3').textContent='Territorial unit';section.querySelector('p').textContent='Identified separately from sovereign countries.';}}
     q('.status').textContent=this.message;
+    this.paintActivityLearning();
     this.positionLabel();
+  }
+  paintActivityLearning(){
+    const slot=q('.activity-learning-slot');if(!slot)return;
+    const id=this.lastLearning[this.mode],unit=this.data.units.find(c=>c.id===id);
+    if(slot.dataset.country===(unit?.id||''))return;
+    slot.dataset.country=unit?.id||'';
+    slot.innerHTML=unit?activityLearningCard(unit,{reference:this.fullData.reference,config:this.config,region:countryRegion(unit.id,this.regions)?.name||'',completed:this.mode==='puzzle',escape:esc}):'';
+    slot.dataset.tone=unit?String(this.fullData.units.findIndex(c=>c.id===unit.id)%4):'0';
   }
   positionRevealLabels(){
     const layer=q('.reveal-label-layer'),labels=[...layer.querySelectorAll('.reveal-country-label')];
@@ -426,7 +436,7 @@ class CountryMaps {
       if(this.armed){this.place(this.byId.get(this.armed),this.armed===c.id);return;}
       this.selected=c.id;this.message=this.engines.puzzle.placed.has(c.id)?c.name+' is placed.':'Choose a piece from the tray first.';
     }else{
-      if(this.mode==='reveal'&&!c.classification)this.engines.reveal.toggle(c.id);
+      if(this.mode==='reveal'&&!c.classification){this.engines.reveal.toggle(c.id);if(this.engines.reveal.revealed.has(c.id))this.lastLearning.reveal=c.id;}
       if(this.mode==='explorer'&&!c.classification)this.engines.explorer.select(c.id);
       this.selected=c.id;this.message=c.classification?c.name+' — '+c.classification+(c.description?'. '+c.description:''):c.name;
       if(this.mode==='reveal'&&!c.classification&&!this.engines.reveal.revealed.has(c.id))this.message=''+this.terms.title+' name hidden. Select it again to reveal.';
@@ -510,6 +520,7 @@ class CountryMaps {
   place(c,correct){
     this.mnemonics.clear();this.armed=null;
     if(this.engines.puzzle.place(c.id,correct)){
+      this.lastLearning.puzzle=c.id;
       this.selected=c.id;
       this.message=this.engines.puzzle.placed.size===this.data.units.length?'Complete! All '+this.data.units.length+' '+this.terms.plural+' are placed.':c.name+' placed.';
       const next=this.puzzleUnits.find(n=>!this.engines.puzzle.placed.has(n.id));if(next)this.currentId=next.id;
@@ -517,6 +528,7 @@ class CountryMaps {
     this.paint();
   }
   reset(){
+    this.lastLearning[this.mode]=null;
     this.mnemonics.reset();this.clearClue();this.pan.cancel();this.drag.cancel();this.suppressClick=false;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};
     this.engines[this.mode].reset();this.currentId=(this.mode==='puzzle'?this.puzzleUnits:this.data.units)[0].id;
     this.message='Reset. Ready to begin again.';

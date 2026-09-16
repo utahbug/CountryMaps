@@ -1382,3 +1382,15 @@ body:has(.puzzle-workspace) main { width:calc(100% - 16px); margin:8px auto; }
  body:has(.puzzle-workspace) main { width:calc(100% - 12px); margin:6px auto; }
  .puzzle-workspace .side-panel { padding:6px; }
 }
+
+/* Reserve recap space so new learning text never moves the map or piece tray. */
+.activity-learning-slot { height:110px; padding:6px; overflow-anchor:none; }
+.activity-learning-card { height:100%; padding:7px 10px; border:1px solid #c4d4c2; border-left:3px solid #669566; border-radius:6px; background:#edf5eb; color:#263c32; overflow:auto; }
+.activity-learning-card strong,.activity-learning-card small { display:block; }
+.activity-learning-card strong { font-size:.94rem; line-height:1.25; color:#214e3f; }
+.activity-learning-card small { font-size:.75rem; color:#526357; margin:2px 0; }
+.activity-learning-card p { margin:3px 0 0; font-size:.82rem; line-height:1.35; }
+.activity-learning-slot[data-tone="1"] .activity-learning-card { background:#edf4fa; border-left-color:#638aaa; }
+.activity-learning-slot[data-tone="2"] .activity-learning-card { background:#fbf5e4; border-left-color:#a98b42; }
+.activity-learning-slot[data-tone="3"] .activity-learning-card { background:#f2eef8; border-left-color:#9075ab; }
+@media(max-width:650px){.activity-learning-slot{height:126px;}}
