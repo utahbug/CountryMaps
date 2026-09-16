@@ -1328,3 +1328,24 @@ body:has(.compact-heading) main { margin-top:2px; }
 .history-grid button { min-height:44px; padding:5px 8px; margin:2px; }
 .learning-card summary:focus-visible,.history-grid summary:focus-visible { outline:3px solid #a34224; outline-offset:-3px; }
 @media(min-width:1000px){.explorer-workspace:has(.learning-card){grid-template-columns:minmax(0,1fr) 290px}.explorer-workspace.panel-collapsed:has(.learning-card){grid-template-columns:1fr}}
+
+/* Current learning units lead; history stays a secondary reference. */
+.learning-workspace .side-panel { max-height:none; overflow:visible; }
+.learning-workspace .country-list { max-height:none; overflow:visible; }
+.learning-workspace .learning-card { --card-fill:#edf5eb; --card-accent:#669566; background:var(--card-fill); border-left:4px solid var(--card-accent); }
+.learning-workspace .learning-card:nth-child(4n+2) { --card-fill:#edf4fa; --card-accent:#638aaa; }
+.learning-workspace .learning-card:nth-child(4n+3) { --card-fill:#fbf5e4; --card-accent:#a98b42; }
+.learning-workspace .learning-card:nth-child(4n) { --card-fill:#f2eef8; --card-accent:#9075ab; }
+.learning-workspace .learning-card > button { background:transparent; color:#203b31; }
+.learning-workspace .learning-card:has(>button.active) { outline:2px solid #245b48; outline-offset:1px; }
+.learning-workspace .learning-card > button.active { background:transparent; color:#173d2e; }
+.learning-workspace .learning-card > button > span { font-size:.88rem; }
+.learning-workspace .learning-card summary { padding:8px; }
+.history-disclosure > summary { cursor:pointer; font-size:1.05rem; font-weight:700; padding:12px 0; min-height:44px; }
+.history-disclosure > p { max-width:75ch; font-size:.85rem; }
+@media(min-width:1000px){
+ .explorer-workspace.learning-workspace { grid-template-columns:minmax(0,2fr) minmax(300px,1fr); align-items:start; }
+ .learning-workspace .map-panel { position:sticky; top:8px; }
+ .explorer-workspace.learning-workspace.panel-collapsed { grid-template-columns:1fr; }
+}
+.learning-card details strong { display:inline; }

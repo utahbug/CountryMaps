@@ -1,4 +1,4 @@
-import {referenceFilters,learningCard,historySection} from '../lib/learning-reference.mjs';
+import {referenceFilters,learningCard,historySection} from '../lib/learning-reference.mjs?v=current-cards';
 import {MnemonicPlayer} from '../lib/mnemonics.mjs?v=piece-card';
 import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
@@ -112,6 +112,7 @@ class CountryMaps {
       select.before(wrap);wrap.append(measure,select);
     }
     this.renderSide();this.paint();
+    if(this.mode==='explorer'&&this.data.reference)q('.workspace').classList.add('learning-workspace');
     if(this.mode==='explorer'&&this.data.reference)root.insertAdjacentHTML('beforeend',historySection(this.data.reference,this.byId,esc));
   }
   renderSide() {
@@ -122,7 +123,7 @@ class CountryMaps {
     }else{
       q('.side-panel').innerHTML='<h2>'+(this.mode==='explorer'?'Find a '+this.terms.singular+'':''+this.terms.title+' names')+'</h2>'+(this.mode==='explorer'?'<div class="list-order" role="group" aria-label="'+this.terms.title+' list organization"><button data-list-order="az">A–Z</button><button data-list-order="region"'+(this.config.regions?'':' hidden disabled')+'>By region</button></div><p class="list-help" hidden>Select a heading to fit its region. Use + / − to expand or collapse the list.</p>':'')+'<label for="country-search"'+(this.mode==='reveal'?' class="sr-only"':'')+'>Search '+this.terms.plural+'</label><input id="country-search" type="search" placeholder="'+this.terms.title+' name…" autocomplete="off"><div class="country-list"></div><section class="territory-section" aria-label="Territories and disputed areas"><h3>Territories &amp; disputed areas</h3><p>Hatched areas are geographic context, separate from the '+this.fullData.units.length+'-'+this.terms.singular+' score.</p><div class="territory-list"></div></section>';
       if(this.mode==='explorer'&&this.data.id==='africa'){
-        const heading=q('.side-panel h2'),panel=document.createElement('div');panel.className='panel-title';heading.before(panel);panel.append(heading);
+        const heading=q('.side-panel h2');if(this.data.reference)heading.textContent='Current countries · '+this.data.units.length;const panel=document.createElement('div');panel.className='panel-title';heading.before(panel);panel.append(heading);
         panel.insertAdjacentHTML('beforeend','<button class="icon-control" type="button" popovertarget="explorer-filter-menu" aria-label="Organize countries" title="Organize countries">'+icon('filter')+'</button>');
         const menu=q('.list-order');menu.id='explorer-filter-menu';menu.className='list-order filter-popover';menu.setAttribute('popover','auto');
         for(const [id,subset] of Object.entries({...this.config.practiceSubsets,...(this.data.reference?referenceFilters(this.data.reference,this.data.units):{})}))menu.insertAdjacentHTML('beforeend','<button type="button" data-list-order="'+id+'">'+esc(subset.name)+'</button>');
@@ -411,12 +412,20 @@ class CountryMaps {
       if(this.mode!=='reveal'&&!regionalStudy){if(focusSelection&&this.config.activities.explorer.repeatSelection==='toggle-focus')this.focus(c);else this.view={...this.fitView};}
     }
     this.paint();
-    if(this.mode==='explorer'&&this.data.reference){const detail=q('[data-learning-unit="'+c.id+'"] details');if(detail)detail.open=true;}
+    if(this.mode==='explorer'&&this.data.reference)this.openLearningCard(c.id);
+  }
+  openLearningCard(id){
+    if(!this.data.reference?.units[id])return;
+    if(!q('[data-learning-unit="'+id+'"]')){this.query='';q('#country-search').value='';this.listOrder='az';this.renderList();}
+    const card=q('[data-learning-unit="'+id+'"]');
+    const group=card.closest('.country-region');if(group){this.openRegion=countryRegionId(id,this.regions);const content=group.querySelector('[id^="countries-"]');content.hidden=false;const toggle=group.querySelector('[data-toggle-region]');toggle.setAttribute('aria-expanded','true');toggle.textContent='−';}
+    card.querySelector('details').open=true;
+    this.paint();
   }
   selectReference(id,focus=false){
     const c=this.byId.get(id);if(this.mode!=='explorer'||!c||this.pan.active)return;
     this.selected=id;this.engines.explorer.select(id);this.message=c.name;this.paint();
-    const details=q('[data-learning-unit="'+id+'"] details');if(details)details.open=true;
+    this.openLearningCard(id);
     if(focus){this.focus(c);this.paint();}
   }
   focus(c){
@@ -566,7 +575,7 @@ async function navigate(){
 }
 
 document.addEventListener('click',event=>{
-  const historyLink=event.target.closest('a[href^="#history-"]');if(historyLink){event.preventDefault();const entry=document.getElementById(historyLink.getAttribute('href').slice(1));if(entry){entry.open=true;entry.scrollIntoView({block:'start',behavior:'smooth'});entry.querySelector('summary').focus({preventScroll:true});}return;}
+  const historyLink=event.target.closest('a[href^="#history-"]');if(historyLink){event.preventDefault();const entry=document.getElementById(historyLink.getAttribute('href').slice(1));if(entry){entry.closest('.history-disclosure').open=true;entry.open=true;entry.scrollIntoView({block:'start',behavior:'smooth'});entry.querySelector('summary').focus({preventScroll:true});}return;}
   const link=event.target.closest('a[href^="?map="],a[data-home],a[data-map-entry],a.back-link');
   if(link&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();history.pushState({},'',link.href);window.scrollTo(0,0);navigate();return;}
   if(!app||app.mode==='home')return;

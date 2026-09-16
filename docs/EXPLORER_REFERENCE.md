@@ -28,3 +28,5 @@ Text is original concise paraphrase of factual material, not copied source prose
 ## Validation
 
 Unit tests check exactly 54 fact records, valid reciprocal neighbor references, canonical regions, 16 landlocked / 38 coastal countries, unique historical IDs and valid modern targets. Browser tests cover all cards, all filters, global search, context-preserving selection, expansion, explicit focus, historical links, responsive overflow and 44px controls. Existing Reveal and Puzzle engines and geometry are untouched.
+
+Current-country cards lead the page, with concise visible summaries and expandable Region, Geography, Neighbors and relevant name/history links. Soft green, blue, gold and lavender cycle by display order for readability, without political meaning. The desktop map stays alongside the flowing cards; phone cards follow the map. Historical reference is collapsed by default after all current units. Selecting a map unit restores its card if a search/subset had hidden it.

@@ -5,10 +5,14 @@ document.querySelector('#run').onclick=()=>{let n=0;const ok=(v,m)=>{if(!v)throw
  const d=frame.contentDocument,w=frame.contentWindow,q=s=>d.querySelector(s),all=s=>[...d.querySelectorAll(s)],click=s=>q(s).click(),view=()=>q('#africa-map').getAttribute('viewBox');
  const filter=id=>click('[data-list-order="'+id+'"]'),search=text=>{q('#country-search').value=text;q('#country-search').dispatchEvent(new w.Event('input',{bubbles:true}))};
  filter('az');ok(all('[data-learning-unit]').length===54,'54 cards');ok(new Set(all('[data-learning-unit]').map(c=>c.dataset.learningUnit)).size===54,'unique cards');
+ ok(!q('.history-disclosure').open,'history secondary by default');
+ ok(q('.side-panel h2').textContent.includes('Current countries'),'current countries prominent');
+ for(const card of all('[data-learning-unit]'))ok(card.querySelector('button > span').textContent.trim().length>0,'visible summary');
  const initial=view();
  const names=all('[data-learning-unit] .list-name').map(el=>el.textContent);ok(JSON.stringify(names)===JSON.stringify([...names].sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'}))),'alphabetical cards');
  for(const id of Object.keys(ref.units)){click('[data-list-country="'+id+'"]');ok(q('[data-country="'+id+'"]').classList.contains('selected'),'map '+id);ok(q('[data-learning-unit="'+id+'"] details').open,'details '+id);ok(view()===initial,'card preserves context');}
  for(const [id,total] of [['coastal',38],['landlocked',16],['islands',6],['small',16]]){filter(id);ok(all('[data-learning-unit]').length===total,'filter '+id);if(africaPracticeSubsets[id])ok(all('[data-learning-unit]').every(c=>africaPracticeSubsets[id].ids.includes(c.dataset.learningUnit)),'canonical '+id);search('Algeria');ok(q('[data-list-country="DZA"]'),'global search');search('');}
+ filter('islands');q('[data-country="DZA"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));ok(q('[data-learning-unit="DZA"] details').open,'map selection restores filtered card');
  filter('region');ok(all('.country-region').length===5,'five regions');ok(all('[data-learning-unit]').length===54,'54 grouped');
  for(const [id,r] of Object.entries(africaRegions).filter(([id])=>id!=='all')){click('[data-focus-region="'+id+'"]');const fit=view();for(const unit of r.ids){click('[data-list-country="'+unit+'"]');ok(view()===fit,'regional context');}}
  filter('az');click('[data-focus-unit="DZA"]');ok(view()!==initial,'explicit focus');const focused=view();click('[data-list-country="EGY"]');ok(view()===focused,'card keeps manual view');
