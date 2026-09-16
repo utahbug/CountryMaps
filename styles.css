@@ -1419,3 +1419,6 @@ body:has(.africa-landing) .all-maps-link { background:transparent; border-color:
  .africa-landing-activities { gap:2px; }
  .africa-landing-activities a { padding:7px 8px; gap:5px; font-size:.88rem; }
 }
+
+/* Reveal is a map-only workspace; its learning recap stays below the map. */
+.workspace.reveal-workspace { grid-template-columns:minmax(0,1fr); }

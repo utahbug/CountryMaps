@@ -21,13 +21,11 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
    path.dispatchEvent(new w.PointerEvent('pointerout',{bubbles:true,pointerType}));
    assert(path.getAttribute('aria-pressed')==='false'&&labels().length===0,'hover never reveals');
   }
-  const row=q('[data-list-country="'+path.dataset.country+'"]');
-  assert(row.querySelector('.list-name').textContent==='Hidden country'&&!row.querySelector('.list-number'),'concealed list without numbers');
-  row.click();
+  tap(path.dataset.country);
   path.dispatchEvent(new w.PointerEvent('pointerout',{bubbles:true,pointerType:'mouse'}));
   assert(path.getAttribute('aria-pressed')==='true'&&labels().length===1,'pointer leaving retains persistent name');
   assert(q('[data-number="'+path.dataset.country+'"]').hasAttribute('hidden'),'no visible numeric map label');
-  row.click();
+  tap(path.dataset.country);
  }
  reset();const baseline=signature(),fitted=box();assert(svg.viewBox.baseVal.width<800&&svg.viewBox.baseVal.height<730,'tighter initial fit');
  const ids=['MAR','TUN','SOM','ZAF','CPV','MUS','SYC','CAF','COD'];
@@ -46,18 +44,13 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
  reset();assert(labels().length===0&&box()===fitted,'Reset clears all names and fits');
  send('pointerdown',q('[data-country="MAR"]'));send('pointermove',svg,71,195,185);send('pointerup',svg,71,195,185);assert(labels().length===0,'pan is not tap');if(phone)assert(box()===fitted,'phone swipe cannot move map');clean();
  for(const end of ['pointercancel','lostpointercapture']){send('pointerdown',q('[data-country="MAR"]'));send(end);send('pointerup');assert(labels().length===0,'cancel never reveals');}
- reset();q('[data-list-country="COD"]').click();q('[data-list-country="CAF"]').click();assert(labels().length===2,'list selections independent');assert(box()===fitted,'list never focuses');visible();
- const search=q('#country-search');search.value='Morocco';search.dispatchEvent(new w.Event('input',{bubbles:true}));q('[data-list-country="MAR"]').click();assert(labels().length===3&&box()===fitted,'search selection preserves others and viewport');
- reset();assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');
- assert(q('label[for="country-search"]').classList.contains('sr-only'),'search label visually hidden but associated');
- assert(q('#country-search').placeholder==='Country name…','search placeholder preserved');
- assert(!q('.reveal-state'),'no redundant row action text');
- for(const row of d.querySelectorAll('.country-list button')){
-  assert(row.getBoundingClientRect().height>=44,'row touch target');
-  assert(parseFloat(w.getComputedStyle(row).paddingTop)<=3,'compact row padding');
-  row.click();assert(row.getAttribute('aria-pressed')==='true','whole row reveals');
-  row.click();assert(row.getAttribute('aria-pressed')==='false','whole row hides');
- }
+ reset();
+ assert(!q('#activity-side-panel')&&!q('.country-list')&&!q('#country-search'),'no Reveal country panel');
+ assert(!q('[data-action="toggle-panel"]'),'no obsolete list toggle');
+ const workspace=q('.workspace').getBoundingClientRect(),mapPanel=q('.map-panel').getBoundingClientRect();
+ assert(Math.abs(workspace.width-mapPanel.width)<2,'map fills reclaimed workspace width');
+ assert(q('.activity-learning-slot'),'learning card retained below map');
+ assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');
 
  assert(q('.map-readout strong').textContent==='Africa','stable map heading');
  assert(q('.map-progress').textContent==='0 / 54','compact authoritative progress');
