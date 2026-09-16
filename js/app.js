@@ -171,7 +171,7 @@ class CountryMaps {
       path.setAttribute('aria-pressed',String(shown));
       path.setAttribute('aria-label',this.isPuzzle&&!shown?'Unplaced location '+(i+1):this.mode==='reveal'&&!shown?'Reveal '+this.terms.singular+' '+(i+1):c.name);
       path.querySelector('title').textContent=this.mode==='explorer'||shown?c.name:''+this.terms.title+' '+(i+1);
-      q('[data-number="'+c.id+'"]').toggleAttribute('hidden',!shown||this.mode==='explorer');
+      q('[data-number="'+c.id+'"]').toggleAttribute('hidden',this.mode==='puzzle'||!shown||this.mode==='explorer');
       if(this.isPuzzle){
         const piece=q('[data-piece="'+c.id+'"]'),placed=this.engines.puzzle.placed.has(c.id);
         piece.disabled=placed;piece.classList.toggle('current-piece',this.currentId===c.id);

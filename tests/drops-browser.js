@@ -4,8 +4,8 @@ const ids=['GMB','BEN','TGO','RWA','BDI','DJI','SWZ','LSO','MWI','CPV','COM','MU
 button.onclick=()=>{
  let checks=0;const assert=(value,label)=>{if(!value)throw Error(label);checks++;};
  try{
-  const w=frame.contentWindow,d=w.document,q=s=>d.querySelector(s),svg=q('#africa-map');
-  const reset=()=>q('[data-action="reset"]').click(),score=()=>q('progress').value;
+  const w=frame.contentWindow,d=w.document,q=s=>d.querySelector(s),all=s=>[...d.querySelectorAll(s)],svg=q('#africa-map');
+  const reset=()=>q('[data-action="reset"]').click(),score=()=>q('progress').value,numbersHidden=()=>all('.country-number').every(number=>number.hasAttribute('hidden'));
   const send=(type,target,x,y,id=91,primary=true)=>target.dispatchEvent(new w.PointerEvent(type,{bubbles:true,cancelable:true,pointerType:'touch',pointerId:id,isPrimary:primary,button:0,clientX:x,clientY:y}));
   const begin=id=>{const p=q('[data-piece="'+id+'"]');p.setPointerCapture=()=>{};p.hasPointerCapture=()=>false;send('pointerdown',p,10,10);return p;};
   const finish=(x,y)=>{send('pointermove',d,x,y);send('pointerup',d,x,y);};
@@ -13,6 +13,8 @@ button.onclick=()=>{
   const rect=el=>{const b=el.getBoundingClientRect();return {x:b.left,y:b.top,w:b.width,h:b.height};};
   const overlap=(a,b)=>Math.max(0,Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y));
   const outside=(p,b)=>p.x<b.x||p.x>b.x+b.w||p.y<b.y||p.y>b.y+b.h;
+  reset();assert(numbersHidden(),'numeric map labels hidden at puzzle start');
+  q('[data-action="preview"]').click();assert(numbersHidden(),'numeric map labels hidden in answer preview');q('[data-action="preview"]').click();
   for(const id of ids){
    reset();const c=data.countries.find(c=>c.id===id);q('[data-piece="'+id+'"]').click();
    const trayPiece=q('[data-piece="'+id+'"]'),trayView=trayPiece.querySelector('svg').getAttribute('viewBox').split(' ').map(Number);
@@ -68,7 +70,7 @@ button.onclick=()=>{
    begin(c.id);const point=new w.DOMPoint(...c.anchor).matrixTransform(svg.getScreenCTM());
    finish(point.x,point.y);assert(q('[data-piece="'+c.id+'"]').disabled,'all-country aligned drop '+c.id);
   }
-  assert(score()===54&&!q('.completion').hidden,'54/54 completion unchanged');reset();assert(score()===0&&!q('.clue-target'),'Reset clean');clean();assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');
+  assert(score()===54&&!q('.completion').hidden,'54/54 completion unchanged');assert(numbersHidden(),'numeric map labels hidden after completion');reset();assert(score()===0&&!q('.clue-target'),'Reset clean');assert(numbersHidden(),'numeric map labels hidden after Reset');clean();assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');
   results.textContent='PASS: '+checks+' overlap/drop checks at '+w.innerWidth+' × '+w.innerHeight+'. All 14 requested countries and 54 aligned placements. Synthetic touch; capture stubbed.';
  }catch(error){results.textContent='FAIL after '+checks+' checks: '+error.message;}
 };
