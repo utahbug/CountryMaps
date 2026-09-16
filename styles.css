@@ -486,6 +486,14 @@ input {
   line-height: 1.25;
   pointer-events: none;
 }
+.piece small {
+  display: block;
+  margin-top: 3px;
+  color: var(--subtle);
+  font-size: 0.68rem;
+  line-height: 1.15;
+  pointer-events: none;
+}
 .piece:disabled {
   opacity: 0.45;
 }
@@ -739,6 +747,9 @@ input {
   }
   .piece svg {
     height: 40px;
+  }
+  .piece small {
+    font-size: 0.62rem;
   }
   .puzzle-workspace .status {
     margin-top: 10px;

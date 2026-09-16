@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {acceptsGeometryDrop,acceptsInsetDrop,draggedBounds} from '../lib/drop-validation.mjs';
+import {acceptsGeometryDrop,acceptsInsetDrop,draggedBounds,dragPreviewGeometry} from '../lib/drop-validation.mjs';
 const viewport={x:0,y:0,w:400,h:400};
 const shape=(x,y,w,h,small=false)=>({bounds:{x,y,w,h},center:{x:x+w/2,y:y+h/2},small,contains:p=>p.x>=x&&p.x<=x+w&&p.y>=y&&p.y<=y+h});
 const points=b=>Array.from({length:400},(_,i)=>({x:b.x+(i%20+.5)*b.w/20,y:b.y+(Math.floor(i/20)+.5)*b.h/20}));
@@ -35,4 +35,13 @@ test('inset overlap loses to nearer visible neighboring geography',()=>{
 test('small-country tolerance rejects a mostly-neighbor drop even with a distant neighbor center',()=>{
  const target=shape(100,100,8,80,true),piece={x:107.5,y:100,w:8,h:80},neighbor=shape(108,0,180,300);
  assert.equal(acceptsGeometryDrop({points:points(piece),piece,target,neighbors:[neighbor],viewport}),false);
+});
+
+test('small drag preview keeps true scale inside a larger invisible interaction frame',()=>{
+ const country={bounds:[0,0,8,12],anchor:[4,6]},preview=dragPreviewGeometry(country,100,120,.5);
+ assert.deepEqual(preview.visible,{x:98,y:117,w:4,h:6});
+ assert.deepEqual(preview.frame,{x:78,y:98,w:44,h:44});
+ assert.equal(preview.viewBox[2],88);assert.equal(preview.viewBox[3],88);
+ const large=dragPreviewGeometry({bounds:[0,0,100,80],anchor:[50,40]},100,120,1);
+ assert.deepEqual(large.frame,{x:46,y:76,w:108,h:88});
 });

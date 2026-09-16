@@ -15,6 +15,11 @@ button.onclick=()=>{
   const outside=(p,b)=>p.x<b.x||p.x>b.x+b.w||p.y<b.y||p.y>b.y+b.h;
   for(const id of ids){
    reset();const c=data.countries.find(c=>c.id===id);q('[data-piece="'+id+'"]').click();
+   const trayPiece=q('[data-piece="'+id+'"]'),trayView=trayPiece.querySelector('svg').getAttribute('viewBox').split(' ').map(Number);
+   assert(trayPiece.classList.contains('small-scale-piece')&&trayView[2]===140&&trayView[3]===96,'map-scale tray frame '+id);
+   assert(trayPiece.getBoundingClientRect().width>=44&&trayPiece.getBoundingClientRect().height>=44,'large tray hit target '+id);
+   assert(trayPiece.querySelector('small').textContent.includes('large touch area'),'scale explanation '+id);
+   if(c.inset)assert(q('.inset text').textContent==='Enlarged helper','inset clearly marked helper '+id);
    const geometry=q('[data-country="'+id+'"]'),original=geometry.getAttribute('d'),unit=svg.getScreenCTM().a,scale=unit*(c.inset?insetTransform(c).scale:1);
    const pw=(c.bounds[2]-c.bounds[0])*scale,ph=(c.bounds[3]-c.bounds[1])*scale,ax=(c.anchor[0]-c.bounds[0])*scale,ay=(c.anchor[1]-c.bounds[1])*scale;
    let near,far;
@@ -36,7 +41,11 @@ button.onclick=()=>{
    }
    // Region clue and requested highlight must not alter validation or scoring.
    q('[data-action="clue"]').click();q('[data-action="clue"]').click();
-   begin(id);finish(near.x,near.y);assert(score()===1&&q('[data-piece="'+id+'"]').disabled,'forgiving intended overlap accepted '+id);clean();
+   begin(id);const ghost=q('.drag-preview'),ghostShape=ghost.querySelector('path').getBoundingClientRect(),mapShape=geometry.getBoundingClientRect();
+   assert(ghost.dataset.visualScale==='map','map-scale drag marker '+id);
+   assert(Math.abs(ghostShape.width-mapShape.width)<1.5&&Math.abs(ghostShape.height-mapShape.height)<1.5,'drag silhouette matches map scale '+id);
+   assert(ghost.getBoundingClientRect().width>=44&&ghost.getBoundingClientRect().height>=44,'invisible drag frame '+id);
+   finish(near.x,near.y);assert(score()===1&&q('[data-piece="'+id+'"]').disabled,'forgiving intended overlap accepted '+id);clean();
    assert(geometry.getAttribute('d')===original&&!geometry.hasAttribute('transform'),'canonical outline and snap unchanged '+id);assert(q('.puzzle-clue').dataset.level==='0'&&!q('.clue-target'),'placement clears clue');
    reset();begin(id);finish(far.x,far.y);assert(score()===0&&!q('[data-piece="'+id+'"]').disabled,'miss rejected '+id);clean();
    // Dropping on a neighboring country's actual geography never solves an inset piece.

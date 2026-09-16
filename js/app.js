@@ -1,8 +1,8 @@
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
 import {terminology,mapDefinitions} from '../lib/map-configs.mjs';
-import {draggedBounds,acceptsInsetDrop,acceptsGeometryDrop} from '../lib/drop-validation.mjs';
+import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop} from '../lib/drop-validation.mjs';
 import {practiceSet,fittedRegion,countryRegion,countryRegionId,groupedCountries} from '../lib/regions.mjs';
-import {loadMap,registry,modes,titles,findCountries,insetTransform,pieceViewBox,escapeHTML as esc} from '../lib/maps.js';
+import {loadMap,registry,modes,titles,findCountries,insetTransform,pieceDisplayViewBox,usesPieceScaleFrame,escapeHTML as esc} from '../lib/maps.js';
 import {ExplorerEngine,RevealEngine,PuzzleEngine} from '../lib/engines/activities.mjs';
 import {DragController} from '../lib/engines/drag-controller.mjs';
 import {placeRevealLabels} from '../lib/reveal-labels.mjs';
@@ -76,7 +76,7 @@ class CountryMaps {
   renderSide() {
     if(this.isPuzzle){
       q('.side-panel').innerHTML='<div class="panel-title"><h2>'+this.terms.title+' pieces</h2><span></span></div><progress max="'+this.data.units.length+'" value="0" aria-label="'+this.terms.pluralTitle+' placed"></progress><p class="piece-help">Drag a piece, or tap it and then tap its map location. Use the arrows to browse.</p><div class="active-piece"><strong></strong><button data-action="arm">Select piece</button></div><div class="tray-scroll" aria-label="Browse '+this.terms.singular+' pieces"><button data-action="previous-pieces" aria-controls="piece-tray">↑ Previous pieces</button><button data-action="more-pieces" aria-controls="piece-tray">↓ More pieces</button></div><div id="piece-tray" class="piece-tray" aria-label="Unplaced '+this.terms.plural+'">'+
-      this.data.units.map(c=>'<button data-piece="'+c.id+'" class="piece" aria-label="Piece: '+esc(c.name)+'" aria-pressed="false"><svg aria-hidden="true" viewBox="'+pieceViewBox(c)+'"><path d="'+c.path+'" '+unitSvgAttributes(this.config,c)+'/></svg><span>'+esc(c.name)+'</span></button>').join('')+'</div>';
+      this.data.units.map(c=>'<button data-piece="'+c.id+'" class="piece'+(usesPieceScaleFrame(c)?' small-scale-piece':'')+'" aria-label="Piece: '+esc(c.name)+(usesPieceScaleFrame(c)?'. Map-scale shape with large touch area.':'')+'" aria-pressed="false"><svg aria-hidden="true" viewBox="'+pieceDisplayViewBox(c)+'"><path d="'+c.path+'" '+unitSvgAttributes(this.config,c)+'/></svg><span>'+esc(c.name)+'</span>'+(usesPieceScaleFrame(c)?'<small>Map-scale shape · large touch area</small>':'')+'</button>').join('')+'</div>';
     }else{
       q('.side-panel').innerHTML='<h2>'+(this.mode==='explorer'?'Find a '+this.terms.singular+'':''+this.terms.title+' names')+'</h2>'+(this.mode==='explorer'?'<div class="list-order" role="group" aria-label="'+this.terms.title+' list organization"><button data-list-order="az">A–Z</button><button data-list-order="region"'+(this.config.regions?'':' hidden disabled')+'>By region</button></div><p class="list-help" hidden>Select a heading to fit its region. Use + / − to expand or collapse the list.</p>':'')+'<label for="country-search">Search '+this.terms.plural+'</label><input id="country-search" type="search" placeholder="'+this.terms.title+' name…" autocomplete="off"><div class="country-list"></div><section class="territory-section" aria-label="Territories and disputed areas"><h3>Territories &amp; disputed areas</h3><p>Hatched areas are geographic context, separate from the '+this.fullData.units.length+'-'+this.terms.singular+' score.</p><div class="territory-list"></div></section>';
       q('#country-search').value=this.query;this.renderList();
@@ -176,7 +176,7 @@ class CountryMaps {
     }
     this.paintInset(inset);
     this.paintClue();
-    q('.map-caption').textContent=this.phoneReveal?'Tap to reveal / hide. Use Explorer for zooming and closer inspection.':this.isPuzzle?(inset?'Drop inside the enlarged inset box. The ring marks its real location.':'Pieces snap when dropped inside their matching '+this.terms.singular+'.'):this.mode==='explorer'?(this.region==='all'?'Drag to pan · Repeat a selection to toggle focus / full map.':this.regions[this.region].name+' · '+this.terms.title+' selections keep your zoom and pan.'):'Tap to reveal / hide · Drag to pan · Fit map restores the practice area.';
+    q('.map-caption').textContent=this.phoneReveal?'Tap to reveal / hide. Use Explorer for zooming and closer inspection.':this.isPuzzle?(inset?'Drop inside the enlarged helper inset. The ring marks its real location.':'Pieces snap when dropped inside their matching '+this.terms.singular+'.'):this.mode==='explorer'?(this.region==='all'?'Drag to pan · Repeat a selection to toggle focus / full map.':this.regions[this.region].name+' · '+this.terms.title+' selections keep your zoom and pan.'):'Tap to reveal / hide · Drag to pan · Fit map restores the practice area.';
     if(this.isPuzzle){
       q('.panel-title span').textContent=this.engines.puzzle.placed.size+' / '+this.data.units.length;
       q('progress').value=this.engines.puzzle.placed.size;
@@ -297,20 +297,18 @@ class CountryMaps {
     layer.dataset.country=c?.id||'';
     if(!c){layer.innerHTML='';return;}
     const t=insetTransform(c);
-    layer.innerHTML='<g class="inset"><rect x="595" y="24" width="170" height="175" rx="8" data-inset-hit="'+c.id+'" role="button" tabindex="0" aria-label="Enlarged drop zone for '+esc(c.name)+'"/><text x="680" y="59" text-anchor="middle">Inset</text><path data-inset-target="'+c.id+'" d="'+c.path+'" transform="translate('+t.x+' '+t.y+') scale('+t.scale+')" class="country inset-country" style="pointer-events:none" '+(this.config.visualClassification?unitSvgAttributes(this.config,c):'')+'/><text x="680" y="185" text-anchor="middle">Drop here</text><circle class="inset-locator" cx="'+c.anchor[0]+'" cy="'+c.anchor[1]+'" r="8"/></g>';
+    layer.innerHTML='<g class="inset"><rect x="595" y="24" width="170" height="175" rx="8" data-inset-hit="'+c.id+'" role="button" tabindex="0" aria-label="Enlarged helper drop zone for '+esc(c.name)+'"/><text x="680" y="52" text-anchor="middle">Enlarged helper</text><path data-inset-target="'+c.id+'" d="'+c.path+'" transform="translate('+t.x+' '+t.y+') scale('+t.scale+')" class="country inset-country" style="pointer-events:none" '+(this.config.visualClassification?unitSvgAttributes(this.config,c):'')+'/><text x="680" y="185" text-anchor="middle">Drop here</text><circle class="inset-locator" cx="'+c.anchor[0]+'" cy="'+c.anchor[1]+'" r="8"/></g>';
   }
   paintDrag(state){
     if(!state){document.querySelector('.drag-preview')?.remove();q('.status')?.setAttribute('data-active-pointer','');return;}
     if(this.currentId!==state.country.id){this.currentId=state.country.id;this.paint();}
-    const c=state.country,box=this.svg.getBoundingClientRect(),unit=Math.min(box.width/this.view.w,box.height/this.view.h),scale=unit*(c.inset?insetTransform(c).scale:1);
-    const [x0,y0,x1,y1]=c.bounds;
+    const c=state.country,box=this.svg.getBoundingClientRect(),unit=Math.min(box.width/this.view.w,box.height/this.view.h),preview=dragPreviewGeometry(c,state.x,state.y,unit);
     let ghost=document.querySelector('.drag-preview');
-    if(!ghost){ghost=document.createElementNS('http://www.w3.org/2000/svg','svg');ghost.classList.add('drag-preview');ghost.setAttribute('aria-hidden','true');ghost.innerHTML='<path d="'+c.path+'" '+unitSvgAttributes(this.config,c,{stroke:'#285d52','stroke-width':1.5/scale})+'/>';document.body.append(ghost);}
-    const footprint=draggedBounds(c,state.x,state.y,scale);
-    ghost.style.left=footprint.x-4+'px';
-    ghost.style.top=footprint.y-4+'px';
-    ghost.style.width=footprint.w+8+'px';ghost.style.height=footprint.h+8+'px';
-    ghost.setAttribute('viewBox',[x0-4/scale,y0-4/scale,x1-x0+8/scale,y1-y0+8/scale].join(' '));
+    if(!ghost){ghost=document.createElementNS('http://www.w3.org/2000/svg','svg');ghost.classList.add('drag-preview');ghost.setAttribute('aria-hidden','true');ghost.innerHTML='<path d="'+c.path+'" '+unitSvgAttributes(this.config,c,{stroke:'#285d52','stroke-width':1.5/unit})+'/>';document.body.append(ghost);}
+    ghost.dataset.visualScale='map';
+    ghost.style.left=preview.frame.x+'px';ghost.style.top=preview.frame.y+'px';
+    ghost.style.width=preview.frame.w+'px';ghost.style.height=preview.frame.h+'px';
+    ghost.setAttribute('viewBox',preview.viewBox.join(' '));
     q('.status').setAttribute('data-active-pointer',state.pointerId);
   }
   select(c){
