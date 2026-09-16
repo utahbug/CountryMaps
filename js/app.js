@@ -218,11 +218,18 @@ class CountryMaps {
     if(this.mode==='reveal'||(this.mode==='explorer'&&this.data.id==='africa')){q('.map-readout strong').textContent=this.fullData.name;q('.map-readout strong').title=this.fullData.name;}
     q('.map-progress').textContent=this.mode==='explorer'?this.data.units.length+' '+this.terms.plural+(this.config.mapOnly&&this.data.context.length?' + '+this.data.context.length+' territorial unit':''):revealed.size+' / '+this.data.units.length+(this.mode==='reveal'?'':this.preview?' revealed':' placed');
     q('.map-tools').hidden=this.isPuzzle||this.phoneReveal;
-    q('.territory-legend').hidden=!this.data.context.length;
+    q('.territory-legend').hidden=!this.data.context.length||(this.mode==='explorer'&&this.data.id==='africa');
+    q('.map-caption').hidden=this.mode==='explorer'&&this.data.id==='africa';
     const territorySection=q('.territory-section');if(territorySection)territorySection.hidden=!this.data.context.length;
     this.svg.classList.toggle('puzzle-map',this.isPuzzle);
     this.svg.classList.toggle('explorer-map',this.mode==='explorer');
-    q('[data-action="fit"]').textContent=this.mode==='explorer'?''+this.regions.all.name+' / Fit map':'Fit map';
+    q('[data-action="fit"]').textContent=this.mode==='explorer'&&this.data.id!=='africa'?''+this.regions.all.name+' / Fit map':'Fit map';
+    if(this.mode==='explorer'&&this.data.id==='africa'){
+      for(const button of q('.map-tools').querySelectorAll('button')){
+        const label=button.dataset.action==='fit'?'All Africa / Fit map':button.getAttribute('aria-label');
+        button.setAttribute('aria-label',label);button.title=label;button.dataset.tooltip=label;
+      }
+    }
     this.svg.classList.toggle('navigable-map',this.mode==='explorer'||this.mode==='reveal');
     const specialContext=this.data.id==='africa'&&!!chosen?.classification;
     const overlay=q('.selected-country-overlay');

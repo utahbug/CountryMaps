@@ -12,6 +12,10 @@ document.querySelector('#run').onclick=()=>{let n=0;const ok=(v,m)=>{if(!v)throw
  ok(q('.current-country-reference').getBoundingClientRect().top-q('.workspace').getBoundingClientRect().bottom<24,'no large gap below map');
  ok(w.getComputedStyle(q('.learning-grid')).gridTemplateColumns.split(' ').length===(w.innerWidth>650?2:1),'responsive card columns');
  for(const card of all('[data-learning-unit]'))ok(card.querySelector('summary > span').textContent.trim().length>0,'visible summary');
+ ok(q('.map-caption').hidden&&q('.territory-legend').hidden,'permanent map hints removed');
+ const controls=all('.map-tools button');ok(controls.length===7,'seven map controls retained');
+ ok(q('.map-tools').getBoundingClientRect().height<=50,'compact single control row');
+ for(const button of controls){const box=button.getBoundingClientRect();ok(box.width>=44&&box.height>=44,'44px map control target');ok(w.getComputedStyle(button).borderTopWidth==='0px','borderless control');ok(button.title&&button.getAttribute('aria-label'),'control labels and tooltips');}
  const initial=view();
  const names=all('[data-learning-unit] .list-name').map(el=>el.textContent);ok(JSON.stringify(names)===JSON.stringify([...names].sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'}))),'alphabetical cards');
  for(const id of Object.keys(ref.units)){click('[data-list-country="'+id+'"]');ok(q('[data-country="'+id+'"]').classList.contains('selected'),'map '+id);ok(q('[data-learning-unit="'+id+'"] details').open,'details '+id);ok(view()===initial,'card preserves context');click('[data-card-country="'+id+'"]');ok(!q('[data-learning-unit="'+id+'"] details').open,'card collapses');click('[data-card-country="'+id+'"]');ok(q('[data-learning-unit="'+id+'"] details').open,'card expands');q('[data-country="'+id+'"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));ok(q('[data-learning-unit="'+id+'"]').classList.contains('active'),'map opens matching card');ok(view()===initial,'map selection keeps context');}
