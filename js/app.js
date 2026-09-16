@@ -25,7 +25,7 @@ const controlIcons={
   explorer:'<circle cx="10" cy="10" r="5.5"/><path d="m14.5 14.5 5 5"/>',
   reveal:'<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/>',
   reference:'<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Z"/><path d="M9 3v16M15 5v16"/>',
-  puzzle:'<path d="M4 4h6a2.3 2.3 0 1 0 4 0h6v6a2.3 2.3 0 1 0 0 4v6h-6a2.3 2.3 0 1 0-4 0H4v-6a2.3 2.3 0 1 0 0-4Z"/>',
+  puzzle:'<path d="M4 8h5V5a3 3 0 0 1 6 0v3h5v4h-2a3 3 0 0 0 0 6h2v3H4Z"/>',
   reset:'<path d="M5 8a8 8 0 1 1-1 7"/><path d="M5 3v5h5"/>',
   panel:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
   clue:'<path d="M9 18h6M10 21h4"/><path d="M8.2 14.5A6 6 0 1 1 15.8 14.5c-1 .8-1.4 1.5-1.4 2.5h-4.8c0-1-.4-1.7-1.4-2.5Z"/>',
