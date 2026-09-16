@@ -25,6 +25,9 @@ const controlIcons={
   panel:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
   clue:'<path d="M9 18h6M10 21h4"/><path d="M8.2 14.5A6 6 0 1 1 15.8 14.5c-1 .8-1.4 1.5-1.4 2.5h-4.8c0-1-.4-1.7-1.4-2.5Z"/>',
   info:'<circle cx="12" cy="12" r="9"/><path d="M12 10v7M12 7h.01"/>',
+  activate:'<path d="m5 12 4 4L19 6"/>',
+  previous:'<path d="M12 20V4m-6 6 6-6 6 6"/>',
+  next:'<path d="M12 4v16m-6-6 6 6 6-6"/>',
   close:'<path d="m6 6 12 12M18 6 6 18"/>'
 };
 const icon=name=>'<svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+controlIcons[name]+'</svg>';
@@ -92,7 +95,7 @@ class CountryMaps {
   }
   renderSide() {
     if(this.isPuzzle){
-      q('.side-panel').innerHTML='<div class="panel-title"><h2>'+this.terms.title+' pieces</h2><span></span></div><progress max="'+this.data.units.length+'" value="0" aria-label="'+this.terms.pluralTitle+' placed"></progress><p class="piece-help">Drag a piece, or tap it and then tap its map location. Use the arrows to browse.</p><div class="active-piece"><strong></strong><button data-action="arm">Select piece</button></div><div class="tray-scroll" aria-label="Browse '+this.terms.singular+' pieces"><button data-action="previous-pieces" aria-controls="piece-tray">↑ Previous pieces</button><button data-action="more-pieces" aria-controls="piece-tray">↓ More pieces</button></div><div id="piece-tray" class="piece-tray" aria-label="Unplaced '+this.terms.plural+'">'+
+      q('.side-panel').innerHTML='<div class="panel-title"><h2>'+this.terms.title+' pieces</h2><span></span></div><progress max="'+this.data.units.length+'" value="0" aria-label="'+this.terms.pluralTitle+' placed"></progress><div class="active-piece"><strong></strong><div class="piece-controls"><span class="piece-position"></span>'+compactButton('arm','Select current piece','activate')+compactButton('previous-pieces','Previous pieces','previous','aria-controls="piece-tray"')+compactButton('more-pieces','More pieces','next','aria-controls="piece-tray"')+'</div></div><div id="piece-tray" class="piece-tray" aria-label="Unplaced '+this.terms.plural+'">'+
       this.data.units.map(c=>'<button data-piece="'+c.id+'" class="piece'+(usesPieceScaleFrame(c)?' small-scale-piece':'')+'" aria-label="Piece: '+esc(c.name)+(usesPieceScaleFrame(c)?'. Map-scale shape with large touch area.':'')+'" aria-pressed="false"><svg aria-hidden="true" viewBox="'+pieceDisplayViewBox(c)+'"><path d="'+c.path+'" '+unitSvgAttributes(this.config,c)+'/></svg><span>'+esc(c.name)+'</span>'+(usesPieceScaleFrame(c)?'<small>Map-scale shape · large touch area</small>':'')+'</button>').join('')+'</div>';
     }else{
       q('.side-panel').innerHTML='<h2>'+(this.mode==='explorer'?'Find a '+this.terms.singular+'':''+this.terms.title+' names')+'</h2>'+(this.mode==='explorer'?'<div class="list-order" role="group" aria-label="'+this.terms.title+' list organization"><button data-list-order="az">A–Z</button><button data-list-order="region"'+(this.config.regions?'':' hidden disabled')+'>By region</button></div><p class="list-help" hidden>Select a heading to fit its region. Use + / − to expand or collapse the list.</p>':'')+'<label for="country-search">Search '+this.terms.plural+'</label><input id="country-search" type="search" placeholder="'+this.terms.title+' name…" autocomplete="off"><div class="country-list"></div><section class="territory-section" aria-label="Territories and disputed areas"><h3>Territories &amp; disputed areas</h3><p>Hatched areas are geographic context, separate from the '+this.fullData.units.length+'-'+this.terms.singular+' score.</p><div class="territory-list"></div></section>';
@@ -199,6 +202,10 @@ class CountryMaps {
       q('.panel-title span').textContent=this.engines.puzzle.placed.size+' / '+this.data.units.length;
       q('progress').value=this.engines.puzzle.placed.size;
       q('.active-piece strong').textContent=current.name;
+      const position=this.data.units.findIndex(c=>c.id===current.id)+1;
+      q('.piece-position').textContent=position+' / '+this.data.units.length;
+      q('.piece-position').setAttribute('aria-label','Piece '+position+' of '+this.data.units.length);
+      q('[data-action="arm"]').setAttribute('aria-pressed',String(this.armed===current.id));
       q('[data-action="arm"]').disabled=this.engines.puzzle.placed.has(current.id);
     }
     const previewButton=q('[data-action="preview"]');if(previewButton){const label=this.preview?'Return to Puzzle':'Reveal answer map';if(previewButton.classList.contains('icon-control')){previewButton.setAttribute('aria-label',label);previewButton.setAttribute('title',label);previewButton.dataset.tooltip=label;previewButton.querySelector('.sr-only').textContent=label;}else previewButton.textContent=label;}
