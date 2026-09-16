@@ -219,19 +219,20 @@ class CountryMaps {
     panelToggle.setAttribute('aria-expanded',String(!this.panelHidden));
     }
     q('#instructions').textContent=this.phoneReveal?'Tap a '+this.terms.singular+' to reveal or hide its name. '+this.data.name+' stays fitted while you study.':this.mode==='explorer'?(this.data.reference?'Select a country to open its card below · Drag to pan · Use Focus on map for a closer view.':this.region==='all'?'Select a '+this.terms.singular+' in the full map. Repeat the selection to toggle '+this.terms.singular+' focus.':'Select '+this.terms.plural+' while the regional view stays in place. Use '+this.regions.all.name+' to restore the full map.'):this.mode==='reveal'?'Tap a '+this.terms.singular+' to reveal or hide its name. Your map view stays in place.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location.';
+    if(this.mode==='reveal')q('#instructions').textContent='Tap a country to reveal or hide its name. Keep up to two labels for comparison; a new label replaces the oldest. Clear removes labels without moving the map. Reveal All shows every name until Clear or Reset. Reset clears names and fits the practice area. '+(this.phoneReveal?'The map stays fitted on phone. ':'Drag to pan; use + / − to zoom or Fit map to restore the practice area. ')+'Tap hatched special-status areas for details; they are outside the 54-country count.';
     q('.map-readout strong').textContent=(identified?chosen.name+(unitPresentation(this.config,chosen).label?' — '+unitPresentation(this.config,chosen).label:''):null)||(this.isPuzzle?current.name:null)||(this.mode==='explorer'&&this.region!=='all'?this.regions[this.region].name:this.data.name);
     if(this.mode==='reveal'||(this.mode==='explorer'&&this.data.id==='africa')){q('.map-readout strong').textContent=this.fullData.name;q('.map-readout strong').title=this.fullData.name;}
     q('.map-progress').textContent=this.mode==='explorer'?this.data.units.length+' '+this.terms.plural+(this.config.mapOnly&&this.data.context.length?' + '+this.data.context.length+' territorial unit':''):revealed.size+' / '+this.data.units.length+(this.mode==='reveal'?'':this.preview?' revealed':' placed');
     q('.map-tools').hidden=this.isPuzzle||this.phoneReveal;
-    q('.territory-legend').hidden=!this.data.context.length||(this.mode==='explorer'&&this.data.id==='africa');
-    q('.map-caption').hidden=this.isPuzzle||(this.mode==='explorer'&&this.data.id==='africa');
+    q('.territory-legend').hidden=this.mode==='reveal'||!this.data.context.length||(this.mode==='explorer'&&this.data.id==='africa');
+    q('.map-caption').hidden=this.mode==='reveal'||this.isPuzzle||(this.mode==='explorer'&&this.data.id==='africa');
     const territorySection=q('.territory-section');if(territorySection)territorySection.hidden=!this.data.context.length;
     this.svg.classList.toggle('puzzle-map',this.isPuzzle);
     this.svg.classList.toggle('explorer-map',this.mode==='explorer');
     q('[data-action="fit"]').textContent=this.mode==='explorer'&&this.data.id!=='africa'?''+this.regions.all.name+' / Fit map':'Fit map';
-    if(this.mode==='explorer'&&this.data.id==='africa'){
+    if(this.mode==='reveal'||(this.mode==='explorer'&&this.data.id==='africa')){
       for(const button of q('.map-tools').querySelectorAll('button')){
-        const label=button.dataset.action==='fit'?'All Africa / Fit map':button.getAttribute('aria-label');
+        const label=button.dataset.action==='fit'?(this.mode==='reveal'?'Fit map':'All Africa / Fit map'):button.getAttribute('aria-label');
         button.setAttribute('aria-label',label);button.title=label;button.dataset.tooltip=label;
       }
     }
@@ -295,6 +296,7 @@ class CountryMaps {
     for(const action of ['zoom-out','left','right','up','down'])q('[data-action="'+action+'"]').disabled=this.view.w===this.fitView.w&&(action==='zoom-out'||!(this.mode==='explorer'||this.mode==='reveal'));
     q('.completion').hidden=!(this.isPuzzle&&this.engines.puzzle.placed.size===this.data.units.length);
     if(this.config.mapOnly){q('.back-link').hidden=true;q('.region-control').hidden=true;q('.list-order').hidden=true;const legend=q('.territory-legend');if(this.data.context.length)legend.innerHTML='French Guiana — France · Overseas department/region, separate from the 12 sovereign countries.';const section=q('.territory-section');if(section){section.querySelector('h3').textContent='Territorial unit';section.querySelector('p').textContent='Identified separately from sovereign countries.';}}
+    q('.status').classList.toggle('sr-only',this.mode==='reveal');
     q('.status').textContent=this.message;
     this.paintActivityLearning();
     this.positionLabel();

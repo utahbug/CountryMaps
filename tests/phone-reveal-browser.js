@@ -61,6 +61,17 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
  assert(q('.activity-learning-slot'),'learning card retained below map');
  assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');
 
+ assert(q('.map-caption').hidden&&q('.territory-legend').hidden,'no permanent map guidance');
+ assert(q('.status').classList.contains('sr-only'),'status is announced without a permanent instruction card');
+ const info=q('[popovertarget="puzzle-instructions"]');info.click();
+ assert(q('#puzzle-instructions').matches(':popover-open'),'instructions open');
+ assert(q('#instructions').textContent.includes('two labels')&&q('#instructions').textContent.includes('special-status'),'guidance in info popup');
+ q('[popovertargetaction="hide"]').click();assert(!q('#puzzle-instructions').matches(':popover-open'),'instructions dismiss');
+ if(!phone)for(const button of q('.map-tools').querySelectorAll('button')){
+  assert(button.getBoundingClientRect().height>=44&&button.getBoundingClientRect().width>=44,'map control touch target');
+  assert(parseFloat(w.getComputedStyle(button).borderTopWidth)===0,'borderless map control');
+  assert(button.title&&button.getAttribute('aria-label'),'map control label and tooltip');
+ }
  assert(q('.map-readout strong').textContent==='Africa','stable map heading');
  assert(q('.map-progress').textContent==='0 / 54','compact authoritative progress');
  assert(q('.map-readout #practice-region'),'region selector belongs to map header');
