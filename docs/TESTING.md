@@ -173,3 +173,68 @@ Pre-publication verification: all 31 Node tests passed. A dedicated actual-DOM h
 ## 2026-09-15: stable Reveal viewports on every device
 
 Reveal regression harness passed 6,879 assertions at each of 390×844, 430×932, 820×1180 and 1440×1000. Checks cover independent persistent names, repeated toggles, unchanged viewBox/screen transform/map bounds, manual desktop/tablet zoom and pan retained across selections and Reveal All, phone navigation disabled, all 54 names contained without overlap, wrapped text, Reset, cancelled gestures, pan-versus-tap, and list/search activation. Edge/long-name cases: Morocco, Tunisia, Somalia, South Africa, Cabo Verde, Mauritius, Seychelles, Central African Republic, Democratic Republic of the Congo. Explorer's existing 158-check suite passed at each size unchanged. Synthetic touch PointerEvents use a capture stub; physical iPhone Safari remains a remote user check. Phone visual inspection confirmed readable wrapping and all names inside the viewport; Reveal All is necessarily denser than individual study.
+
+## 2026-09-15: Africa regional practice sets
+
+All six selectors tested in both Explorer and Reveal at 390×844, 430×932, 820×1180, and 1440×1000 using tests/regions-browser.html. Verified exact canonical SVG paths, each country's rendered bounds inside the regional fit (including island polygons), region-only search/list/progress, independent reveal/hide for every member, Reveal All, contained wrapping labels, Reset to active-region fit, no horizontal overflow, 44px native selector target, swipe-versus-tap, Explorer focus toggles, zoom and Fit. Desktop/tablet regional Reveal preserves manually zoomed/panned views. Native selector, reload and browser Back were checked; phone East and West layouts visually inspected.
+
+Existing full-Africa browser suites passed at all four sizes: 6,879 Reveal assertions and 158 Explorer assertions per size. Node suite: 36 passing tests, including a disjoint 54-country regional partition, shared object identity/geometry, fitted bounds, and Reveal/Puzzle engine compatibility for each subset. No hardware iPhone Safari run; browser touch tests use synthetic PointerEvents with capture stubbed. No publication was performed for this change.
+
+## 2026-09-16: optional graduated Puzzle clues
+
+Node suite: 37 tests pass, including shared regional-clue coverage for all 54 sovereign countries. Browser harness tests/clues-browser.html passes 579 checks at 390×844 and 430×932, and 578 at 820×1180 and 1440×1000. It verifies each country's first region-only clue, second destination outline (including every inset), repeated requests, unchanged score and view, automatic pulse expiry, Reset, country changes, correct/incorrect placements, all-54 completion, Reveal preview/return, drag cancellation and lost capture, second-pointer isolation, Reset during drag, successful drag after abnormal states, wrapped long text, 44px targets and phone sticky placement. Touch PointerEvents are synthetic; native capture is stubbed. Physical iPhone Safari testing remains outstanding.
+
+Native browser clicks and screenshots at phone widths verified first-clue text near the map, the temporary Algeria outline, the long Democratic Republic of the Congo clue, and the Mauritius inset pulse with 0/54 unchanged. No commit or deployment performed.
+
+## 2026-09-16: overlap-based Puzzle drops
+
+The tests/drops-browser.html harness passes 268 checks at 390×844, 430×932, 820×1180 and 1440×1000. Explicit cases: The Gambia, Benin, Togo, Rwanda, Burundi, Djibouti, Eswatini, Lesotho, Malawi, Cabo Verde, Comoros, Mauritius, Seychelles and São Tomé and Príncipe. Each has an accepted overlapping drop with its pointer outside the target, a rejected miss, a rejected wrong-neighbor drop, three repeated successes, clue cleanup, no ghost/dragging classes, and unchanged canonical path/snap geometry. Also verifies successful aligned drags for every country and 54/54 completion, then clean Reset. All existing insets remain active for inset-designated countries; Malawi uses direct geographic geometry.
+
+A phone test exposed Djibouti-over-Eritrea ambiguity near the inset; the validator now compares intersected visible neighbors and rejects it. Unit cases cover normal overlap, slivers, narrow-target tolerance, nearest neighboring targets, distant-center/mostly-neighbor rejection, clipping, inset masking and the shared footprint. Existing clue/drag-state harness passed 579 checks at both phone widths, covering second pointers, cancel/lost capture, Reset during drag, incorrect and correct drops, pulse lifecycle and scoring. Touch tests use synthetic PointerEvents with capture stubbed; no physical iPhone Safari test. No commit, push or deployment performed.
+
+## 2026-09-16: Explorer regional organization
+
+43 Node tests pass, including canonical-object grouping, alphabetical ordering, and exact one-region membership for all 54 countries. tests/explorer-groups-browser.html passes 392 assertions at each of 390×844, 430×932, 820×1180 and 1440×1000: five groups, all 54 list/map selections, regional viewport and rendered-map stability, repeated selection, manual navigation retained, disclosure behavior, all-country search in both list orders, outside-region search selection, All Africa return, legacy country focus, touch targets and no horizontal overflow. Native phone screenshots verified compact collapsed headings and expanded West Africa selection.
+
+Existing Explorer gesture suite passes 158 checks at each size. The regional subset harness now targets Reveal only because Explorer intentionally retains all 54 countries; it passes on phone and desktop after this change. Earlier Explorer subset-filtering expectations are superseded by the global-search requirement. Physical iPhone Safari remains untested. Changes remain uncommitted and unpublished.
+
+## Future map structure verification (2026-09-16)
+
+- npm run check, npm test: 47 passing tests, npm run build: 21 static files, no dependencies.
+- New configuration tests cover planned-only routing, unique 13/7/12 manifests, Canadian province/territory counts, French Guiana exclusion, shared engines with Canadian IDs, generic search, canonical Africa object identity, and rejection of wrong manifest IDs.
+- Explorer grouped-list browser harness: 392 checks at each of 390 × 844, 430 × 932, 820 × 1180 and 1440 × 1000.
+- Reveal browser harness: 6,879 checks at each of those sizes.
+- Puzzle drop harness: 268 checks at each size, including all 54 aligned placements and the 14 small/narrow countries.
+- Additional desktop checks: 578 Puzzle clue checks and 847 regional Reveal checks.
+- Landing page verified: only Africa activities are linked; no future map navigation. Existing geometry and manifests unchanged.
+- Browser pointer regression tests use synthetic PointerEvents with capture stubbed; these are not physical iPhone Safari tests.
+- No commit, push or deployment performed. Earlier local regional/clue/drop work remains uncommitted.
+
+## Unit classification and capital schema verification (2026-09-16)
+
+Structural follow-up only: 50 tests pass; syntax checks and the dependency-free 21-file static build pass. Tests verify explicit Canada unitType values (10 provinces / 3 territories), parent sovereign states, disabled future learning settings, French Guiana inclusion in the 13-unit learning set but exclusion from the 12-country Puzzle, and preservation of optional capital/multiple-seat metadata. No map geometry, current Africa UI or interaction code changed in this pass. No new device/browser testing was needed for metadata-only changes. No commit, push or deployment.
+
+## Canada visual classification preparation
+
+52 automated tests, syntax checks and static build pass. All 13 planned Canadian units resolve to explicit Province / Territory labels, distinct colors and solid / dashed boundaries. Africa fallback presentation remains unchanged. Local browser regression at 319 × 1242 passed 392 Explorer grouping checks, 6,879 Reveal checks and 268 Puzzle drop checks. Canada map rendering cannot yet be tested because its geometry remains intentionally unbuilt; verify boundary readability at phone and desktop scale during map implementation. No commit or push.
+
+## Canada / Central America / South America map-only verification (2026-09-16)
+
+- 56 automated tests pass, including exact manifest membership, 13/7/12+1 coverage, finite/fitted geometry, provenance hashes, metadata and a byte-for-byte Africa geometry hash guard.
+- New Americas browser harness: 241 checks pass at each of 390 × 844, 430 × 932, 820 × 1180 and 1440 × 1000. All 33 units select correctly, labels stay within the viewport, search/fit/zoom/pan work, Canada has two fill families and explicit solid/dashed type cues, French Guiana is separately identified, no horizontal overflow, and direct Puzzle URLs expose no unfinished Puzzle.
+- Visual inspections: all three new maps on phone; Canada and South America on desktop. Canada's legend sits immediately above geography on phones.
+- Africa regression suites pass at 390 × 844, 430 × 932 and 1440 × 1000: 392 Explorer grouping checks, 6,879 Reveal checks, and 268 Puzzle overlap/drop checks at each size.
+- Synthetic touch PointerEvents use capture stubs; no physical iPhone Safari test was performed.
+- Dependency-free static packaging includes all new data under /CountryMaps/. No Europe/Asia data builds, no Africa data rebuild, no commit/push/deployment.
+
+## Root All Maps hub verification
+
+The no-query root now renders the registry-driven hub; explicit ?map=africa still renders Africa’s existing landing page. Home/navigation browser checks pass at 390 × 844 and 430 × 932 (50 each), and 820 × 1180 and 1440 × 1000 (49 each). Verified all four cards, all three Africa activities, no unfinished mode links, large touch targets, no horizontal overflow, root-return links and the CountryMaps brand. All four cards fit within the phone viewport with minimal scrolling. The root and all links were exercised under /CountryMaps/. 56 automated tests and the static build pass. No commit, push or deployment.
+
+## Bird’s-eye home tiles
+
+60 automated tests pass, including preview membership and SHA-256 provenance against canonical geometry. Static build regenerates and copies four SVG thumbnails (under 200 KB each); the activity JSON files are not modified. Home browser checks pass at 390 × 844 and 430 × 932 (62 each), and tablet 820 × 1180 and desktop 1440 × 1000 (61 each). Checked image loading, readable preview sizes, correct activity labels, all tile destinations, All Maps/brand return routes, touch targets and no horizontal overflow. Visual inspections confirmed a compact 2 × 2 phone layout and four-column desktop layout. No commit, push or deployment.
+
+## Planned United States structure
+
+62 automated tests and static build pass. New tests verify 50 unique state units, disabled activities, rejection of unavailable U.S. routes, capital/region metadata, Alaska/Hawaii inset groups and the unset optional Utah project link. Home navigation checks pass at 390 × 844 and 430 × 932 (64 each), and 1440 × 1000 (63): four working cards plus one non-clickable planned U.S. tile, no broken U.S. link. No U.S. geometry or Utah county data was added. No commit/push/deployment.

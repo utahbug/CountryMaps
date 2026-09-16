@@ -20,7 +20,7 @@ test('browser module imports resolve locally from any hosting subfolder',()=>{
  const index=fs.readFileSync(new URL('index.html',root),'utf8');
  for(const match of index.matchAll(/(?:src|href)="(\.\/[^"]+)"/g))assert.ok(fs.existsSync(new URL(match[1],root)),match[1]);
  assert.ok(fs.existsSync(new URL('.nojekyll',root)));
- assert.equal(Object.keys(registry).join(','),'africa');
+ assert.equal(Object.keys(registry).join(','),'africa,canada,central-america,south-america');
  assert.ok(fs.existsSync(fileURLToPath(registry.africa.url)));
 });
 test('all countries and common accent-free aliases are searchable',()=>{

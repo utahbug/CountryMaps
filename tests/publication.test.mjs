@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const root=new URL('../',import.meta.url);
 test('all source HTML pages discourage indexing and link local icons',()=>{
- for(const name of ['index.html','tests/pan-browser.html']){
+ for(const name of ['index.html','tests/pan-browser.html','tests/home-browser.html','tests/americas-browser.html','tests/regions-browser.html','tests/clues-browser.html','tests/drops-browser.html','tests/explorer-groups-browser.html']){
   const url=new URL(name,root),html=fs.readFileSync(url,'utf8');
   assert.match(html,/<meta name="robots" content="noindex, nofollow">/);
   assert.match(html,/rel="apple-touch-icon"/);
