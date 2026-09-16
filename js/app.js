@@ -1,6 +1,7 @@
 import {loadMap,modes,titles,findCountries,insetTransform,pieceViewBox,escapeHTML as esc} from '../lib/maps.js';
 import {ExplorerEngine,RevealEngine,PuzzleEngine} from '../lib/engines/activities.mjs';
 import {DragController} from '../lib/engines/drag-controller.mjs';
+import {placeRevealLabels} from '../lib/reveal-labels.mjs';
 import {placeCountryLabel} from '../lib/label-placement.mjs';
 import {PanController,clampPan} from '../lib/engines/pan-controller.mjs';
 
@@ -44,7 +45,7 @@ class CountryMaps {
     const name=esc(this.data.name);
     root.innerHTML='<div class="activity-heading"><div><a class="back-link" href="'+this.href('home')+'">← '+name+'</a><h1>'+name+' <span>/ '+titles[this.mode]+'</span></h1></div><nav class="mode-links" aria-label="'+name+' activities">'+modes.map(m=>'<a href="'+this.href(m)+'"'+(m===this.mode?' aria-current="page"':'')+'>'+titles[m]+'</a>').join('')+'</nav></div>'+
     '<div class="toolbar"><p id="instructions"></p><div class="toolbar-actions">'+(this.mode==='reveal'?'<button data-action="reveal-all">Reveal All</button>':'')+(this.mode==='puzzle'?'<button data-action="preview">Reveal</button>':'')+'<button data-action="reset">Reset</button></div></div>'+
-    '<div class="workspace"><section class="map-panel" aria-label="'+name+' map"><div class="map-readout"><strong></strong><span></span></div><div class="map-viewport"><div class="selected-country-overlay" hidden aria-hidden="true"></div><svg id="africa-map" class="map-canvas" viewBox="0 0 800 730" role="group" aria-label="Interactive '+name+' country map">'+
+    '<div class="workspace"><section class="map-panel" aria-label="'+name+' map"><div class="map-readout"><strong></strong><span></span></div><div class="map-viewport"><div class="reveal-label-layer" aria-hidden="true"></div><div class="selected-country-overlay" hidden aria-hidden="true"></div><svg id="africa-map" class="map-canvas" viewBox="0 0 800 730" role="group" aria-label="Interactive '+name+' country map">'+
     '<defs><pattern id="territory-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#e6e2d7"/><path d="M0 8L8 0" stroke="#aaa391" stroke-width="1"/></pattern></defs>'+
     this.data.countries.map((c,i)=>'<g><path data-country="'+c.id+'" data-name="'+esc(c.name)+'" data-anchor-x="'+((c.anchor[0]-c.bounds[0])/(c.bounds[2]-c.bounds[0]))+'" data-anchor-y="'+((c.anchor[1]-c.bounds[1])/(c.bounds[3]-c.bounds[1]))+'" class="country" d="'+c.path+'" role="button" tabindex="0" aria-pressed="false"><title></title></path><text hidden data-number="'+c.id+'" class="country-number" x="'+c.anchor[0]+'" y="'+c.anchor[1]+'">'+(i+1)+'</text></g>').join('')+
     this.data.context.map(c=>'<g class="territory-geometry"><path data-territory="'+c.id+'" d="'+c.path+'" class="context-region" role="button" tabindex="0" aria-label="'+esc(c.name+' — '+c.classification)+'" aria-pressed="false"><title>'+esc(c.name+' — '+c.classification)+'</title></path><text data-territory-label="'+c.id+'" class="territory-map-label" text-anchor="middle" x="'+c.anchor[0]+'" y="'+(c.anchor[1]-8)+'">'+esc(c.name)+'</text></g>').join('')+'<circle hidden class="location-marker"/><g id="inset-layer"></g></svg></div><div class="map-tools" aria-label="Map view controls">'+
@@ -78,7 +79,8 @@ class CountryMaps {
     const identified=chosen&&(this.mode!=='reveal'||chosen.classification||revealed.has(chosen.id));
     q('.workspace').classList.toggle('puzzle-workspace',this.isPuzzle);
     q('.workspace').classList.toggle('phone-reveal',this.phoneReveal);
-    q('#instructions').textContent=this.phoneReveal?'Tap a country to reveal or hide its name. Africa stays fitted while you study.':this.mode==='explorer'?'Select a country in the full map. Select it again to switch between focus and the continent.':this.mode==='reveal'?'Tap a country to reveal or hide its name. Repeated taps also switch focus and continent views.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location.';
+    q('.workspace').classList.toggle('reveal-workspace',this.mode==='reveal');
+    q('#instructions').textContent=this.phoneReveal?'Tap a country to reveal or hide its name. Africa stays fitted while you study.':this.mode==='explorer'?'Select a country in the full map. Select it again to switch between focus and the continent.':this.mode==='reveal'?'Tap a country to reveal or hide its name. Your map view stays in place.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location.';
     q('.map-readout strong').textContent=(identified?chosen.name:null)||inset?.name||this.data.name;
     q('.map-readout span').textContent=this.mode==='explorer'?this.data.countries.length+' countries':revealed.size+' / '+this.data.countries.length+(this.mode==='reveal'||this.preview?' revealed':' placed');
     q('.map-tools').hidden=this.isPuzzle||this.phoneReveal;
@@ -87,7 +89,9 @@ class CountryMaps {
     this.svg.classList.toggle('navigable-map',this.mode==='explorer'||this.mode==='reveal');
     const overlay=q('.selected-country-overlay');
     overlay.textContent=identified?(chosen.classification?chosen.name+' — '+chosen.classification:chosen.name):'';
-    overlay.hidden=!identified||!(this.mode==='explorer'||this.mode==='reveal');
+    overlay.hidden=!identified||!(this.mode==='explorer'||this.mode==='reveal')||(this.mode==='reveal'&&!chosen?.classification);
+    const labels=q('.reveal-label-layer');
+    labels.innerHTML=this.mode==='reveal'?this.data.countries.filter(c=>revealed.has(c.id)).map(c=>'<div class="reveal-country-label" data-reveal-country="'+c.id+'">'+esc(c.name)+'</div>').join(''):'';
     this.svg.setAttribute('viewBox',[this.view.x,this.view.y,this.view.w,this.view.h].join(' '));
     for(const [i,c] of this.data.countries.entries()){
       const path=q('[data-country="'+c.id+'"],[data-territory="'+c.id+'"]'),shown=this.mode==='explorer'?this.selected===c.id:revealed.has(c.id);
@@ -131,7 +135,52 @@ class CountryMaps {
     q('.status').textContent=this.message;
     this.positionLabel();
   }
+  positionRevealLabels(){
+    const layer=q('.reveal-label-layer'),labels=[...layer.querySelectorAll('.reveal-country-label')];
+    if(!labels.length)return;
+    const frame=layer.getBoundingClientRect(),matrix=this.svg.getScreenCTM();
+    if(!matrix||!frame.width)return;
+    const viewport={w:frame.width,h:frame.height};
+    layer.classList.toggle('dense',labels.length>18);
+    const measure=()=>labels.map(label=>{
+      const c=this.byId.get(label.dataset.revealCountry),b=q('[data-country="'+c.id+'"]').getBoundingClientRect();
+      const a=new DOMPoint(...c.anchor).matrixTransform(matrix),size=label.getBoundingClientRect();
+      return {id:c.id,w:size.width,h:size.height,anchor:{x:a.x-frame.left,y:a.y-frame.top},country:{x:b.left-frame.left,y:b.top-frame.top,w:b.width,h:b.height}};
+    });
+    for(const label of labels){label.style.width='';label.style.maxWidth='';}
+    let items=measure(),positions=placeRevealLabels(viewport,items);
+    // Dense maps use measured columns if adjacent placements cannot all fit.
+    if(!positions){
+      layer.classList.add('dense');
+      for(let columns=3;columns<=6&&!positions;columns++){
+        const width=(viewport.w-16-(columns-1)*3)/columns;
+        for(const label of labels){label.style.width=width+'px';label.style.maxWidth=width+'px';}
+        items=measure();const heights=Array(columns).fill(8),candidate={};
+        for(const item of [...items].sort((a,b)=>b.h-a.h)){
+          const col=heights.indexOf(Math.min(...heights));
+          candidate[item.id]={x:8+col*(width+3),y:heights[col]};heights[col]+=item.h+3;
+        }
+        if(Math.max(...heights)-3<=viewport.h-8)positions=candidate;
+      }
+    }
+    layer.querySelector('.reveal-connectors')?.remove();
+    const connectors=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    connectors.classList.add('reveal-connectors');connectors.setAttribute('viewBox','0 0 '+viewport.w+' '+viewport.h);
+    layer.prepend(connectors);
+    for(const item of items){
+      const label=labels.find(el=>el.dataset.revealCountry===item.id);
+      const point=positions?.[item.id]||placeCountryLabel({viewport,label:item,country:item.country,anchor:item.anchor});
+      label.style.left=Math.max(8,Math.min(viewport.w-item.w-8,point.x))+'px';
+      label.style.top=Math.max(8,Math.min(viewport.h-item.h-8,point.y))+'px';
+      const x=parseFloat(label.style.left),y=parseFloat(label.style.top),a=item.anchor;
+      const end={x:Math.max(x,Math.min(x+item.w,a.x)),y:Math.max(y,Math.min(y+item.h,a.y))};
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',Math.max(8,Math.min(viewport.w-8,a.x)));line.setAttribute('y1',Math.max(8,Math.min(viewport.h-8,a.y)));
+      line.setAttribute('x2',end.x);line.setAttribute('y2',end.y);connectors.append(line);
+    }
+  }
   positionLabel(){
+    if(this.mode==='reveal')this.positionRevealLabels();
     if(this.svg&&this.mode!=='home'){
       const b=this.svg.getBoundingClientRect(),unit=Math.min(b.width/this.view.w,b.height/this.view.h);
       for(const label of this.svg.querySelectorAll('.territory-map-label'))label.style.fontSize=(11/Math.max(unit,.01))+'px';
@@ -179,12 +228,12 @@ class CountryMaps {
       if(this.mode==='explorer'&&!c.classification)this.engines.explorer.select(c.id);
       this.selected=c.id;this.message=c.classification?c.name+' — '+c.classification+'. '+c.description:c.name;
       if(this.mode==='reveal'&&!c.classification&&!this.engines.reveal.revealed.has(c.id))this.message='Country name hidden. Select it again to reveal.';
-      if(focusSelection)this.focus(c);else this.view={...fit};
+      if(this.mode!=='reveal'){if(focusSelection)this.focus(c);else this.view={...fit};}
     }
     this.paint();
   }
   focus(c){
-    if(this.phoneReveal){this.view={...fit};return;}
+    if(this.mode==='reveal')return;
     const [x0,y0,x1,y1]=c.bounds,factor=Math.min(12,Math.max(1,Math.min(600/(x1-x0),500/(y1-y0)))),w=800/factor,h=730/factor;
     this.view={x:Math.max(0,Math.min(800-w,(x0+x1-w)/2)),y:Math.max(0,Math.min(730-h,(y0+y1-h)/2)),w,h};
   }

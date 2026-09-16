@@ -805,3 +805,12 @@ progress::-webkit-progress-bar{background:#e5eae5}progress::-webkit-progress-val
   .phone-reveal .map-readout strong { font-size:.95rem; line-height:1.3; }
   .phone-reveal .navigable-map, .phone-reveal .navigable-map.is-panning { touch-action:pan-y; cursor:pointer; }
 }
+
+/* Reveal labels are measured in viewport pixels, independently of SVG zoom. */
+.reveal-workspace .map-readout { height:80px; min-height:80px; }
+.reveal-label-layer { position:absolute; inset:0; z-index:1; pointer-events:none; }
+.reveal-country-label { position:absolute; width:max-content; max-width:min(175px,44%); padding:4px 6px; border:1px solid #ccd8d2; border-radius:5px; background:rgb(255 253 248 / 95%); color:#244f43; font-size:14px; line-height:17px; font-weight:600; overflow-wrap:anywhere; pointer-events:none; user-select:none; }
+.reveal-label-layer.dense .reveal-country-label { font-size:12px; line-height:14px; padding:2px 3px; max-width:135px; }
+
+.reveal-connectors { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.reveal-connectors line { stroke:#526d61; stroke-width:1; opacity:.55; }

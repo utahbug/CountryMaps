@@ -17,9 +17,9 @@ document.querySelector('#run').onclick=()=>{
   const clean=()=>assert(!svg.hasAttribute('data-pan-pointer')&&!svg.classList.contains('is-panning')&&!captured.size&&!q('.drag-preview'),'no stranded gesture state');
   const reset=()=>q('[data-action="reset"]').click();
   try{
-   if(w.innerWidth<=650&&new URL(w.location.href).searchParams.get('mode')==='reveal'){
+   if(new URL(w.location.href).searchParams.get('mode')==='reveal'){
     runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box});
-    results.textContent='PASS: '+checks+' stable phone Reveal checks at '+w.innerWidth+' × '+w.innerHeight+'. Touch PointerEvents; capture stubbed.';return;
+    results.textContent='PASS: '+checks+' stable Reveal checks at '+w.innerWidth+' × '+w.innerHeight+'. Touch PointerEvents; capture stubbed.';return;
    }
    reset();assert(w.getComputedStyle(svg).touchAction==='none','one-finger map gesture owns touch');
    assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');
