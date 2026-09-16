@@ -298,8 +298,8 @@ class CountryMaps {
   paintActivityLearning(){
     const slot=q('.activity-learning-slot');if(!slot)return;
     const id=this.lastLearning[this.mode],unit=this.data.units.find(c=>c.id===id);
-    if(slot.dataset.country===(unit?.id||''))return;
-    slot.dataset.country=unit?.id||'';
+    if(slot.dataset.learningId===(unit?.id||''))return;
+    slot.dataset.learningId=unit?.id||'';
     slot.innerHTML=unit?activityLearningCard(unit,{reference:this.fullData.reference,config:this.config,region:countryRegion(unit.id,this.regions)?.name||'',completed:this.mode==='puzzle',escape:esc}):'';
     slot.dataset.tone=unit?String(this.fullData.units.findIndex(c=>c.id===unit.id)%4):'0';
   }

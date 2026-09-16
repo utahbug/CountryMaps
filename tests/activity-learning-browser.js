@@ -12,7 +12,7 @@ document.querySelector('#run').onclick=()=>{let n=0;const ok=(v,m)=>{if(!v)throw
  for(const c of data.countries){
    const prior=current();
    if(mode==='puzzle'){click('[data-piece="'+c.id+'"]');ok(current()===prior,'selection does not reveal recap');shape(c.id==='DZA'?'EGY':'DZA');ok(current()===prior,'incorrect placement keeps prior recap');click('[data-piece="'+c.id+'"]');}
-   shape(c.id);ok(current()===c.id,'latest country '+c.id);ok(d.querySelectorAll('.activity-learning-card').length===1,'one card');
+   shape(c.id);ok(current()===c.id,'latest country '+c.id);ok(d.querySelectorAll('.activity-learning-card').length===1,'one card');const pressed=q('[data-country="'+c.id+'"]').getAttribute('aria-pressed');click('.activity-learning-card');ok(q('[data-country="'+c.id+'"]').getAttribute('aria-pressed')===pressed,'recap click does not change activity');
    ok(q('.activity-learning-card p').textContent===reference.units[c.id].summary,'canonical description');
    ok(q('.activity-learning-card small').textContent.includes(countryRegion(c.id).name),'canonical region');
    ok(q('.activity-learning-card').scrollHeight<=q('.activity-learning-card').clientHeight,'card text fits');
