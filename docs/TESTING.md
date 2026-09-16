@@ -238,3 +238,10 @@ The no-query root now renders the registry-driven hub; explicit ?map=africa stil
 ## Planned United States structure
 
 62 automated tests and static build pass. New tests verify 50 unique state units, disabled activities, rejection of unavailable U.S. routes, capital/region metadata, Alaska/Hawaii inset groups and the unset optional Utah project link. Home navigation checks pass at 390 × 844 and 430 × 932 (64 each), and 1440 × 1000 (63): four working cards plus one non-clickable planned U.S. tile, no broken U.S. link. No U.S. geometry or Utah county data was added. No commit/push/deployment.
+
+## Dedicated Africa route and compact landing page
+
+- `/CountryMaps/` remains the All Maps hub; `/CountryMaps/africa/` is the dedicated Africa landing page. Shared CSS, JavaScript, data, icons and manifest resolve from the project root through a base-path-safe entry document.
+- Home/navigation checks pass at 390 × 844 and 430 × 932 (67 each), 820 × 1180 (67), and 1440 × 900 (68). They verify the dedicated route, nested asset paths, all three Africa activities, return to the short root URL, working map cards and no unfinished links.
+- At 1440 × 900 the Africa map begins near the top of the content, remains 510px tall, and finishes above the fold. All three desktop activity cards are approximately 69px tall. At 820px the map begins before 500px. The existing stacked phone layout remains unchanged and has no horizontal overflow.
+- Explorer (158 checks), Reveal (6,879 checks), and Puzzle (268 checks) pass at each of 390 × 844, 430 × 932, 820 × 1180 and 1440 × 900. Pointer/touch tests are synthetic; no physical iPhone Safari test was performed.

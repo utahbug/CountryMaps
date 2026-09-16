@@ -534,28 +534,31 @@ input {
   padding: 22px;
   border-radius: 8px;
 }
-@media (min-width: 1100px) {
+@media (min-width: 900px) {
   .landing-layout {
-    padding-right: 440px;
-    min-height: 500px;
+    display: grid;
+    grid-template-columns: minmax(330px, 0.85fr) minmax(440px, 1.15fr);
+    align-items: start;
+    gap: clamp(28px, 4vw, 58px);
+    min-height: 470px;
   }
   .landing-map {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 430px;
-    height: 430px;
+    width: 100%;
+    max-width: 590px;
+    height: min(510px, calc(100vh - 175px));
+    min-height: 430px;
+    margin: 0 auto;
   }
   .landing-layout .activity-cards {
     grid-template-columns: 1fr;
-    margin-top: 24px;
-    gap: 12px;
+    margin-top: 16px;
+    gap: 8px;
   }
   .landing-layout .activity-cards > a {
-    padding: 16px 20px;
+    padding: 11px 14px;
     display: grid;
-    grid-template-columns: 38px 1fr auto;
-    gap: 4px 12px;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    gap: 2px 10px;
     align-items: center;
   }
   .landing-layout .activity-number {
@@ -564,16 +567,53 @@ input {
   }
   .landing-layout h2 {
     margin: 0;
+    font-size: 1.08rem;
   }
   .landing-layout .activity-cards p {
     grid-column: 2;
     margin: 0;
-    font-size: 0.94rem;
+    font-size: 0.84rem;
+    line-height: 1.35;
   }
   .landing-layout .activity-cards strong {
     grid-column: 3;
     grid-row: 1/3;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  .landing-layout .eyebrow {
+    margin-bottom: 6px;
+  }
+  .landing-layout h1 {
+    margin-bottom: 6px;
+  }
+  .landing-layout .landing-intro {
+    margin-bottom: 0;
+    font-size: 1rem;
+  }
+}
+@media (min-width: 651px) and (max-width: 899px) {
+  .landing-layout .activity-cards {
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .landing-layout .activity-cards > a {
+    padding: 14px;
+  }
+  .landing-layout .activity-number {
+    margin-bottom: 10px;
+  }
+  .landing-layout .activity-cards h2 {
+    margin-bottom: 5px;
+  }
+  .landing-layout .activity-cards p {
+    margin-bottom: 8px;
+    font-size: 0.86rem;
+    line-height: 1.35;
+  }
+  .landing-map {
+    height: 400px;
+    margin-top: 18px;
   }
 }
 @media (max-width: 850px) {

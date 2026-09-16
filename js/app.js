@@ -9,6 +9,10 @@ import {placeRevealLabels} from '../lib/reveal-labels.mjs';
 import {placeCountryLabel} from '../lib/label-placement.mjs';
 import {PanController,clampPan} from '../lib/engines/pan-controller.mjs';
 
+// Resolve from the shared module, never from the current nested route.
+const projectRoot=new URL('../',import.meta.url);
+document.querySelector('base').href=projectRoot.href;
+const mapEntry=id=>id==='africa'?new URL('africa/',projectRoot).pathname:projectRoot.pathname+'?map='+encodeURIComponent(id);
 const root=document.querySelector('#main');
 const q=(selector,scope=root)=>scope.querySelector(selector);
 let app=null;
@@ -29,7 +33,7 @@ class CountryMaps {
   get preview(){return this.mode==='puzzle'&&this.engines.puzzle.preview;}
   get isPuzzle(){return this.mode==='puzzle'&&!this.preview;}
   get revealed(){return this.mode==='reveal'?this.engines.reveal.revealed:this.preview?new Set(this.data.units.map(c=>c.id)):this.engines.puzzle.placed;}
-  href(mode){return '?map='+this.data.id+(mode==='home'?'':'&mode='+mode)+(['explorer','reveal'].includes(mode)&&this.region!=='all'?'&region='+this.region:'');}
+  href(mode){if(mode==='home'&&this.data.id==='africa')return mapEntry('africa');return '?map='+this.data.id+(mode==='home'?'':'&mode='+mode)+(['explorer','reveal'].includes(mode)&&this.region!=='all'?'&region='+this.region:'');}
   enter(mode,region='all') {
     if(this.config.mapOnly){mode='explorer';region='all';}
     this.clearClue();this.pan.cancel();this.drag.cancel();this.toolLifecycle?.abort();
@@ -424,15 +428,15 @@ function renderHome(){
  const cards=[...Object.keys(registry),...Object.keys(mapDefinitions).filter(id=>!registry[id]&&mapDefinitions[id].showOnHome)].map(id=>{
   const config=mapDefinitions[id];
   if(!registry[id])return '<article class="map-card map-card-planned" aria-label="'+esc(config.name)+' — Planned"><div class="map-card-preview planned-preview"><strong>'+config.manifest.expectedCount+'</strong><span>'+esc(config.terminology.plural)+'</span></div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">Planned · Not available yet</span></div></article>';
-  return '<a class="map-card" href="?map='+id+'"><div class="map-card-preview"><img src="./assets/maps/'+id+'.svg" alt="" width="800" height="730" decoding="async"></div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">'+(config.mapOnly?'Map only for now':'Explorer / Reveal / Puzzle')+'</span></div><span class="map-card-arrow" aria-hidden="true">→</span></a>';
+  return '<a class="map-card" href="'+mapEntry(id)+'" data-map-entry="'+id+'"><div class="map-card-preview"><img src="./assets/maps/'+id+'.svg" alt="" width="800" height="730" decoding="async"></div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">'+(config.mapOnly?'Map only for now':'Explorer / Reveal / Puzzle')+'</span></div><span class="map-card-arrow" aria-hidden="true">→</span></a>';
  }).join('');
  root.innerHTML='<section class="maps-home" aria-labelledby="maps-title"><p class="eyebrow">COUNTRYMAPS</p><h1 id="maps-title">Choose a map</h1><p class="hub-intro">Explore places. Learn their shapes and locations.</p><nav class="map-cards" aria-label="Choose a map">'+cards+'</nav></section>';
 }
 // Registry-driven navigation includes only available maps, with project-relative URLs.
-document.querySelector('.map-navigation').innerHTML='<a href="./" data-home>All Maps</a>'+Object.keys(registry).map(id=>'<a href="?map='+id+'">'+esc(registry[id].name)+'</a>').join('');
+document.querySelector('.map-navigation').innerHTML='<a href="./" data-home>All Maps</a>'+Object.keys(registry).map(id=>'<a data-map-entry="'+id+'" href="'+mapEntry(id)+'">'+esc(registry[id].name)+'</a>').join('');
 
 async function navigate(){
-  const version=++navigationVersion,params=new URLSearchParams(location.search),id=params.get('map'),mode=modes.includes(params.get('mode'))?params.get('mode'):'home';
+  const version=++navigationVersion,params=new URLSearchParams(location.search),id=params.get('map')||(location.pathname===new URL('africa/',projectRoot).pathname||location.pathname===new URL('africa/index.html',projectRoot).pathname?'africa':null),mode=modes.includes(params.get('mode'))?params.get('mode'):'home';
   app?.pan.cancel();app?.drag.cancel();
   if(!id){renderHome();return;}
   try{
@@ -447,8 +451,8 @@ async function navigate(){
 }
 
 document.addEventListener('click',event=>{
-  const link=event.target.closest('a[href^="?map="],a[data-home]');
-  if(link&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();history.pushState({},'',link.getAttribute('href'));window.scrollTo(0,0);navigate();return;}
+  const link=event.target.closest('a[href^="?map="],a[data-home],a[data-map-entry],a.back-link');
+  if(link&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();history.pushState({},'',link.href);window.scrollTo(0,0);navigate();return;}
   if(!app||app.mode==='home')return;
   const piece=event.target.closest('[data-piece]');
   if(piece&&!piece.disabled){

@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const root=new URL('../',import.meta.url);
 test('all source HTML pages discourage indexing and link local icons',()=>{
- for(const name of ['index.html','tests/pan-browser.html','tests/home-browser.html','tests/americas-browser.html','tests/regions-browser.html','tests/clues-browser.html','tests/drops-browser.html','tests/explorer-groups-browser.html']){
+ for(const name of ['index.html','africa/index.html','tests/pan-browser.html','tests/home-browser.html','tests/americas-browser.html','tests/regions-browser.html','tests/clues-browser.html','tests/drops-browser.html','tests/explorer-groups-browser.html']){
   const url=new URL(name,root),html=fs.readFileSync(url,'utf8');
   assert.match(html,/<meta name="robots" content="noindex, nofollow">/);
   assert.match(html,/rel="apple-touch-icon"/);
-  for(const match of html.matchAll(/(?:src|href)="(\.\.?\/[^"?]+)"/g))assert.ok(fs.existsSync(new URL(match[1],url)),match[1]);
+  for(const match of html.matchAll(/(?:src|href)="(\.\.?\/[^"?]+)"/g))assert.ok(fs.existsSync(new URL(match[1],html.includes('<base href="../">')?new URL('../',url):url)),match[1]);
  }
  assert.equal(fs.readFileSync(new URL('robots.txt',root),'utf8').trim(),'User-agent: *\nDisallow: /');
 });

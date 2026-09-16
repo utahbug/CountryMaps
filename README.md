@@ -174,3 +174,5 @@ United States (`united-states`) is reserved as a separate 50-state map and appea
 ## Publishing workflow
 
 GitHub Pages at https://utahbug.github.io/CountryMaps/ is the primary review and iPhone testing version. After each completed, tested requested change: commit to this repository, push main, wait for the existing Pages deployment, verify the live site and /CountryMaps/ asset paths, then report the commit hash and deployment status. Do not publish when explicitly instructed otherwise, when tests fail, or when incomplete/experimental changes could break the site; report the blocker clearly. Preserve noindex, nofollow and the root robots.txt exclusion until instructed otherwise.
+
+Africa now has a dedicated landing URL: `/CountryMaps/africa/`. The root `/CountryMaps/` remains All Maps. Old `?map=africa` and activity query URLs remain compatible. Both HTML entry documents use base-path-safe assets; the shared module locks the project base before client-side navigation so All Maps always returns to the root.

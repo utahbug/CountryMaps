@@ -11,7 +11,11 @@ http.createServer((req,res)=>{
   const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
   if(prefix&&!pathname.startsWith(prefix+'/')){res.writeHead(404);res.end('Not found');return;}
   const relative=pathname.slice(prefix.length).replace(/^\/+/,'')||'index.html';
-  const file=path.resolve(root,relative);
+  let file=path.resolve(root,relative);
+  if(file.startsWith(root+path.sep)&&fs.existsSync(file)&&fs.statSync(file).isDirectory()){
+   if(!pathname.endsWith('/')){res.writeHead(301,{Location:pathname+'/'+new URL(req.url,'http://localhost').search});res.end();return;}
+   file=path.join(file,'index.html');
+  }
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||fs.statSync(file).isDirectory()){res.writeHead(404);res.end('Not found');return;}
   res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});
   fs.createReadStream(file).pipe(res);
