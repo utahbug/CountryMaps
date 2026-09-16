@@ -48,4 +48,9 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
  assert(q('#practice-region').getBoundingClientRect().height>=44,'region touch target');
  assert(q('.map-readout').getBoundingClientRect().height<=50,'compact map header');
 
+ const measure=q('.region-select-width'),control=q('#practice-region');
+ assert(measure.textContent===control.selectedOptions[0].textContent,'width follows active region');
+ assert(Math.abs(measure.getBoundingClientRect().width-control.getBoundingClientRect().width)<2,'select matches text-sized wrapper');
+ assert(w.getComputedStyle(q('.region-select-wrap'),'::after').pointerEvents==='none','caret cannot intercept taps');
+
 }

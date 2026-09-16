@@ -98,7 +98,13 @@ class CountryMaps {
     '<button data-action="zoom-in" aria-label="Zoom in">+</button><button data-action="zoom-out" aria-label="Zoom out">−</button><button data-action="fit">Fit map</button><button data-action="left" aria-label="Pan left">←</button><button data-action="up" aria-label="Pan up">↑</button><button data-action="down" aria-label="Pan down">↓</button><button data-action="right" aria-label="Pan right">→</button></div><div class="map-caption"></div>'+(this.config.mapOnly?'':unitLegend(this.config))+'<p class="territory-legend"><span aria-hidden="true"></span>Special-status area — tap for details. Outside the '+this.fullData.units.length+'-'+this.terms.singular+' score.</p></section><aside id="activity-side-panel" class="side-panel"></aside></div>'+
     '<p role="status" aria-live="polite" class="status" data-active-pointer=""></p><div class="completion" hidden><h2>'+name+', complete.</h2><p>All '+this.data.units.length+' '+this.terms.plural+' are in place.</p><button data-action="reset">Play again</button></div>';
     this.svg=q('#africa-map');
-    if(this.mode==='reveal')q('.map-readout').insertBefore(q('.region-control'),q('.map-progress'));
+    if(this.mode==='reveal'){
+      q('.map-readout').insertBefore(q('.region-control'),q('.map-progress'));
+      const select=q('#practice-region'),wrap=document.createElement('div'),measure=document.createElement('span');
+      wrap.className='region-select-wrap';measure.className='region-select-width';measure.setAttribute('aria-hidden','true');
+      measure.textContent=select.selectedOptions[0].textContent;
+      select.before(wrap);wrap.append(measure,select);
+    }
     this.renderSide();this.paint();
   }
   renderSide() {

@@ -1261,3 +1261,10 @@ body:has(.compact-heading) main { margin-top:2px; }
  .reveal-workspace .map-readout .region-control select { max-width:145px; font-size:.78rem; }
  .reveal-workspace .map-readout .map-progress { font-size:.72rem; }
 }
+
+/* Native select hit area follows the active name rather than the longest option. */
+.reveal-workspace .region-select-wrap { position:relative; display:inline-grid; flex:none; min-height:44px; font-size:.85rem; }
+.reveal-workspace .map-readout .region-select-width { visibility:hidden; white-space:nowrap; padding:0 25px 0 7px; font:inherit; }
+.reveal-workspace .map-readout .region-select-wrap select { position:absolute; inset:0; width:100%; max-width:none; min-width:0; appearance:none; -webkit-appearance:none; font:inherit; padding:4px 24px 4px 6px; }
+.reveal-workspace .region-select-wrap::after { content:""; position:absolute; right:10px; top:18px; width:5px; height:5px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(45deg); pointer-events:none; }
+@media(max-width:650px){.reveal-workspace .region-select-wrap{font-size:.78rem;}}
