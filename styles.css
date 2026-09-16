@@ -975,10 +975,11 @@ progress::-webkit-progress-bar{background:#e5eae5}progress::-webkit-progress-val
 .reveal-country-label[data-strategy="lane"] { border-color:#9fb8ad; }
 .reveal-connectors,.selected-label-leader { position:absolute; inset:0; width:100%; height:100%; z-index:6; pointer-events:none; overflow:visible; }
 .reveal-connectors polyline,.selected-label-leader polyline { fill:none; stroke:#3e6256; stroke-width:1.4; opacity:.9; vector-effect:non-scaling-stroke; }
-.special-status-card { position:absolute; z-index:8; left:10px; bottom:10px; width:min(290px,calc(100% - 20px)); padding:9px 11px; border:1px dashed #746b59; border-radius:7px; background:rgb(255 253 248 / 96%); color:#403a30; pointer-events:none; box-shadow:0 3px 12px #1f292620; }
+.special-status-card { position:absolute; z-index:8; left:10px; bottom:10px; width:min(290px,calc(100% - 20px)); padding:9px 11px; border:1px solid #91a79f; border-top:3px solid #669566; border-radius:7px; background:#edf5eb; color:#263c32; pointer-events:none; box-shadow:0 3px 12px #1d312a14; }
 .special-status-card strong,.special-status-card span { display:block; }
-.special-status-card span { color:#665c49; font-size:.8rem; }
-.special-status-card p { margin:4px 0 0; color:#4d4639; font-size:.78rem; line-height:1.3; }
+.special-status-card strong { color:#214e3f; }
+.special-status-card span { color:#526357; font-size:.8rem; }
+.special-status-card p { margin:4px 0 0; color:#263c32; font-size:.78rem; line-height:1.3; }
 .context-region { fill:url(#territory-hatch); stroke:#776e5c; stroke-width:1.4; stroke-dasharray:4 2; }
 .territory-map-label { pointer-events:none; }
 
@@ -1097,9 +1098,10 @@ progress::-webkit-progress-bar{background:#e5eae5}progress::-webkit-progress-val
   padding:13px 14px;
   border:1px solid #91a79f;
   border-radius:9px;
-  background:var(--panel);
-  color:var(--ink);
-  box-shadow:0 12px 35px #1d312a38;
+  background:#edf5eb;
+  color:#263c32;
+  border-top:3px solid #669566;
+  box-shadow:0 3px 12px #1d312a14;
 }
 .instructions-popover::backdrop { background:#17251f55; }
 .instructions-popover > div {
@@ -1109,7 +1111,10 @@ progress::-webkit-progress-bar{background:#e5eae5}progress::-webkit-progress-val
   gap:12px;
 }
 .instructions-popover p { margin:9px 0 2px; line-height:1.45; }
-.instructions-popover .icon-control { width:40px; min-width:40px; height:40px; min-height:40px; }
+.instructions-popover #puzzle-instructions-title { color:#214e3f; font-size:1.08rem; }
+.instructions-popover button.icon-control[popovertarget] { width:44px; min-width:44px; height:44px; min-height:44px; padding:0; border:0; background:transparent; color:#285d52; border-radius:5px; box-shadow:none; }
+.instructions-popover button.icon-control[popovertarget]:hover { background:#dce9db; }
+.instructions-popover button.icon-control[popovertarget]:focus-visible { background:#dce9db; outline:2px solid #285d52; outline-offset:-3px; }
 .puzzle-readout {
   display:grid;
   grid-template-columns:minmax(140px,1.4fr) minmax(0,2fr);
