@@ -1276,3 +1276,33 @@ body:has(.compact-heading) main { margin-top:2px; }
 .reveal-workspace .map-caption { padding:3px 6px; }
 .reveal-workspace .territory-legend { padding:4px 8px; }
 @media(max-width:650px){.reveal-workspace .map-canvas { height:min(49svh,380px); }}
+
+/* Explorer uses the same compact map-area header as Reveal. */
+.explorer-workspace .map-readout { display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; height:auto; min-height:48px; padding:2px 10px; }
+.explorer-workspace .map-readout > strong { flex:1 1 64px; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.explorer-workspace .map-readout .region-control { display:flex; flex:0 1 auto; margin:0; padding:0; border:0; background:transparent; min-height:44px; gap:0; }
+.explorer-workspace .map-readout .region-control label,
+.explorer-workspace .map-readout #region-help { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.explorer-workspace .map-readout .region-control select { width:auto; max-width:165px; min-height:44px; margin:0; padding:4px 22px 4px 6px; border-color:transparent; background:transparent; font-size:.85rem; }
+.explorer-workspace .map-readout .map-progress { flex:0 0 auto; white-space:nowrap; font-size:.8rem; }
+@media(max-width:650px){
+ .explorer-workspace .map-readout { gap:2px 8px; padding:2px 8px; }
+ .explorer-workspace .map-readout .region-control select { max-width:145px; font-size:.78rem; }
+ .explorer-workspace .map-readout .map-progress { font-size:.72rem; }
+}
+
+/* Native select hit area follows the active name rather than the longest option. */
+.explorer-workspace .region-select-wrap { position:relative; display:inline-grid; flex:none; min-height:44px; font-size:.85rem; }
+.explorer-workspace .map-readout .region-select-width { visibility:hidden; white-space:nowrap; padding:0 25px 0 7px; font:inherit; }
+.explorer-workspace .map-readout .region-select-wrap select { position:absolute; inset:0; width:100%; max-width:none; min-width:0; appearance:none; -webkit-appearance:none; font:inherit; padding:4px 24px 4px 6px; }
+.explorer-workspace .region-select-wrap::after { content:""; position:absolute; right:10px; top:18px; width:5px; height:5px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(45deg); pointer-events:none; }
+@media(max-width:650px){.explorer-workspace .region-select-wrap{font-size:.78rem;}}
+
+
+.explorer-workspace .map-readout { padding:0 8px; min-height:44px; gap:2px 6px; }
+.explorer-workspace .map-readout > strong { flex:0 1 auto; }
+.explorer-workspace .map-readout .map-progress { margin-left:auto; }
+.explorer-workspace .country-list { margin-top:5px; }
+.explorer-workspace .country-list button { min-height:44px; padding:3px 4px; }
+#explorer-filter-menu:not(:popover-open) { display:none; }
+#explorer-filter-menu:popover-open { display:grid; gap:4px; }

@@ -8,7 +8,7 @@ document.querySelector('#run').onclick=()=>{
  try{
   const w=frame.contentWindow,d=w.document,svg=d.querySelector('#africa-map');
   if(!svg)throw Error('Explorer not loaded');
-  const q=s=>d.querySelector(s),box=()=>svg.getAttribute('viewBox'),selected=()=>q('.map-readout strong').textContent;
+  const q=s=>d.querySelector(s),box=()=>svg.getAttribute('viewBox'),selected=()=>q('path[data-country].selected')?.dataset.name||q('path[data-territory].selected title')?.textContent||'Africa';
   const assert=(condition,label)=>{if(!condition)throw Error(label);checks++;};
   const captured=new Set(),originals=['setPointerCapture','hasPointerCapture','releasePointerCapture'].map(k=>svg[k]);
   svg.setPointerCapture=id=>captured.add(id);svg.hasPointerCapture=id=>captured.has(id);svg.releasePointerCapture=id=>{captured.delete(id);send('lostpointercapture',svg,id);};
