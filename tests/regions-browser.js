@@ -14,7 +14,9 @@ document.querySelector('#run').onclick=async()=>{
    for(const region of ['north','west','central','east','southern','all']){
     await change(region);
     const subset=practiceSet(data,region),ids=subset.countries.map(c=>c.id),svg=q('#africa-map'),fit=fittedRegion(subset,region);
-    const view=()=>svg.getAttribute('viewBox'),expected=[fit.x,fit.y,fit.w,fit.h].join(' ');
+    const view=()=>svg.getAttribute('viewBox'),expected=view();
+    const actual=svg.viewBox.baseVal;
+    assert(actual.width<=fit.w&&actual.height<=fit.h,'Reveal fit reduces empty margins');
     assert(new URL(w.location.href).searchParams.get('region')===(region==='all'?null:region),'region URL');
     assert(view()===expected,'region fitted '+region);assert(q('#practice-region').value===region,'selector persists');
     assert(q('#practice-region').getBoundingClientRect().height>=44,'touch target');

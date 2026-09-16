@@ -61,6 +61,11 @@ class CountryMaps {
     const nextRegion=['explorer','reveal'].includes(mode)&&Object.hasOwn(this.regions,region)?region:'all';
     const subset=nextRegion==='all'?this.fullData:practiceSet(this.fullData,nextRegion);
     this.data=mode==='explorer'?this.fullData:subset;this.fitView=fittedRegion(subset,nextRegion);
+    if(mode==='reveal'){
+      const shapes=[...subset.units,...subset.context],x=Math.min(...shapes.map(c=>c.bounds[0])),y=Math.min(...shapes.map(c=>c.bounds[1]));
+      const right=Math.max(...shapes.map(c=>c.bounds[2])),bottom=Math.max(...shapes.map(c=>c.bounds[3])),pad=Math.max(right-x,bottom-y)*.02;
+      this.fitView={x:x-pad,y:y-pad,w:right-x+pad*2,h:bottom-y+pad*2};
+    }
     this.byId=new Map([...this.data.units,...this.data.context].map(c=>[c.id,c]));
     if(nextRegion!==this.region){
       this.engines.explorer=new ExplorerEngine(this.fullData.units.map(c=>c.id));
@@ -182,8 +187,8 @@ class CountryMaps {
     panelToggle.setAttribute('aria-expanded',String(!this.panelHidden));
     q('#instructions').textContent=this.phoneReveal?'Tap a '+this.terms.singular+' to reveal or hide its name. '+this.data.name+' stays fitted while you study.':this.mode==='explorer'?(this.region==='all'?'Select a '+this.terms.singular+' in the full map. Repeat the selection to toggle '+this.terms.singular+' focus.':'Select '+this.terms.plural+' while the regional view stays in place. Use '+this.regions.all.name+' to restore the full map.'):this.mode==='reveal'?'Tap a '+this.terms.singular+' to reveal or hide its name. Your map view stays in place.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location.';
     q('.map-readout strong').textContent=(identified?chosen.name+(unitPresentation(this.config,chosen).label?' — '+unitPresentation(this.config,chosen).label:''):null)||(this.isPuzzle?current.name:null)||(this.mode==='explorer'&&this.region!=='all'?this.regions[this.region].name:this.data.name);
-    if(this.mode==='reveal')q('.map-readout strong').title=q('.map-readout strong').textContent;
-    q('.map-progress').textContent=this.mode==='explorer'?this.data.units.length+' '+this.terms.plural+(this.config.mapOnly&&this.data.context.length?' + '+this.data.context.length+' territorial unit':''):revealed.size+' / '+this.data.units.length+(this.mode==='reveal'||this.preview?' revealed':' placed');
+    if(this.mode==='reveal'){q('.map-readout strong').textContent=this.fullData.name;q('.map-readout strong').title=this.fullData.name;}
+    q('.map-progress').textContent=this.mode==='explorer'?this.data.units.length+' '+this.terms.plural+(this.config.mapOnly&&this.data.context.length?' + '+this.data.context.length+' territorial unit':''):revealed.size+' / '+this.data.units.length+(this.mode==='reveal'?'':this.preview?' revealed':' placed');
     q('.map-tools').hidden=this.isPuzzle||this.phoneReveal;
     q('.territory-legend').hidden=!this.data.context.length;
     const territorySection=q('.territory-section');if(territorySection)territorySection.hidden=!this.data.context.length;
