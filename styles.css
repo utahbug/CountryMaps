@@ -1242,3 +1242,8 @@ body:has(.compact-heading) main { margin-top:2px; }
 .mnemonic-part path { vector-effect:non-scaling-stroke; }
 .mnemonic-decoration { fill:none; stroke:#98652f; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 @media(max-width:650px){.mnemonic-overlay { width:144px; padding:5px; }.mnemonic-overlay p{font-size:.65rem}.map-readout.puzzle-readout { padding-right:14px; }}
+
+/* Reveal rows are whole-button toggles; retain comfortable touch height. */
+.reveal-workspace .country-list { margin-top:5px; }
+.reveal-workspace .country-list button { min-height:44px; padding:3px 4px; gap:6px; line-height:1.25; }
+.reveal-workspace .country-list .list-name { min-width:0; overflow-wrap:anywhere; }

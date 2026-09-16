@@ -32,4 +32,14 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
  reset();q('[data-list-country="COD"]').click();q('[data-list-country="CAF"]').click();assert(labels().length===2,'list selections independent');assert(box()==='0 0 800 730','list never focuses');visible();
  const search=q('#country-search');search.value='Morocco';search.dispatchEvent(new w.Event('input',{bubbles:true}));q('[data-list-country="MAR"]').click();assert(labels().length===3&&box()==='0 0 800 730','search selection preserves others and viewport');
  reset();assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');
+ assert(q('label[for="country-search"]').classList.contains('sr-only'),'search label visually hidden but associated');
+ assert(q('#country-search').placeholder==='Country name…','search placeholder preserved');
+ assert(!q('.reveal-state'),'no redundant row action text');
+ for(const row of d.querySelectorAll('.country-list button')){
+  assert(row.getBoundingClientRect().height>=44,'row touch target');
+  assert(parseFloat(w.getComputedStyle(row).paddingTop)<=3,'compact row padding');
+  row.click();assert(row.getAttribute('aria-pressed')==='true','whole row reveals');
+  row.click();assert(row.getAttribute('aria-pressed')==='false','whole row hides');
+ }
+
 }
