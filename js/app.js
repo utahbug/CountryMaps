@@ -1,5 +1,5 @@
 import {referenceFilters,learningCard,historySection} from '../lib/learning-reference.mjs';
-import {MnemonicPlayer} from '../lib/mnemonics.mjs';
+import {MnemonicPlayer} from '../lib/mnemonics.mjs?v=piece-card';
 import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
 import {terminology,mapDefinitions} from '../lib/map-configs.mjs?v=learning';
@@ -427,7 +427,7 @@ class CountryMaps {
   arm(c){
     if(this.drag.active||this.engines.puzzle.placed.has(c.id))return;
     this.currentId=c.id;this.armed=c.id;
-    this.mnemonics.play(c.id,this.fullData,q('.map-viewport'));
+    this.mnemonics.play(c.id,this.fullData,q('[data-piece="'+c.id+'"]'));
     this.message=c.name+' selected. Tap its shape on the map'+(this.isIsland(c)?' or nearby ocean':c.inset?' or enlarged inset':'')+', or focus a location and press Enter.';
     this.paint();
   }
@@ -600,6 +600,16 @@ root.addEventListener('change',event=>{
 root.addEventListener('input',event=>{
   if(event.target.id==='country-search'){app.query=event.target.value;app.renderList();}
 });
+// Delegated boundary checks ignore movement between descendants of one card.
+root.addEventListener('pointerover',event=>{
+ const card=event.target.closest('[data-piece]');
+ if(event.pointerType!=='mouse'||!app?.isPuzzle||app.drag.active||!card||card.disabled||card.contains(event.relatedTarget))return;
+ app.mnemonics.play(card.dataset.piece,app.fullData,card);
+});
+root.addEventListener('pointerout',event=>{
+ const card=event.target.closest('[data-piece]');
+ if(event.pointerType==='mouse'&&card&&!card.contains(event.relatedTarget)&&app?.mnemonics.host===card&&!app.drag.active)app.mnemonics.clear();
+});
 root.addEventListener('pointerdown',event=>{
   if((app?.mode==='explorer'||app?.mode==='reveal')&&event.target.closest('.navigable-map')){
     const matrix=app.svg.getScreenCTM();
@@ -611,7 +621,7 @@ root.addEventListener('pointerdown',event=>{
   const c=app.byId.get(source.dataset.piece);
   if(app.drag.begin(event,c,source)){
     event.preventDefault();app.suppressClick=true;app.currentId=c.id;app.armed=null;
-    app.mnemonics.play(c.id,app.fullData,q('.map-viewport'));
+    app.mnemonics.play(c.id,app.fullData,source);
     app.message='Place '+c.name+(app.isIsland(c)?' at its ocean location.':c.inset?' in the enlarged inset.':'.');app.paint();
   }
 });

@@ -1,5 +1,6 @@
 import {mnemonicCandidates} from '../lib/mnemonics.mjs';
 document.querySelector('#run').onclick=async()=>{
+ document.querySelector('#run').disabled=true;document.querySelector('#results').textContent='Running';
  let n=0;const assert=(v,m)=>{if(!v)throw Error(m);n++;};
  const d=document.querySelector('iframe').contentDocument,w=d.defaultView,q=s=>d.querySelector(s),click=s=>q(s).dispatchEvent(new w.MouseEvent('click',{bubbles:true})),reset=()=>click('[data-action="reset"]');
  const originalMatch=w.matchMedia;
@@ -10,12 +11,19 @@ document.querySelector('#run').onclick=async()=>{
    assert(overlay?.dataset.mnemonic===c.id,'candidate '+c.id);
    assert(overlay.textContent.includes(c.caption),'caption '+c.id);
    assert(w.getComputedStyle(overlay).pointerEvents==='none','non-interactive');
-   const b=overlay.getBoundingClientRect(),host=q('.map-viewport').getBoundingClientRect();assert(b.left>=host.left&&b.right<=host.right&&b.top>=host.top&&b.bottom<=host.bottom,'overlay fits');
+   const b=overlay.getBoundingClientRect(),host=q('[data-piece="'+c.units[0]+'"]').getBoundingClientRect();assert(b.left>=host.left&&b.right<=host.right&&b.top>=host.top&&b.bottom<=host.bottom,'overlay fits');
    for(const id of c.units){const path=q('path[data-country="'+id+'"]');assert(!path.hasAttribute('transform')&&!path.getAnimations().length,'canonical map not animated '+id);}
    click('[data-piece="DZA"]');assert(!q('.mnemonic-overlay'),'switch clears');
    click('[data-piece="'+c.units[0]+'"]');assert(!q('.mnemonic-overlay'),'repeat pick quiet');
   }
-  reset();click('[data-piece="BWA"]');await new Promise(r=>setTimeout(r,1450));assert(!q('.mnemonic-overlay'),'automatic expiry');
+  reset();const hoverCard=q('[data-piece="BWA"]'),tray=q('.piece-tray'),before=[w.scrollX,w.scrollY,tray.scrollTop,tray.scrollHeight,hoverCard.offsetHeight].join();
+  hoverCard.dispatchEvent(new w.PointerEvent('pointerover',{bubbles:true,pointerType:'touch'}));assert(!q('.mnemonic-overlay'),'touch hover ignored');
+  hoverCard.dispatchEvent(new w.PointerEvent('pointerover',{bubbles:true,pointerType:'mouse'}));const first=q('.mnemonic-overlay');assert(first?.parentElement===hoverCard,'hover anchored to card');
+  hoverCard.querySelector('svg').dispatchEvent(new w.PointerEvent('pointerover',{bubbles:true,pointerType:'mouse',relatedTarget:hoverCard}));assert(q('.mnemonic-overlay')===first,'internal motion never restarts');
+  assert([w.scrollX,w.scrollY,tray.scrollTop,tray.scrollHeight,hoverCard.offsetHeight].join()===before,'animation leaves layout and scroll unchanged');
+  hoverCard.dispatchEvent(new w.PointerEvent('pointerout',{bubbles:true,pointerType:'mouse'}));assert(!q('.mnemonic-overlay')&&!hoverCard.classList.contains('mnemonic-playing'),'leaving restores static card');
+  hoverCard.dispatchEvent(new w.PointerEvent('pointerover',{bubbles:true,pointerType:'mouse'}));assert(!q('.mnemonic-overlay'),'no repeated hover replay');
+  reset();click('[data-piece="BWA"]');await new Promise(r=>setTimeout(r,1450));assert(!q('.mnemonic-overlay')&&!q('.mnemonic-playing'),'automatic expiry restores static silhouette');
   reset();click('[data-piece="CMR"]');reset();assert(!q('.mnemonic-overlay'),'Reset clears');
   w.matchMedia=query=>query==='(prefers-reduced-motion: reduce)'?{matches:true}:originalMatch.call(w,query);
   click('[data-piece="SLE"]');assert(q('.mnemonic-overlay').dataset.reducedMotion==='true','reduced motion');assert(!q('.mnemonic-overlay').getAnimations({subtree:true}).length,'static reduced-motion equivalent');w.matchMedia=originalMatch;
@@ -32,5 +40,5 @@ document.querySelector('#run').onclick=async()=>{
   reset();assert(canonical.every((path,i)=>d.querySelectorAll('path[data-country]')[i].getAttribute('d')===path&&!d.querySelectorAll('path[data-country]')[i].hasAttribute('transform')),'canonical transforms unchanged');
   assert(d.documentElement.scrollWidth<=w.innerWidth,'no overflow');
   document.querySelector('#results').textContent='PASS: '+n+' mnemonic checks at '+w.innerWidth+' × '+w.innerHeight;
- }catch(e){document.querySelector('#results').textContent='FAIL after '+n+': '+e.message;}finally{w.matchMedia=originalMatch;}
+ }catch(e){document.querySelector('#results').textContent='FAIL after '+n+': '+e.message;}finally{w.matchMedia=originalMatch;document.querySelector('#run').disabled=false;}
 };

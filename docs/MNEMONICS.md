@@ -37,3 +37,7 @@ Preview candidates by selecting their cards after Reset. The focused browser
 regression at `tests/mnemonics-browser.html` verifies every candidate, cleanup,
 reduced-motion behavior, canonical paths, and concurrent dragging. This is a
 static dependency-free SVG/Web Animations implementation.
+
+
+## Card-local presentation
+Memory sketches now replace the silhouette visually inside the existing piece card for their brief duration. The static SVG remains in layout and is restored on expiry/cancel. No separate map overlay or caption panel is rendered. Relationship sketches share the card silhouette area. Mouse boundary entry or explicit selection starts a candidate once per country until Reset; movement among card descendants cannot restart it. Touch hover is ignored. Reduced-motion users receive a static, temporary sketch. Placement geometry, invisible hit areas, scoring and drag transforms are unchanged.
