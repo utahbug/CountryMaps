@@ -17,6 +17,18 @@ const root=document.querySelector('#main');
 const q=(selector,scope=root)=>scope.querySelector(selector);
 let app=null;
 let navigationVersion=0;
+const controlIcons={
+  explorer:'<circle cx="10" cy="10" r="5.5"/><path d="m14.5 14.5 5 5"/>',
+  reveal:'<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/>',
+  puzzle:'<path d="M4 4h6a2.3 2.3 0 1 0 4 0h6v6a2.3 2.3 0 1 0 0 4v6h-6a2.3 2.3 0 1 0-4 0H4v-6a2.3 2.3 0 1 0 0-4Z"/>',
+  reset:'<path d="M5 8a8 8 0 1 1-1 7"/><path d="M5 3v5h5"/>',
+  panel:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
+  clue:'<path d="M9 18h6M10 21h4"/><path d="M8.2 14.5A6 6 0 1 1 15.8 14.5c-1 .8-1.4 1.5-1.4 2.5h-4.8c0-1-.4-1.7-1.4-2.5Z"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 10v7M12 7h.01"/>',
+  close:'<path d="m6 6 12 12M18 6 6 18"/>'
+};
+const icon=name=>'<svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+controlIcons[name]+'</svg>';
+const compactButton=(action,label,iconName,extra='')=>'<button type="button" class="icon-control"'+(action?' data-action="'+action+'"':'')+' aria-label="'+label+'" title="'+label+'" data-tooltip="'+label+'" '+extra+'>'+icon(iconName)+'<span class="sr-only">'+label+'</span></button>';
 
 class CountryMaps {
   constructor(data) {
@@ -61,10 +73,15 @@ class CountryMaps {
   }
   renderActivity() {
     const name=esc(this.data.name);
-    root.innerHTML='<div class="activity-heading"><div><a class="back-link" href="'+this.href('home')+'">← '+esc(this.fullData.name)+'</a><h1>'+name+' <span>/ '+(this.config.mapOnly?'Map view':titles[this.mode])+'</span></h1></div><nav class="mode-links" aria-label="'+name+' activities">'+(this.config.mapOnly?['explorer']:modes).map(m=>'<a href="'+this.href(m)+'"'+(m===this.mode?' aria-current="page"':'')+'>'+(this.config.mapOnly?'Map view':titles[m])+'</a>').join('')+'</nav></div>'+
-    '<div class="activity-commandbar"><div class="toolbar"><p id="instructions"></p><div class="toolbar-actions">'+(this.mode==='reveal'?'<button data-action="reveal-all">Reveal All</button>':'')+(this.mode==='puzzle'?'<button data-action="preview">Reveal</button>':'')+'<button data-action="reset">Reset</button><button data-action="toggle-panel" aria-controls="activity-side-panel" aria-expanded="true">Hide list</button></div></div>'+
-    (['explorer','reveal'].includes(this.mode)?'<div class="region-control"><label for="practice-region">'+(this.mode==='explorer'?'Map area':'Practice region')+'</label><select id="practice-region" aria-describedby="region-help">'+Object.entries(this.regions).map(([id,r])=>'<option value="'+id+'"'+(id===this.region?' selected':'')+'>'+r.name+'</option>').join('')+'</select><p id="region-help">'+this.data.units.length+(this.mode==='explorer'?' '+this.terms.plural+' searchable in every map area.':' '+this.terms.plural+' · Changing regions starts a fresh practice set.')+'</p></div>':'')+'</div>'+
-    '<div class="workspace"><section class="map-panel" aria-label="'+name+' map"><div class="map-readout"><strong></strong><span></span></div>'+(this.config.mapOnly?unitLegend(this.config):'')+'<div class="puzzle-clue" hidden><button data-action="clue" aria-describedby="clue-text">Clue</button><p id="clue-text" role="status" aria-live="polite" aria-atomic="true"></p></div><div class="map-viewport"><div class="reveal-label-layer" aria-hidden="true"></div><svg class="selected-label-leader" aria-hidden="true"></svg><div class="selected-country-overlay" hidden aria-hidden="true"></div><aside class="special-status-card" hidden aria-live="polite"></aside><svg id="africa-map" class="map-canvas" viewBox="0 0 '+this.fullData.width+' '+this.fullData.height+'" role="group" aria-label="Interactive '+name+' '+this.terms.singular+' map">'+
+    const puzzlePage=this.mode==='puzzle';
+    const modeLinks=(this.config.mapOnly?['explorer']:modes).map(m=>puzzlePage?'<a class="icon-control" href="'+this.href(m)+'" aria-label="'+titles[m]+'" title="'+titles[m]+'" data-tooltip="'+titles[m]+'"'+(m===this.mode?' aria-current="page"':'')+'>'+icon(m)+'<span class="sr-only">'+titles[m]+'</span></a>':'<a href="'+this.href(m)+'"'+(m===this.mode?' aria-current="page"':'')+'>'+(this.config.mapOnly?'Map view':titles[m])+'</a>').join('');
+    const puzzleToolbar=compactButton('preview','Reveal answer map','reveal')+compactButton('reset','Reset puzzle','reset')+compactButton('toggle-panel','Hide country pieces','panel','aria-controls="activity-side-panel" aria-expanded="true"')+'<button type="button" class="icon-control" popovertarget="puzzle-instructions" aria-label="Puzzle instructions" title="Puzzle instructions" data-tooltip="Instructions">'+icon('info')+'<span class="sr-only">Puzzle instructions</span></button>';
+    const clueRow=puzzlePage?'<div class="puzzle-clue" hidden><p id="clue-text" role="status" aria-live="polite" aria-atomic="true" hidden></p>'+compactButton('clue','Clue','clue','aria-describedby="clue-text"')+'<span class="map-progress"></span></div>':'<span class="map-progress"></span>';
+    root.innerHTML=(puzzlePage?'<div class="puzzle-top-shell">':'')+'<div class="activity-heading'+(puzzlePage?' puzzle-heading':'')+'"><div><a class="back-link" href="'+this.href('home')+'">← '+esc(this.fullData.name)+'</a><h1>'+name+' <span>/ '+(this.config.mapOnly?'Map view':titles[this.mode])+'</span></h1></div><nav class="mode-links" aria-label="'+name+' activities">'+modeLinks+'</nav></div>'+
+    '<div class="activity-commandbar'+(puzzlePage?' puzzle-commandbar':'')+'"><div class="toolbar">'+(puzzlePage?'':'<p id="instructions"></p>')+'<div class="toolbar-actions">'+(puzzlePage?puzzleToolbar:(this.mode==='reveal'?'<button data-action="reveal-all">Reveal All</button>':'')+'<button data-action="reset">Reset</button><button data-action="toggle-panel" aria-controls="activity-side-panel" aria-expanded="true">Hide list</button>')+'</div></div>'+
+    (puzzlePage?'<div id="puzzle-instructions" class="instructions-popover" popover role="dialog" aria-labelledby="puzzle-instructions-title"><div><strong id="puzzle-instructions-title">How to play</strong>'+compactButton('', 'Close instructions','close','popovertarget="puzzle-instructions" popovertargetaction="hide"')+'</div><p id="instructions"></p></div>':'')+
+    (['explorer','reveal'].includes(this.mode)?'<div class="region-control"><label for="practice-region">'+(this.mode==='explorer'?'Map area':'Practice region')+'</label><select id="practice-region" aria-describedby="region-help">'+Object.entries(this.regions).map(([id,r])=>'<option value="'+id+'"'+(id===this.region?' selected':'')+'>'+r.name+'</option>').join('')+'</select><p id="region-help">'+this.data.units.length+(this.mode==='explorer'?' '+this.terms.plural+' searchable in every map area.':' '+this.terms.plural+' · Changing regions starts a fresh practice set.')+'</p></div>':'')+'</div>'+(puzzlePage?'</div>':'')+
+    '<div class="workspace"><section class="map-panel" aria-label="'+name+' map"><div class="map-readout'+(puzzlePage?' puzzle-readout':'')+'"><strong></strong>'+clueRow+'</div>'+(this.config.mapOnly?unitLegend(this.config):'')+'<div class="map-viewport"><div class="reveal-label-layer" aria-hidden="true"></div><svg class="selected-label-leader" aria-hidden="true"></svg><div class="selected-country-overlay" hidden aria-hidden="true"></div><aside class="special-status-card" hidden aria-live="polite"></aside><svg id="africa-map" class="map-canvas" viewBox="0 0 '+this.fullData.width+' '+this.fullData.height+'" role="group" aria-label="Interactive '+name+' '+this.terms.singular+' map">'+
     '<defs><pattern id="territory-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#e6e2d7"/><path d="M0 8L8 0" stroke="#aaa391" stroke-width="1"/></pattern></defs>'+
     this.data.units.map((c,i)=>'<g><path data-country="'+c.id+'" data-name="'+esc(c.name)+'" data-anchor-x="'+((c.anchor[0]-c.bounds[0])/(c.bounds[2]-c.bounds[0]))+'" data-anchor-y="'+((c.anchor[1]-c.bounds[1])/(c.bounds[3]-c.bounds[1]))+'" class="country" d="'+c.path+'" role="button" tabindex="0" aria-pressed="false"><title></title></path><text hidden data-number="'+c.id+'" class="country-number" x="'+c.anchor[0]+'" y="'+c.anchor[1]+'">'+(i+1)+'</text></g>').join('')+
     this.data.context.map(c=>'<g class="territory-geometry"><path data-territory="'+c.id+'" d="'+c.path+'" class="context-region" role="button" tabindex="0" aria-label="'+esc(c.name+' — '+c.classification)+'" aria-pressed="false"><title>'+esc(c.name+' — '+c.classification)+'</title></path>'+(this.data.id==='africa'?'':'<text data-territory-label="'+c.id+'" class="territory-map-label" text-anchor="middle" x="'+c.anchor[0]+'" y="'+(c.anchor[1]-8)+'">'+esc(c.name+(this.config.mapOnly&&c.parentSovereignState?' — '+c.parentSovereignState.name:''))+'</text>')+'</g>').join('')+'<circle hidden class="location-marker"/><g id="inset-layer"></g></svg></div><div class="map-tools" aria-label="Map view controls">'+
@@ -121,11 +138,12 @@ class CountryMaps {
     q('.workspace').classList.toggle('panel-collapsed',this.panelHidden);
     q('.side-panel').hidden=this.panelHidden;
     const panelToggle=q('[data-action="toggle-panel"]');
-    panelToggle.textContent=this.panelHidden?'Show '+(this.isPuzzle?'pieces':'list'):'Hide '+(this.isPuzzle?'pieces':'list');
+    const panelLabel=this.panelHidden?'Show '+(this.isPuzzle?'country pieces':'list'):'Hide '+(this.isPuzzle?'country pieces':'list');
+    if(panelToggle.classList.contains('icon-control')){panelToggle.setAttribute('aria-label',panelLabel);panelToggle.setAttribute('title',panelLabel);panelToggle.dataset.tooltip=panelLabel;panelToggle.querySelector('.sr-only').textContent=panelLabel;}else panelToggle.textContent=panelLabel;
     panelToggle.setAttribute('aria-expanded',String(!this.panelHidden));
     q('#instructions').textContent=this.phoneReveal?'Tap a '+this.terms.singular+' to reveal or hide its name. '+this.data.name+' stays fitted while you study.':this.mode==='explorer'?(this.region==='all'?'Select a '+this.terms.singular+' in the full map. Repeat the selection to toggle '+this.terms.singular+' focus.':'Select '+this.terms.plural+' while the regional view stays in place. Use '+this.regions.all.name+' to restore the full map.'):this.mode==='reveal'?'Tap a '+this.terms.singular+' to reveal or hide its name. Your map view stays in place.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location.';
-    q('.map-readout strong').textContent=(identified?chosen.name+(unitPresentation(this.config,chosen).label?' — '+unitPresentation(this.config,chosen).label:''):null)||inset?.name||(this.mode==='explorer'&&this.region!=='all'?this.regions[this.region].name:this.data.name);
-    q('.map-readout span').textContent=this.mode==='explorer'?this.data.units.length+' '+this.terms.plural+(this.config.mapOnly&&this.data.context.length?' + '+this.data.context.length+' territorial unit':''):revealed.size+' / '+this.data.units.length+(this.mode==='reveal'||this.preview?' revealed':' placed');
+    q('.map-readout strong').textContent=(identified?chosen.name+(unitPresentation(this.config,chosen).label?' — '+unitPresentation(this.config,chosen).label:''):null)||(this.isPuzzle?current.name:null)||(this.mode==='explorer'&&this.region!=='all'?this.regions[this.region].name:this.data.name);
+    q('.map-progress').textContent=this.mode==='explorer'?this.data.units.length+' '+this.terms.plural+(this.config.mapOnly&&this.data.context.length?' + '+this.data.context.length+' territorial unit':''):revealed.size+' / '+this.data.units.length+(this.mode==='reveal'||this.preview?' revealed':' placed');
     q('.map-tools').hidden=this.isPuzzle||this.phoneReveal;
     q('.territory-legend').hidden=!this.data.context.length;
     const territorySection=q('.territory-section');if(territorySection)territorySection.hidden=!this.data.context.length;
@@ -183,7 +201,7 @@ class CountryMaps {
       q('.active-piece strong').textContent=current.name;
       q('[data-action="arm"]').disabled=this.engines.puzzle.placed.has(current.id);
     }
-    const previewButton=q('[data-action="preview"]');if(previewButton)previewButton.textContent=this.preview?'Return to Puzzle':'Reveal';
+    const previewButton=q('[data-action="preview"]');if(previewButton){const label=this.preview?'Return to Puzzle':'Reveal answer map';if(previewButton.classList.contains('icon-control')){previewButton.setAttribute('aria-label',label);previewButton.setAttribute('title',label);previewButton.dataset.tooltip=label;previewButton.querySelector('.sr-only').textContent=label;}else previewButton.textContent=label;}
     for(const action of ['zoom-out','left','right','up','down'])q('[data-action="'+action+'"]').disabled=this.view.w===this.fitView.w&&(action==='zoom-out'||!(this.mode==='explorer'||this.mode==='reveal'));
     q('.completion').hidden=!(this.isPuzzle&&this.engines.puzzle.placed.size===this.data.units.length);
     if(this.config.mapOnly){q('.back-link').hidden=true;q('.region-control').hidden=true;q('.list-order').hidden=true;const legend=q('.territory-legend');if(this.data.context.length)legend.innerHTML='French Guiana — France · Overseas department/region, separate from the 12 sovereign countries.';const section=q('.territory-section');if(section){section.querySelector('h3').textContent='Territorial unit';section.querySelector('p').textContent='Identified separately from sovereign countries.';}}
@@ -270,9 +288,11 @@ class CountryMaps {
     if(!this.isPuzzle)return;
     this.clue.country=this.currentId;
     const c=this.byId.get(this.currentId),region=countryRegion(c.id,this.regions);
-    q('[data-action="clue"]').disabled=placed;
-    q('[data-action="clue"]').setAttribute('aria-label',this.clue.level?'Clue: highlight destination for '+c.name:'Clue: show region for '+c.name);
-    q('#clue-text').textContent=placed?(this.engines.puzzle.placed.size===this.data.units.length?'All '+this.terms.plural+' placed.':'Choose an unplaced '+this.terms.singular+' for a clue.'):this.clue.level?c.name+' — '+(region?.name||this.fullData.name)+'. '+(this.clue.level===1?'Press Clue again for its location.':this.clueTimer?'Destination highlighted.':'Press Clue to highlight again.'):'Optional help: region first, then location.';
+    const clueButton=q('[data-action="clue"]'),clueLabel=this.clue.level?'Clue: highlight destination for '+c.name:'Clue: show region for '+c.name;
+    clueButton.disabled=placed;clueButton.setAttribute('aria-label',clueLabel);clueButton.setAttribute('title',clueLabel);clueButton.dataset.tooltip=clueLabel;clueButton.querySelector('.sr-only').textContent=clueLabel;
+    const clueText=q('#clue-text');
+    clueText.textContent=placed?(this.engines.puzzle.placed.size===this.data.units.length?'Complete':'Choose another piece'):this.clue.level?(this.clue.level===1?(region?.name||this.fullData.name):this.clueTimer?'Location highlighted':'Show location again'):'';
+    clueText.hidden=!clueText.textContent;
     bar.dataset.level=String(this.clue.level);
   }
   requestClue(){

@@ -9,7 +9,7 @@ document.querySelector('#run').onclick=async()=>{
   const reset=()=>q('[data-action="reset"]').click(),clue=()=>q('[data-action="clue"]').click(),choose=id=>q('[data-piece="'+id+'"]').click();
   const level=()=>q('.puzzle-clue').dataset.level,score=()=>q('progress').value;
   const view=()=>q('#africa-map').getAttribute('viewBox');
-  reset();assert(score()===0&&level()==='0','initial state');const initialView=view();
+  reset();assert(score()===0&&level()==='0','initial state');const initialView=view(),initialMapTop=q('.map-viewport').getBoundingClientRect().top;
   for(const c of data.countries){
    choose(c.id);assert(level()==='0'&&!q('.clue-target'),'active country clears previous clue');
    clue();assert(level()==='1','first clue level');assert(q('#clue-text').textContent.includes(countryRegion(c.id).name),'shared regional clue '+c.id);
@@ -42,8 +42,14 @@ document.querySelector('#run').onclick=async()=>{
   reset();
   for(const c of data.countries){choose(c.id);clue();clue();const target=q(c.inset?'[data-inset-hit="'+c.id+'"]':'[data-country="'+c.id+'"]');target.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));assert(q('[data-piece="'+c.id+'"]').disabled,'place '+c.id);assert(level()==='0'&&!q('.clue-target'),'placement clears clue '+c.id);}
   assert(score()===54&&q('[data-action="clue"]').disabled&&!q('.completion').hidden,'completion unchanged, clue disabled');
-  reset();choose('COD');clue();const panel=q('.map-panel').getBoundingClientRect(),hint=q('.puzzle-clue').getBoundingClientRect(),map=q('.map-viewport').getBoundingClientRect();
-  assert(hint.top>=panel.top&&hint.bottom<=map.top+.1&&map.top-hint.bottom<2,'clue immediately beside map');assert(q('[data-action="clue"]').getBoundingClientRect().height>=44,'touch target');
+  reset();choose('COD');clue();const panel=q('.map-panel').getBoundingClientRect(),readout=q('.map-readout').getBoundingClientRect(),hint=q('.puzzle-clue').getBoundingClientRect(),map=q('.map-viewport').getBoundingClientRect();
+  assert(hint.top>=readout.top&&hint.bottom<=readout.bottom+.1&&map.top-readout.bottom<2,'clue contained in compact country row beside map');
+  assert(q('[data-action="clue"]').getBoundingClientRect().height>=(w.innerWidth<=650?44:40),'responsive clue touch target');
+  assert(initialMapTop<=(w.innerWidth<=650?225:190),'map begins high in viewport');
+  const compactControls=all('.puzzle-heading .icon-control,.puzzle-commandbar .toolbar-actions .icon-control');
+  assert(compactControls.length===7&&compactControls.every(control=>control.getAttribute('aria-label')&&control.title),'compact controls retain accessible names and tooltips');
+  const info=q('[popovertarget="puzzle-instructions"]'),instructions=q('#puzzle-instructions');info.focus();info.click();assert(instructions.matches(':popover-open')&&q('#instructions').textContent.includes('Drag a piece'),'instruction icon opens compact popover');
+  instructions.querySelector('[popovertargetaction="hide"]').click();await new Promise(resolve=>w.requestAnimationFrame(resolve));assert(!instructions.matches(':popover-open')&&d.activeElement===info,'instruction popover dismisses and restores focus');
   assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');assert(q('#clue-text').scrollWidth<=q('#clue-text').clientWidth+1,'long clue wraps');
   if(w.innerWidth<=650)assert(w.getComputedStyle(q('.map-panel')).position==='sticky','phone clue stays with sticky map');
   reset();results.textContent='PASS: '+checks+' Puzzle clue checks at '+w.innerWidth+' × '+w.innerHeight+'. Synthetic touch, native capture stubbed.';
