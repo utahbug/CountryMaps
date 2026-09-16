@@ -80,7 +80,7 @@ document.querySelector('#run').onclick=()=>{
     reset();const shape=q('[data-territory="'+id+'"]');assert(!!shape&&w.getComputedStyle(shape).pointerEvents!=='none','territory map can receive pointer input');
     send('pointerdown',shape);send('pointerup');assert(shape.getAttribute('aria-pressed')==='true','territory tap identifies it');
     assert(box()==='0 0 800 730','territory first selection preserves Fit');assert(q('.map-readout span').textContent===score,'territory does not affect country score');
-    assert(q('.selected-country-overlay').textContent.includes('territory')||id==='SOL','territory classified in selected label');
+    assert(!q('.special-status-card').hidden&&q('.special-status-card').textContent.includes(shape.getAttribute('aria-label').split(' — ')[0]),'special-status detail card identifies area');
     q('[data-list-country="'+id+'"]').click();assert(Number(box().split(' ')[2])<800,'repeat territory selection focuses');
     assert(!q('[data-piece="'+id+'"]'),'territory has no puzzle piece');
    }

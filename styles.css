@@ -904,3 +904,89 @@ progress::-webkit-progress-bar{background:#e5eae5}progress::-webkit-progress-val
 @media(max-width:340px){.map-cards{grid-template-columns:1fr}.map-card{flex-direction:row;align-items:center}.map-card-preview{flex:0 0 96px}.map-card-activities{min-height:0}}
 
 .map-card-planned{border-top-color:var(--subtle);border-style:dashed}.map-card-planned:hover{background:var(--panel)}.planned-preview{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--subtle);background:#eeeae1}.planned-preview strong{font-size:2.4rem;line-height:1.1}.planned-preview span{font-size:.9rem}
+
+/* Map-first activity shell. The same compact structure serves all activities. */
+@media (min-width:651px) {
+  body:has(.workspace) main { width:min(1480px,calc(100% - 24px)); margin:12px auto 20px; }
+  .activity-heading { align-items:center; margin-bottom:6px; }
+  .activity-heading h1 { margin:2px 0 0; font-size:clamp(1.35rem,2vw,1.8rem); }
+  .back-link { font-size:.8rem; }
+  .mode-links a { min-height:44px; padding:9px 12px; }
+  .toolbar { min-height:40px; margin-bottom:6px; }
+  .toolbar p { font-size:.82rem; line-height:1.25; }
+  .toolbar-actions button { min-height:44px!important; padding:7px 11px!important; }
+  .activity-commandbar { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px; margin-bottom:7px; }
+  .activity-commandbar .toolbar { margin:0; }
+  .region-control { min-height:40px; margin:0; padding:3px 7px; gap:4px 7px; }
+  .region-control select { min-height:44px; padding:7px 30px 7px 8px; }
+  .region-control p { font-size:.75rem; margin-left:auto; }
+  .activity-commandbar .region-control p { display:none; }
+  .workspace { grid-template-columns:minmax(0,4fr) minmax(230px,1fr); gap:10px; }
+  .workspace.panel-collapsed { grid-template-columns:minmax(0,1fr); }
+  .map-readout,.reveal-workspace .map-readout,.regional-explorer .map-readout { min-height:42px; height:42px; padding:6px 12px; }
+  .map-canvas { height:min(72vh,740px); min-height:500px; }
+  .side-panel { padding:11px; max-height:calc(min(72vh,740px) + 43px); overflow:auto; }
+  .side-panel h2 { margin:0 0 7px; font-size:1.08rem; }
+  .country-list { max-height:none; }
+  .piece-help { margin:6px 0; line-height:1.25; }
+  .piece-tray { max-height:none; }
+  .map-tools { padding:5px 7px 2px; }
+  .map-tools button { min-height:44px!important; }
+  .map-caption { padding:5px 10px 7px; font-size:.78rem; }
+  .territory-legend { padding:6px 10px 8px; }
+  .status { margin:8px 0; min-height:38px; padding:7px 11px; }
+  .puzzle-clue { min-height:46px; padding:4px 9px; }
+}
+
+/* Structured labels: inside names, adjacent callouts, then organized lanes. */
+.reveal-label-layer { z-index:4; }
+.reveal-country-label,.selected-country-overlay { z-index:5; }
+.reveal-country-label[data-strategy="inside"],.selected-country-overlay[data-strategy="inside"] {
+  border:0; background:transparent; padding:2px 3px; text-align:center;
+  color:#173f36; text-shadow:0 0 3px #fffdf8,0 0 5px #fffdf8;
+}
+.reveal-country-label[data-strategy="lane"] { border-color:#9fb8ad; }
+.reveal-connectors,.selected-label-leader { position:absolute; inset:0; width:100%; height:100%; z-index:6; pointer-events:none; overflow:visible; }
+.reveal-connectors polyline,.selected-label-leader polyline { fill:none; stroke:#3e6256; stroke-width:1.4; opacity:.9; vector-effect:non-scaling-stroke; }
+.special-status-card { position:absolute; z-index:8; left:10px; bottom:10px; width:min(290px,calc(100% - 20px)); padding:9px 11px; border:1px dashed #746b59; border-radius:7px; background:rgb(255 253 248 / 96%); color:#403a30; pointer-events:none; box-shadow:0 3px 12px #1f292620; }
+.special-status-card strong,.special-status-card span { display:block; }
+.special-status-card span { color:#665c49; font-size:.8rem; }
+.special-status-card p { margin:4px 0 0; color:#4d4639; font-size:.78rem; line-height:1.3; }
+.context-region { fill:url(#territory-hatch); stroke:#776e5c; stroke-width:1.4; stroke-dasharray:4 2; }
+.territory-map-label { pointer-events:none; }
+
+@media (max-width:650px) {
+  body:has(.workspace) main { width:calc(100% - 16px); margin:8px auto 16px; }
+  .activity-heading { margin-bottom:5px; gap:5px; }
+  .activity-heading > div { display:flex; align-items:baseline; gap:8px; }
+  .activity-heading h1 { margin:0; font-size:1.25rem; }
+  .back-link { font-size:.75rem; }
+  .mode-links { order:2; gap:2px; padding:2px; }
+  .mode-links a { min-height:44px; padding:9px 5px; font-size:.84rem; }
+  .toolbar { gap:4px; margin-bottom:5px; }
+  .toolbar p { width:100%; font-size:.76rem; line-height:1.2; margin-bottom:1px; }
+  .toolbar-actions { gap:4px; }
+  .toolbar-actions button { min-height:44px!important; padding:7px 7px!important; font-size:.8rem; }
+  .activity-commandbar { margin-bottom:5px; }
+  .region-control { margin-bottom:0; padding:4px 6px; display:grid; grid-template-columns:auto minmax(0,1fr); }
+  .region-control label,.region-control select { width:auto; }
+  .region-control label { font-size:.78rem; }
+  .region-control select { min-height:44px; padding:7px 28px 7px 7px; }
+  .region-control p { grid-column:1/-1; font-size:.7rem; }
+  .activity-commandbar .region-control p { display:none; }
+  .workspace { gap:7px; }
+  .map-panel { order:0; }
+  .side-panel { order:1; padding:9px; }
+  .map-readout,.phone-reveal .map-readout,.reveal-workspace .map-readout,.regional-explorer .map-readout { height:42px; min-height:42px; padding:5px 8px; }
+  .map-canvas { height:min(49svh,430px); min-height:330px; max-height:none; }
+  .puzzle-workspace .map-canvas { height:min(43svh,380px); min-height:300px; max-height:none; }
+  .map-tools { padding:4px 5px 1px; }
+  .map-tools button { min-height:44px!important; }
+  .map-caption { padding:4px 7px 6px; font-size:.72rem; }
+  .territory-legend { padding:5px 8px 7px; font-size:.7rem; }
+  .status { margin:7px 0; padding:6px 9px; min-height:38px; font-size:.82rem; }
+  .reveal-country-label { font-size:11px; line-height:13px; padding:2px 3px; max-width:112px; }
+  .selected-country-overlay { font-size:.92rem; max-width:42%; }
+  .special-status-card { padding:7px 8px; }
+  .puzzle-clue { min-height:58px; padding:4px 8px; }
+}

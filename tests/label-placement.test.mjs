@@ -17,3 +17,7 @@ test('right edge selects another side rather than clipping or covering the count
 test('panning geographic bounds recalculates nearby label position',()=>{
  const before=placeCountryLabel(base),after=placeCountryLabel({...base,country:{...base.country,x:220},anchor:{...base.anchor,x:255}});assert.notDeepEqual(before,after);inside(after);
 });
+test('large countries use an inside label without a leader',()=>{
+ const p=placeCountryLabel({viewport:{w:500,h:400},label:{w:80,h:24},country:{x:120,y:80,w:260,h:220},anchor:{x:250,y:190},neighbors:[]});
+ assert.equal(p.strategy,'inside');assert.equal(p.leader,null);inside(p,{viewport:{w:500,h:400},label:{w:80,h:24}});
+});
