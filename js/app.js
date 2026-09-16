@@ -1,7 +1,7 @@
 import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
 import {terminology,mapDefinitions} from '../lib/map-configs.mjs';
-import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop} from '../lib/drop-validation.mjs';
+import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop,acceptsIslandDrop} from '../lib/drop-validation.mjs?v=puzzle-cleanup';
 import {practiceSet,fittedRegion,countryRegion,countryRegionId,groupedCountries} from '../lib/regions.mjs';
 import {loadMap,registry,modes,titles,findCountries,insetTransform,pieceDisplayViewBox,usesPieceScaleFrame,escapeHTML as esc} from '../lib/maps.js';
 import {ExplorerEngine,RevealEngine,PuzzleEngine} from '../lib/engines/activities.mjs';
@@ -46,6 +46,7 @@ class CountryMaps {
     this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
     this.drag=new DragController(state=>this.paintDrag(state),(c,x,y,stationary)=>this.drop(c,x,y,stationary));
   }
+  isIsland(c){return this.config.practiceSubsets?.islands?.ids.includes(c?.id)||false;}
   get puzzleUnits(){return filteredUnits(this.data.units,learningFilters(this.config)[this.pieceFilter]);}
   get phoneReveal(){return this.mode==='reveal'&&this.config.activities.reveal.phoneNavigation===false&&window.matchMedia('(max-width: 650px)').matches;}
   get preview(){return this.mode==='puzzle'&&this.engines.puzzle.preview;}
@@ -100,12 +101,32 @@ class CountryMaps {
   renderSide() {
     if(this.isPuzzle){
       const trayUnits=this.puzzleUnits;
-      q('.side-panel').innerHTML='<div class="panel-title"><h2>'+this.terms.title+' pieces</h2><button class="icon-control" type="button" popovertarget="piece-filter-menu" aria-label="Filter or sort pieces" title="Filter or sort pieces">'+icon('filter')+'</button></div><p class="subset-progress" aria-live="polite"></p><div id="piece-filter-menu" class="filter-popover" popover aria-label="Piece filters"><div role="group" aria-label="Choose pieces">'+Object.entries(learningFilters(this.config)).map(([id,f])=>'<button type="button" data-piece-filter="'+id+'" aria-pressed="'+(this.pieceFilter===id)+'">'+esc(f.name)+'</button>').join('')+'</div></div><progress max="'+this.data.units.length+'" value="0" aria-label="'+this.terms.pluralTitle+' placed"></progress><div class="active-piece"><strong></strong><div class="piece-controls"><span class="piece-position"></span>'+compactButton('arm','Select current piece','activate')+compactButton('previous-pieces','Previous pieces','previous','aria-controls="piece-tray"')+compactButton('more-pieces','More pieces','next','aria-controls="piece-tray"')+'</div></div><div id="piece-tray" class="piece-tray" aria-label="Unplaced '+this.terms.plural+'">'+
+      q('.side-panel').innerHTML='<div class="panel-title"><h2>'+this.terms.title+' pieces</h2><button class="icon-control" type="button" popovertarget="piece-filter-menu" aria-label="Filter or sort pieces" title="Filter or sort pieces">'+icon('filter')+'</button></div><p class="subset-progress" aria-live="polite"></p><div id="piece-filter-menu" class="filter-popover" popover aria-label="Piece filters"><div role="group" aria-label="Choose pieces">'+Object.entries(learningFilters(this.config)).map(([id,f])=>'<button type="button" data-piece-filter="'+id+'" aria-pressed="'+(this.pieceFilter===id)+'">'+esc(f.name)+'</button>').join('')+'</div></div><progress hidden max="'+this.data.units.length+'" value="0" aria-label="'+this.terms.pluralTitle+' placed"></progress><div class="active-piece"><strong></strong><div class="piece-controls"><span class="piece-position"></span>'+compactButton('arm','Select current piece','activate')+compactButton('previous-pieces','Previous pieces','previous','aria-controls="piece-tray"')+compactButton('more-pieces','More pieces','next','aria-controls="piece-tray"')+'</div></div><div id="piece-tray" class="piece-tray" aria-label="Unplaced '+this.terms.plural+'">'+
       trayUnits.concat(this.data.units.filter(c=>!trayUnits.includes(c))).map(c=>'<button data-piece="'+c.id+'" class="piece'+(usesPieceScaleFrame(c)?' small-scale-piece':'')+'" aria-label="Piece: '+esc(c.name)+(usesPieceScaleFrame(c)?'. Map-scale shape with large touch area.':'')+'" aria-pressed="false"><svg aria-hidden="true" viewBox="'+pieceDisplayViewBox(c)+'"><path d="'+c.path+'" '+unitSvgAttributes(this.config,c)+'/></svg><span>'+esc(c.name)+'</span>'+(usesPieceScaleFrame(c)?'<small>Map-scale shape · large touch area</small>':'')+'</button>').join('')+'</div>';
     }else{
       q('.side-panel').innerHTML='<h2>'+(this.mode==='explorer'?'Find a '+this.terms.singular+'':''+this.terms.title+' names')+'</h2>'+(this.mode==='explorer'?'<div class="list-order" role="group" aria-label="'+this.terms.title+' list organization"><button data-list-order="az">A–Z</button><button data-list-order="region"'+(this.config.regions?'':' hidden disabled')+'>By region</button></div><p class="list-help" hidden>Select a heading to fit its region. Use + / − to expand or collapse the list.</p>':'')+'<label for="country-search">Search '+this.terms.plural+'</label><input id="country-search" type="search" placeholder="'+this.terms.title+' name…" autocomplete="off"><div class="country-list"></div><section class="territory-section" aria-label="Territories and disputed areas"><h3>Territories &amp; disputed areas</h3><p>Hatched areas are geographic context, separate from the '+this.fullData.units.length+'-'+this.terms.singular+' score.</p><div class="territory-list"></div></section>';
       q('#country-search').value=this.query;this.renderList();
     }
+  }
+  orderPuzzleTray(){
+    const tray=q('#piece-tray');
+    if(!this.isPuzzle||!tray)return;
+    const cards=[...tray.querySelectorAll('[data-piece]')];
+    const placed=this.engines.puzzle.placed;
+    const units=this.puzzleUnits;
+    const ids=new Set(units.map(c=>c.id));
+    const order=[...units.filter(c=>!placed.has(c.id)),...units.filter(c=>placed.has(c.id)),...this.data.units.filter(c=>!ids.has(c.id))];
+    if(order.every((c,i)=>cards[i]?.dataset.piece===c.id))return;
+    // Retain the first visible unplaced card's screen position where possible.
+    // Reuse nodes so selection, pointer handlers and completion styling survive.
+    const box=tray.getBoundingClientRect(),top=tray.scrollTop;
+    const anchor=cards.find(el=>!el.hidden&&!placed.has(el.dataset.piece)&&el.getBoundingClientRect().bottom>box.top&&el.getBoundingClientRect().top<box.bottom);
+    const anchorTop=anchor?.getBoundingClientRect().top;
+    const focused=tray.contains(document.activeElement)?document.activeElement:null;
+    const nodes=new Map(cards.map(el=>[el.dataset.piece,el]));
+    for(const c of order)tray.append(nodes.get(c.id));
+    if(focused&&!focused.disabled)focused.focus({preventScroll:true});
+    tray.scrollTop=anchor?tray.scrollTop+anchor.getBoundingClientRect().top-anchorTop:top;
   }
   renderList(){
     const matches=findCountries(this.data,this.query),revealed=this.revealed;
@@ -138,7 +159,7 @@ class CountryMaps {
     if(this.phoneReveal)this.view={...this.fitView};
     const trayIds=this.isPuzzle?new Set(this.puzzleUnits.map(c=>c.id)):null;
     const revealed=this.revealed,current=this.byId.get(this.currentId),chosen=this.byId.get(this.selected);
-    const inset=this.isPuzzle&&current?.inset?current:null;
+    const inset=this.isPuzzle&&current?.inset&&!this.isIsland(current)?current:null;
     const identified=chosen&&(this.mode!=='reveal'||chosen.classification||revealed.has(chosen.id));
     q('.workspace').classList.toggle('puzzle-workspace',this.isPuzzle);
     q('.workspace').classList.toggle('phone-reveal',this.phoneReveal);
@@ -202,15 +223,17 @@ class CountryMaps {
       const row=q('[data-list-country="'+territory.id+'"]');if(row){row.classList.toggle('active',selected);row.setAttribute('aria-pressed',String(selected));}
     }
     this.paintInset(inset);
+    if(this.isPuzzle&&this.isIsland(current)){const scale=this.svg.getScreenCTM()?.a||1;q('#inset-layer').innerHTML='<circle data-island-hit="'+current.id+'" cx="'+current.anchor[0]+'" cy="'+current.anchor[1]+'" r="'+26/scale+'" fill="transparent" aria-hidden="true"/>';q('#inset-layer').dataset.country='island-'+current.id;}
     this.paintClue();
-    q('.map-caption').textContent=this.phoneReveal?'Tap to reveal / hide. Use Explorer for zooming and closer inspection.':this.isPuzzle?(inset?'Drop inside the enlarged helper inset. The ring marks its real location.':'Pieces snap when dropped inside their matching '+this.terms.singular+'.'):this.mode==='explorer'?(this.region==='all'?'Drag to pan · Repeat a selection to toggle focus / full map.':this.regions[this.region].name+' · '+this.terms.title+' selections keep your zoom and pan.'):'Tap to reveal / hide · Drag to pan · Fit map restores the practice area.';
+    q('.map-caption').textContent=this.phoneReveal?'Tap to reveal / hide. Use Explorer for zooming and closer inspection.':this.isPuzzle?(this.isIsland(current)?'Drop or tap near the island’s ocean location.':inset?'Drop inside the enlarged helper inset. The ring marks its real location.':'Pieces snap when dropped inside their matching '+this.terms.singular+'.'):this.mode==='explorer'?(this.region==='all'?'Drag to pan · Repeat a selection to toggle focus / full map.':this.regions[this.region].name+' · '+this.terms.title+' selections keep your zoom and pan.'):'Tap to reveal / hide · Drag to pan · Fit map restores the practice area.';
     if(this.isPuzzle){
+      this.orderPuzzleTray();
       const subset=this.puzzleUnits,subsetPlaced=subset.filter(c=>this.engines.puzzle.placed.has(c.id)).length;
-      q('.subset-progress').textContent=learningFilters(this.config)[this.pieceFilter].name+' · '+subsetPlaced+' / '+subset.length+(this.pieceFilter==='az'?' placed':' · '+this.engines.puzzle.placed.size+' / '+this.data.units.length+' total');
+      q('.subset-progress').textContent=learningFilters(this.config)[this.pieceFilter].name+(this.pieceFilter==='az'?'':' · '+subsetPlaced+' / '+subset.length)+(this.pieceFilter==='az'?'':' in subset');
       q('progress').value=this.engines.puzzle.placed.size;
       q('.active-piece strong').textContent=current.name;
       const position=this.puzzleUnits.findIndex(c=>c.id===current.id)+1;
-      q('.piece-position').textContent=position+' / '+this.puzzleUnits.length;
+      q('.piece-position').textContent='Piece '+position+' / '+this.puzzleUnits.length;
       q('.piece-position').setAttribute('aria-label','Piece '+position+' of '+this.puzzleUnits.length);
       q('[data-action="arm"]').setAttribute('aria-pressed',String(this.armed===current.id));
       q('[data-action="arm"]').disabled=this.engines.puzzle.placed.has(current.id);
@@ -370,7 +393,7 @@ class CountryMaps {
   arm(c){
     if(this.drag.active||this.engines.puzzle.placed.has(c.id))return;
     this.currentId=c.id;this.armed=c.id;
-    this.message=c.name+' selected. Tap its shape on the map'+(c.inset?' or enlarged inset':'')+', or focus a location and press Enter.';
+    this.message=c.name+' selected. Tap its shape on the map'+(this.isIsland(c)?' or nearby ocean':c.inset?' or enlarged inset':'')+', or focus a location and press Enter.';
     this.paint();
   }
   drop(c,x,y,stationary){
@@ -406,7 +429,8 @@ class CountryMaps {
     let correct=acceptsGeometryDrop({points,piece,target,neighbors,viewport});
     // Insets are an optional enlarged helper. The real map destination remains
     // valid and is always evaluated at the same scale as the visible drag shape.
-    if(!correct&&c.inset){
+    if(!correct&&this.isIsland(c)){const a=new DOMPoint(...c.anchor).matrixTransform(matrix);correct=acceptsIslandDrop({x,y},a,viewport,neighbors);}
+    if(!correct&&c.inset&&!this.isIsland(c)){
       const inset=q('[data-inset-hit="'+c.id+'"]');
       if(inset){
         const b=inset.getBoundingClientRect(),helperPiece=draggedBounds(c,x,y,unit*insetTransform(c).scale);
@@ -521,6 +545,7 @@ document.addEventListener('click',event=>{
   const regionToggle=event.target.closest('[data-toggle-region]');if(regionToggle){const id=regionToggle.dataset.toggleRegion;app.openRegion=app.openRegion===id?null:id;app.renderList();q('[data-toggle-region="'+id+'"]')?.focus({preventScroll:true});return;}
   const action=event.target.closest('[data-action]');if(action){app.action(action.dataset.action);return;}
   const row=event.target.closest('[data-list-country]');if(row){app.select(app.byId.get(row.dataset.listCountry));return;}
+  const island=event.target.closest('[data-island-hit]');if(island){if(app.armed===island.dataset.islandHit)app.drop(app.byId.get(app.armed),event.clientX,event.clientY,false);return;}
   const inset=event.target.closest('[data-inset-hit]');if(inset){if(app.armed===inset.dataset.insetHit)app.place(app.byId.get(app.armed),true);return;}
   // Pointer taps are completed by PanController because capture retargets click.
   // Keyboard/assistive activation (detail 0, no physical pointer) stays available.
@@ -549,7 +574,7 @@ root.addEventListener('pointerdown',event=>{
   const c=app.byId.get(source.dataset.piece);
   if(app.drag.begin(event,c,source)){
     event.preventDefault();app.suppressClick=true;app.currentId=c.id;app.armed=null;
-    app.message='Place '+c.name+(c.inset?' in the enlarged inset.':'.');app.paint();
+    app.message='Place '+c.name+(app.isIsland(c)?' at its ocean location.':c.inset?' in the enlarged inset.':'.');app.paint();
   }
 });
 document.addEventListener('pointermove',event=>{if(app?.pan.move(event)||app?.drag.move(event))event.preventDefault();},{passive:false});

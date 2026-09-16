@@ -1,4 +1,5 @@
 import {countryRegion} from '../lib/regions.mjs';
+const islands=new Set(['CPV','COM','MDG','MUS','STP','SYC']);
 const frame=document.querySelector('iframe'),results=document.querySelector('#results');
 const data=await (await fetch('../data/africa.json')).json();
 document.querySelector('#run').onclick=async()=>{
@@ -15,7 +16,7 @@ document.querySelector('#run').onclick=async()=>{
    clue();assert(level()==='1','first clue level');assert(q('#clue-text').textContent.includes(countryRegion(c.id).name),'shared regional clue '+c.id);
    assert(!q('.clue-target'),'first clue never reveals destination');assert(score()===0&&view()===initialView,'first clue no placement or camera changes');
    clue();assert(level()==='2'&&q('[data-country="'+c.id+'"].clue-target'),'second clue outlines actual country');
-   if(c.inset)assert(q('[data-inset-hit="'+c.id+'"].clue-target')&&q('[data-inset-target="'+c.id+'"].clue-target'),'small-country inset destination outlined');
+   if(c.inset&&!islands.has(c.id))assert(q('[data-inset-hit="'+c.id+'"].clue-target')&&q('[data-inset-target="'+c.id+'"].clue-target'),'small-country inset destination outlined');
    assert(score()===0&&!q('[data-piece="'+c.id+'"]').disabled&&view()===initialView,'second clue never places or moves piece');
    clue();assert(level()==='2'&&score()===0,'repeated clue is optional repeat highlight');
   }
@@ -40,7 +41,7 @@ document.querySelector('#run').onclick=async()=>{
   const c=data.countries.find(c=>c.id==='DZA'),point=new w.DOMPoint(...c.anchor).matrixTransform(svg.getScreenCTM());
   send('pointerdown',fresh,41,50,50);clue();assert(level()==='0','first clue ignored while dragging');send('pointerup',d,41,point.x,point.y);assert(score()===1&&!q('.drag-preview'),'correct drag still places normally');
   reset();
-  for(const c of data.countries){choose(c.id);clue();clue();const target=q(c.inset?'[data-inset-hit="'+c.id+'"]':'[data-country="'+c.id+'"]');target.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));assert(q('[data-piece="'+c.id+'"]').disabled,'place '+c.id);assert(level()==='0'&&!q('.clue-target'),'placement clears clue '+c.id);}
+  for(const c of data.countries){choose(c.id);clue();clue();const target=q(c.inset&&!islands.has(c.id)?'[data-inset-hit="'+c.id+'"]':'[data-country="'+c.id+'"]');target.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));assert(q('[data-piece="'+c.id+'"]').disabled,'place '+c.id);assert(level()==='0'&&!q('.clue-target'),'placement clears clue '+c.id);}
   assert(score()===54&&q('[data-action="clue"]').disabled&&!q('.completion').hidden,'completion unchanged, clue disabled');
   reset();choose('COD');clue();const panel=q('.map-panel').getBoundingClientRect(),readout=q('.map-readout').getBoundingClientRect(),hint=q('.puzzle-clue').getBoundingClientRect(),map=q('.map-viewport').getBoundingClientRect();
   assert(hint.top>=readout.top&&hint.bottom<=readout.bottom+.1&&map.top-readout.bottom<2,'clue contained in compact country row beside map');
