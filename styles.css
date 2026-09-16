@@ -1394,3 +1394,28 @@ body:has(.puzzle-workspace) main { width:calc(100% - 16px); margin:8px auto; }
 .activity-learning-slot[data-tone="2"] .activity-learning-card { background:#fbf5e4; border-left-color:#a98b42; }
 .activity-learning-slot[data-tone="3"] .activity-learning-card { background:#f2eef8; border-left-color:#9075ab; }
 @media(max-width:650px){.activity-learning-slot{height:126px;}}
+
+/* Africa entry: the existing colorful geography is the primary visual. */
+body:has(.africa-landing) main { width:min(1240px,calc(100% - 32px)); margin:18px auto; }
+.africa-landing { display:grid; grid-template-columns:minmax(300px,.8fr) minmax(0,1.6fr); grid-template-rows:auto 1fr; gap:12px 24px; align-items:start; }
+.africa-landing-heading { padding-top:28px; }
+.africa-landing-heading h1 { margin:0; color:var(--primary); font-size:clamp(2rem,4vw,3.2rem); line-height:1.15; }
+.africa-landing-heading p { margin:5px 0 0; color:var(--subtle); font-size:1rem; }
+.africa-landing-map { display:block; grid-column:2; grid-row:1/3; width:100%; height:min(72vh,670px); min-height:400px; }
+.africa-landing-activities { display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+.africa-landing-activities a { position:relative; display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:44px; padding:7px 9px; color:var(--primary); text-decoration:none; border-radius:5px; font-size:.94rem; font-weight:650; }
+.africa-landing-activities a:hover { background:#e5efe6; }
+.africa-landing-activities a:focus-visible { outline:2px solid var(--primary); outline-offset:2px; background:#e5efe6; }
+body:has(.africa-landing) .all-maps-link { background:transparent; border-color:transparent; }
+@media(max-width:899px){
+ body:has(.africa-landing) main { margin:12px auto; }
+ .africa-landing { grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto auto; gap:10px; }
+ .africa-landing-heading { padding:0; }
+ .africa-landing-map { grid-column:1; grid-row:2; width:min(100%,620px); height:auto; min-height:0; aspect-ratio:800/730; margin:0 auto; }
+ .africa-landing-activities { justify-content:center; grid-row:3; }
+}
+@media(max-width:450px){
+ body:has(.africa-landing) main { width:calc(100% - 24px); }
+ .africa-landing-activities { gap:2px; }
+ .africa-landing-activities a { padding:7px 8px; gap:5px; font-size:.88rem; }
+}
