@@ -219,7 +219,7 @@ class CountryMaps {
     q('.map-progress').textContent=this.mode==='explorer'?this.data.units.length+' '+this.terms.plural+(this.config.mapOnly&&this.data.context.length?' + '+this.data.context.length+' territorial unit':''):revealed.size+' / '+this.data.units.length+(this.mode==='reveal'?'':this.preview?' revealed':' placed');
     q('.map-tools').hidden=this.isPuzzle||this.phoneReveal;
     q('.territory-legend').hidden=!this.data.context.length||(this.mode==='explorer'&&this.data.id==='africa');
-    q('.map-caption').hidden=this.mode==='explorer'&&this.data.id==='africa';
+    q('.map-caption').hidden=this.isPuzzle||(this.mode==='explorer'&&this.data.id==='africa');
     const territorySection=q('.territory-section');if(territorySection)territorySection.hidden=!this.data.context.length;
     this.svg.classList.toggle('puzzle-map',this.isPuzzle);
     this.svg.classList.toggle('explorer-map',this.mode==='explorer');

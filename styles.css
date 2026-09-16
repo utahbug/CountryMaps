@@ -1373,3 +1373,12 @@ body:has(.compact-heading) main { margin-top:2px; }
 .card-map-focus svg { width:23px; height:23px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
 .learning-card details > button.card-map-focus:hover { background:#dce9db; }
 .learning-card details > button.card-map-focus:focus-visible { outline:2px solid #285d52; outline-offset:-3px; background:#dce9db; }
+
+/* Give Puzzle the available width without changing geographic or drag scaling. */
+body:has(.puzzle-workspace) main { width:calc(100% - 16px); margin:8px auto; }
+.puzzle-workspace { gap:6px; }
+.puzzle-workspace .side-panel { padding:8px; }
+@media(max-width:650px){
+ body:has(.puzzle-workspace) main { width:calc(100% - 12px); margin:6px auto; }
+ .puzzle-workspace .side-panel { padding:6px; }
+}
