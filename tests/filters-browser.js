@@ -41,6 +41,12 @@ document.querySelector('#run').onclick=()=>{let checks=0;const assert=(v,m)=>{if
  click('[data-action="reset"]');assert(score()===0&&all('[data-piece]:not([hidden])').length===6,'Reset retains filter and clears score');filter('az');assert(all('[data-piece]:not([hidden])').length===54,'all restored');
  const button=q('[popovertarget="piece-filter-menu"]');assert(button.getBoundingClientRect().height>=44,'touch target');button.click();
  assert(q('#piece-filter-menu').getBoundingClientRect().width<=w.innerWidth,'menu fits');assert(all('[data-piece-filter]').every(e=>e.getBoundingClientRect().height>=44),'menu touch targets');q('#piece-filter-menu').hidePopover();
+ const modeEye=q('.mode-links [aria-label="Go to Reveal mode"]'),reference=q('[data-action="preview"]');
+ assert(!!modeEye&&reference.getAttribute('aria-label')==='Reveal puzzle reference/answer map','unambiguous accessible labels');
+ assert(modeEye.querySelector('svg').innerHTML!==reference.querySelector('svg').innerHTML,'distinct mode and reference icons');
+ for(const control of all('.puzzle-top-shell .icon-control,.puzzle-readout .icon-control').filter(e=>e.getClientRects().length))assert(control.getBoundingClientRect().width>=44&&control.getBoundingClientRect().height>=44,'compact controls retain touch targets');
+ assert(q('.puzzle-readout').getBoundingClientRect().height<=46,'compact country header');
+ assert(parseFloat(w.getComputedStyle(q('main')).marginTop)<=2,'compact activity top spacing');
  assert(!q('.active-piece')&&!q('.piece-controls')&&!q('.piece-position'),'no redundant selection controls');
  assert(q('.subset-progress').hidden,'A–Z does not add a label row');
  for(const card of all('[data-piece]:not([hidden])')){

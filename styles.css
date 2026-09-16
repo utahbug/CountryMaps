@@ -1212,3 +1212,19 @@ body:has(.compact-heading) .site-header > a:first-child { font-size:1.45rem; }
 .puzzle-workspace .piece-tray { grid-auto-rows:max-content; align-content:start; }
 .puzzle-workspace .piece { height:auto; min-height:88px; padding:6px; }
 .puzzle-workspace .piece svg { margin-bottom:4px; }
+
+/* Activity titles are navigation rows, not hero headings. */
+body:has(.compact-heading) main { margin-top:2px; }
+.puzzle-top-shell { gap:2px 6px; margin-bottom:0; }
+.activity-heading.compact-heading { margin:0; padding:0; }
+.activity-heading.compact-heading h1 { margin:0; line-height:1.15; }
+.compact-heading .mode-links { padding:0; }
+.puzzle-top-shell .icon-control,
+.puzzle-top-shell .toolbar-actions button.icon-control,
+.map-readout.puzzle-readout button.icon-control {
+  border-color:transparent; background:transparent; box-shadow:none;
+}
+.puzzle-top-shell .icon-control:hover,.puzzle-readout button.icon-control:hover { background:var(--accent); }
+.puzzle-top-shell .icon-control[aria-current="page"] { background:var(--accent); box-shadow:inset 0 -2px #7fa99b; }
+.map-readout.puzzle-readout { min-height:44px; height:auto; padding:0 8px; }
+.puzzle-readout .icon-control { flex:0 0 44px; width:44px; min-width:44px; height:44px; min-height:44px; }
