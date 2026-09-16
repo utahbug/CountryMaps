@@ -21,7 +21,7 @@ button.onclick=()=>{
    const trayPiece=q('[data-piece="'+id+'"]'),trayView=trayPiece.querySelector('svg').getAttribute('viewBox').split(' ').map(Number);
    assert(trayPiece.classList.contains('small-scale-piece')&&trayView[2]===140&&trayView[3]===96,'map-scale tray frame '+id);
    assert(trayPiece.getBoundingClientRect().width>=44&&trayPiece.getBoundingClientRect().height>=44,'large tray hit target '+id);
-   assert(trayPiece.querySelector('small').textContent.includes('large touch area'),'scale explanation '+id);
+   assert(!trayPiece.querySelector('small'),'no helper text on card '+id);
    if(c.inset&&!islands.has(id))assert(q('.inset text').textContent==='Enlarged helper','inset clearly marked helper '+id);
    const geometry=q('[data-country="'+id+'"]'),original=geometry.getAttribute('d'),unit=svg.getScreenCTM().a,scale=unit*(c.inset?insetTransform(c).scale:1);
    const pw=(c.bounds[2]-c.bounds[0])*scale,ph=(c.bounds[3]-c.bounds[1])*scale,ax=(c.anchor[0]-c.bounds[0])*scale,ay=(c.anchor[1]-c.bounds[1])*scale;

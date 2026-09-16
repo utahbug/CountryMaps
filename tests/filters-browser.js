@@ -41,6 +41,14 @@ document.querySelector('#run').onclick=()=>{let checks=0;const assert=(v,m)=>{if
  click('[data-action="reset"]');assert(score()===0&&all('[data-piece]:not([hidden])').length===6,'Reset retains filter and clears score');filter('az');assert(all('[data-piece]:not([hidden])').length===54,'all restored');
  const button=q('[popovertarget="piece-filter-menu"]');assert(button.getBoundingClientRect().height>=44,'touch target');button.click();
  assert(q('#piece-filter-menu').getBoundingClientRect().width<=w.innerWidth,'menu fits');assert(all('[data-piece-filter]').every(e=>e.getBoundingClientRect().height>=44),'menu touch targets');q('#piece-filter-menu').hidePopover();
+ assert(!q('.active-piece')&&!q('.piece-controls')&&!q('.piece-position'),'no redundant selection controls');
+ assert(q('.subset-progress').hidden,'A–Z does not add a label row');
+ for(const card of all('[data-piece]:not([hidden])')){
+  const bounds=card.getBoundingClientRect(),name=card.querySelector('span').getBoundingClientRect();
+  assert(!card.querySelector('small'),'no explanatory card text');
+  assert(name.bottom<=bounds.bottom&&name.left>=bounds.left&&name.right<=bounds.right,'country name fits its card');
+  assert(bounds.width>=44&&bounds.height>=44,'card touch target');
+ }
  assert(d.documentElement.scrollWidth<=w.innerWidth,'no overflow');
  document.querySelector('#results').textContent='PASS: '+checks+' filter checks at '+w.innerWidth+' × '+w.innerHeight;
  }catch(e){document.querySelector('#results').textContent='FAIL '+checks+': '+e.message;}};
