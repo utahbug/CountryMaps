@@ -1,6 +1,6 @@
 import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
-import {terminology,mapDefinitions} from '../lib/map-configs.mjs';
+import {terminology,mapDefinitions} from '../lib/map-configs.mjs?v=planned-areas';
 import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop,acceptsIslandDrop} from '../lib/drop-validation.mjs?v=puzzle-cleanup';
 import {practiceSet,fittedRegion,countryRegion,countryRegionId,groupedCountries} from '../lib/regions.mjs';
 import {loadMap,registry,modes,titles,findCountries,insetTransform,pieceDisplayViewBox,usesPieceScaleFrame,escapeHTML as esc} from '../lib/maps.js';
@@ -505,9 +505,9 @@ function renderHome(){
  app?.clearClue();app?.toolLifecycle?.abort();app=null;
  document.title='CountryMaps · All Maps';
  document.querySelector('#data-note').textContent='';
- const cards=[...Object.keys(registry),...Object.keys(mapDefinitions).filter(id=>!registry[id]&&mapDefinitions[id].showOnHome)].map(id=>{
+ const cards=[...Object.keys(registry),...Object.keys(mapDefinitions).filter(id=>!registry[id]&&mapDefinitions[id].showOnHome).sort((a,b)=>a==='united-states'?-1:b==='united-states'?1:0)].map(id=>{
   const config=mapDefinitions[id];
-  if(!registry[id])return '<article class="map-card map-card-planned" aria-label="'+esc(config.name)+' — Planned"><div class="map-card-preview planned-preview"><strong>'+config.manifest.expectedCount+'</strong><span>'+esc(config.terminology.plural)+'</span></div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">Planned · Not available yet</span></div></article>';
+  if(!registry[id])return '<article class="map-card map-card-planned" aria-label="'+esc(config.name)+' — Planned"><div class="map-card-preview planned-preview">'+(config.preview?'<img src="./'+esc(config.preview)+'" alt="" width="800" height="730" decoding="async">':'<strong>'+config.manifest.expectedCount+'</strong><span>'+esc(config.terminology.plural)+'</span>')+'</div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">Planned · Not available yet</span></div></article>';
   return '<a class="map-card" href="'+mapEntry(id)+'" data-map-entry="'+id+'"><div class="map-card-preview"><img src="./assets/maps/'+id+'.svg" alt="" width="800" height="730" decoding="async"></div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">'+(config.mapOnly?'Map only for now':'Explorer / Reveal / Puzzle')+'</span></div><span class="map-card-arrow" aria-hidden="true">→</span></a>';
  }).join('');
  root.innerHTML='<section class="maps-home" aria-labelledby="maps-title"><p class="eyebrow">COUNTRYMAPS</p><h1 id="maps-title">Choose a map</h1><p class="hub-intro">Explore places. Learn their shapes and locations.</p><nav class="map-cards" aria-label="Choose a map">'+cards+'</nav></section>';

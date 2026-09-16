@@ -78,7 +78,7 @@ The package.json file only provides optional local commands. It has no dependenc
 - data/africa.manifest.json: explicit country inclusion, grouping, names, aliases and inset policy.
 - data/africa.json: one generated geometry record per country, used by every activity.
 
-Future approved continents or regional submaps can be registered with the same schema and normalized 800 by 730 coordinate space. No Explorer, Reveal or Puzzle engine needs duplication. No Europe or Asia dataset or navigation has been added.
+Future approved continents or regional submaps can be registered with the same schema and normalized 800 by 730 coordinate space. No Explorer, Reveal or Puzzle engine needs duplication. Europe, Asia, and Middle East have non-interactive planned Home cards only.
 
 ## Activities
 
@@ -176,3 +176,20 @@ United States (`united-states`) is reserved as a separate 50-state map and appea
 GitHub Pages at https://utahbug.github.io/CountryMaps/ is the primary review and iPhone testing version. After each completed, tested requested change: commit to this repository, push main, wait for the existing Pages deployment, verify the live site and /CountryMaps/ asset paths, then report the commit hash and deployment status. Do not publish when explicitly instructed otherwise, when tests fail, or when incomplete/experimental changes could break the site; report the blocker clearly. Preserve noindex, nofollow and the root robots.txt exclusion until instructed otherwise.
 
 Africa now has a dedicated landing URL: `/CountryMaps/africa/`. The root `/CountryMaps/` remains All Maps. Old `?map=africa` and activity query URLs remain compatible. Both HTML entry documents use base-path-safe assets; the shared module locks the project base before client-side navigation so All Maps always returns to the root.
+
+
+### Planned Home areas
+
+The Home hub includes `europe`, `asia`, and `middle-east` with the same dashed,
+non-clickable “Planned · Not available yet” treatment as United States. No activity
+routes or playable manifests are enabled. Preview SVGs are simplified, cropped
+illustrations derived from the already-pinned Natural Earth Admin 0 source (public
+domain; attribution optional and retained in the site footer). They are navigation
+previews, not approved country manifests or statements of disputed boundaries.
+
+Future submap IDs are reserved in configuration: `europe-regions`, `western-asia`,
+`central-asia`, `south-asia`, `east-asia`, and `southeast-asia`. Membership remains
+undecided. Middle East is an intentional **overlapping learning region**; future
+units reference canonical country IDs and may also appear in Asia or other
+continental/regional maps. Membership in Middle East never removes a country
+from another learning map. Preview coverage does not determine future membership.
