@@ -6,11 +6,15 @@ document.querySelector('#run').onclick=()=>{let n=0;const ok=(v,m)=>{if(!v)throw
  const filter=id=>click('[data-list-order="'+id+'"]'),search=text=>{q('#country-search').value=text;q('#country-search').dispatchEvent(new w.Event('input',{bubbles:true}))};
  filter('az');ok(all('[data-learning-unit]').length===54,'54 cards');ok(new Set(all('[data-learning-unit]').map(c=>c.dataset.learningUnit)).size===54,'unique cards');
  ok(!q('.history-disclosure').open,'history secondary by default');
- ok(q('.side-panel h2').textContent.includes('Current countries'),'current countries prominent');
- for(const card of all('[data-learning-unit]'))ok(card.querySelector('button > span').textContent.trim().length>0,'visible summary');
+ ok(q('.side-panel h2').textContent==='Find a country','compact locator heading');
+ ok(!q('.side-panel .learning-card'),'no learning cards in locator');
+ ok(q('.current-country-reference').previousElementSibling===q('.workspace'),'cards immediately after map workspace');
+ ok(q('.current-country-reference').getBoundingClientRect().top-q('.workspace').getBoundingClientRect().bottom<24,'no large gap below map');
+ ok(w.getComputedStyle(q('.learning-grid')).gridTemplateColumns.split(' ').length===(w.innerWidth>650?2:1),'responsive card columns');
+ for(const card of all('[data-learning-unit]'))ok(card.querySelector('summary > span').textContent.trim().length>0,'visible summary');
  const initial=view();
  const names=all('[data-learning-unit] .list-name').map(el=>el.textContent);ok(JSON.stringify(names)===JSON.stringify([...names].sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'}))),'alphabetical cards');
- for(const id of Object.keys(ref.units)){click('[data-list-country="'+id+'"]');ok(q('[data-country="'+id+'"]').classList.contains('selected'),'map '+id);ok(q('[data-learning-unit="'+id+'"] details').open,'details '+id);ok(view()===initial,'card preserves context');}
+ for(const id of Object.keys(ref.units)){click('[data-list-country="'+id+'"]');ok(q('[data-country="'+id+'"]').classList.contains('selected'),'map '+id);ok(q('[data-learning-unit="'+id+'"] details').open,'details '+id);ok(view()===initial,'card preserves context');click('[data-card-country="'+id+'"]');ok(!q('[data-learning-unit="'+id+'"] details').open,'card collapses');click('[data-card-country="'+id+'"]');ok(q('[data-learning-unit="'+id+'"] details').open,'card expands');q('[data-country="'+id+'"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));ok(q('[data-learning-unit="'+id+'"]').classList.contains('active'),'map opens matching card');ok(view()===initial,'map selection keeps context');}
  for(const [id,total] of [['coastal',38],['landlocked',16],['islands',6],['small',16]]){filter(id);ok(all('[data-learning-unit]').length===total,'filter '+id);if(africaPracticeSubsets[id])ok(all('[data-learning-unit]').every(c=>africaPracticeSubsets[id].ids.includes(c.dataset.learningUnit)),'canonical '+id);search('Algeria');ok(q('[data-list-country="DZA"]'),'global search');search('');}
  filter('islands');q('[data-country="DZA"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));ok(q('[data-learning-unit="DZA"] details').open,'map selection restores filtered card');
  filter('region');ok(all('.country-region').length===5,'five regions');ok(all('[data-learning-unit]').length===54,'54 grouped');

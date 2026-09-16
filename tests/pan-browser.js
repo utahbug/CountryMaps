@@ -38,12 +38,12 @@ document.querySelector('#run').onclick=()=>{
    reset();q('[data-action="zoom-in"]').click();assert(box().split(' ')[2]==='480','zoom works');start();send('pointermove',svg,71,170,165);send('pointerup',svg,71,170,165);const zoomed=box();q('[data-action="right"]').click();assert(box()!==zoomed,'arrow pan works');q('[data-action="fit"]').click();assert(box()==='0 0 800 730','Fit restores map');
    q('[data-country="EGY"]').dispatchEvent(new w.KeyboardEvent('keydown',{bubbles:true,key:'Enter'}));assert(selected()==='Egypt','keyboard country activation');reset();clean();
    start();send('pointerup');assert(box()==='0 0 800 730','first map tap retains full continent');
-   start();send('pointerup');assert(Number(box().split(' ')[2])<800,'second map tap focuses country');
-   const focused=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()==='0 0 800 730'&&selected()==='Egypt','different country returns to continent');
+   start();send('pointerup');assert(box()==='0 0 800 730','repeat map tap keeps context');
+   const focused=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()==='0 0 800 730'&&selected()==='Egypt','different country keeps continent');
    q('[data-list-country="EGY"]').click();assert(box()==='0 0 800 730','repeat card keeps context');q('[data-focus-unit="EGY"]').click();assert(Number(box().split(' ')[2])<800,'explicit card focus');
    q('[data-action="fit"]').click();start();send('pointerup');assert(box()==='0 0 800 730','new selection after Fit preserves fit');
    start();send('pointermove',svg,71,175,165);send('pointerup',svg,71,175,165);assert(box().split(' ')[2]==='800','pan on selected country does not focus');clean();
-   const panned=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()==='0 0 800 730','new country selection resets manual pan');reset();
+   const panned=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()===panned,'new country selection preserves manual pan');reset();
    for(const id of ['CAF','COD']){
     q('[data-list-country="'+id+'"]').click();
     const label=q('.selected-country-overlay'),before=label.getBoundingClientRect(),map=svg.getBoundingClientRect();
@@ -59,7 +59,7 @@ document.querySelector('#run').onclick=()=>{
    reset();const revealMode=new URL(w.location.href).searchParams.get('mode')==='reveal';
    for(let i=0;i<10;i++){
     start();send('pointerup');
-    assert((Number(box().split(' ')[2])===800)===(i%2===0),'repeated taps alternate Fit and focus');
+    assert(Number(box().split(' ')[2])===800,'repeated taps keep geographic context');
     if(revealMode){
      const visible=i%2===0;assert(q('[data-country="DZA"]').getAttribute('aria-pressed')===String(visible),'Reveal independently toggles name state');
      assert(q('.selected-country-overlay').hidden===!visible,'hidden name removed from adjacent overlay');
