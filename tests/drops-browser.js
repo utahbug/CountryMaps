@@ -47,6 +47,17 @@ button.onclick=()=>{
    assert(ghost.getBoundingClientRect().width>=44&&ghost.getBoundingClientRect().height>=44,'invisible drag frame '+id);
    finish(near.x,near.y);assert(score()===1&&q('[data-piece="'+id+'"]').disabled,'forgiving intended overlap accepted '+id);clean();
    assert(geometry.getAttribute('d')===original&&!geometry.hasAttribute('transform'),'canonical outline and snap unchanged '+id);assert(q('.puzzle-clue').dataset.level==='0'&&!q('.clue-target'),'placement clears clue');
+   if(c.inset){
+    reset();const actual=new w.DOMPoint(...c.anchor).matrixTransform(svg.getScreenCTM());begin(id);finish(actual.x,actual.y);
+    assert(score()===1&&q('[data-piece="'+id+'"]').disabled,'real map destination accepts inset-assisted country '+id);clean();
+    assert(geometry.getAttribute('d')===original&&!geometry.hasAttribute('transform'),'real map drop snaps canonical outline '+id);
+    if(id==='TGO'){
+     reset();const targetRect=geometry.getBoundingClientRect(),tolerant={x:actual.x,y:actual.y+Math.min(6,targetRect.height*.22)};
+     begin(id);finish(tolerant.x,tolerant.y);
+     assert(score()===1&&q('[data-piece="TGO"]').disabled,'Togo substantial canonical overlap accepted without pixel-perfect alignment');clean();
+     assert(geometry.getAttribute('d')===original&&!geometry.hasAttribute('transform'),'Togo tolerant drop snaps exactly to canonical geometry');
+    }
+   }
    reset();begin(id);finish(far.x,far.y);assert(score()===0&&!q('[data-piece="'+id+'"]').disabled,'miss rejected '+id);clean();
    // Dropping on a neighboring country's actual geography never solves an inset piece.
    const neighborId={GMB:'SEN',BEN:'TGO',TGO:'BEN',RWA:'BDI',BDI:'RWA',DJI:'ERI',SWZ:'ZAF',LSO:'ZAF',MWI:'MOZ',CPV:'SEN',COM:'MDG',MUS:'MDG',SYC:'SOM',STP:'GAB'}[id];
@@ -54,9 +65,7 @@ button.onclick=()=>{
    for(let repeat=0;repeat<3;repeat++){reset();begin(id);finish(near.x,near.y);assert(score()===1,'repeated overlap drop '+id);clean();}
   }
   reset();for(const c of data.countries){
-   begin(c.id);let point;
-   if(c.inset){const b=rect(q('[data-inset-hit="'+c.id+'"]')),scale=svg.getScreenCTM().a*insetTransform(c).scale;point={x:b.x+b.w/2+(c.anchor[0]-(c.bounds[0]+c.bounds[2])/2)*scale,y:b.y+b.h/2+(c.anchor[1]-(c.bounds[1]+c.bounds[3])/2)*scale};}
-   else point=new w.DOMPoint(...c.anchor).matrixTransform(svg.getScreenCTM());
+   begin(c.id);const point=new w.DOMPoint(...c.anchor).matrixTransform(svg.getScreenCTM());
    finish(point.x,point.y);assert(q('[data-piece="'+c.id+'"]').disabled,'all-country aligned drop '+c.id);
   }
   assert(score()===54&&!q('.completion').hidden,'54/54 completion unchanged');reset();assert(score()===0&&!q('.clue-target'),'Reset clean');clean();assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');

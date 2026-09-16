@@ -345,36 +345,39 @@ class CountryMaps {
     const svgBox=this.svg.getBoundingClientRect(),matrix=this.svg.getScreenCTM();
     if(!matrix){this.place(c,false);return;}
     const viewport={x:svgBox.left,y:svgBox.top,w:svgBox.width,h:svgBox.height};
-    const scale=Math.min(svgBox.width/this.view.w,svgBox.height/this.view.h)*(c.inset?insetTransform(c).scale:1);
-    const piece=draggedBounds(c,x,y,scale);
+    const unit=Math.min(svgBox.width/this.view.w,svgBox.height/this.view.h);
     const inverse=matrix.inverse();
     const shape=country=>{
       const element=q('[data-country="'+country.id+'"]'),b=element.getBoundingClientRect();
       const anchor=new DOMPoint(...country.anchor).matrixTransform(matrix);
       return {bounds:{x:b.left,y:b.top,w:b.width,h:b.height},center:{x:anchor.x,y:anchor.y},contains:point=>element.isPointInFill(new DOMPoint(point.x,point.y).matrixTransform(inverse))};
     };
-
-    let correct=false;
-    if(c.inset){
-      const inset=q('[data-inset-hit="'+c.id+'"]');
-      if(inset){const b=inset.getBoundingClientRect();correct=acceptsInsetDrop(piece,{x:b.left,y:b.top,w:b.width,h:b.height},viewport,this.data.units.filter(n=>n.id!==c.id).map(shape));}
-    }else{
-      const path=q('[data-country="'+c.id+'"]');
-      let samples=this.dropSamples.get(c.id);
-      if(!samples){
-        samples=[];const [x0,y0,x1,y1]=c.bounds;
-        // Uniform filled-area samples avoid a centroid-only test and ignore oceans/holes.
-        for(let row=0;row<40;row++)for(let col=0;col<40;col++){
-          const point=new DOMPoint(x0+(col+.5)*(x1-x0)/40,y0+(row+.5)*(y1-y0)/40);
-          if(path.isPointInFill(point))samples.push({x:point.x,y:point.y});
-        }
-        this.dropSamples.set(c.id,samples);
+    const neighbors=this.data.units.filter(n=>n.id!==c.id).map(shape);
+    const path=q('[data-country="'+c.id+'"]');
+    let samples=this.dropSamples.get(c.id);
+    if(!samples){
+      samples=[];const [x0,y0,x1,y1]=c.bounds;
+      // Uniform filled-area samples avoid a centroid-only test and ignore oceans/holes.
+      for(let row=0;row<40;row++)for(let col=0;col<40;col++){
+        const point=new DOMPoint(x0+(col+.5)*(x1-x0)/40,y0+(row+.5)*(y1-y0)/40);
+        if(path.isPointInFill(point))samples.push({x:point.x,y:point.y});
       }
-      const target=shape(c);
-      target.small=Math.min(target.bounds.w,target.bounds.h)<24||samples.length/1600<.22;
-      if(samples.length){const center=samples.reduce((sum,p)=>({x:sum.x+p.x/samples.length,y:sum.y+p.y/samples.length}),{x:0,y:0});const point=new DOMPoint(center.x,center.y).matrixTransform(matrix);target.center={x:point.x,y:point.y};}
-      const points=samples.map(p=>({x:x+(p.x-c.anchor[0])*scale,y:y+(p.y-c.anchor[1])*scale}));
-      correct=acceptsGeometryDrop({points,piece,target,neighbors:this.data.units.filter(n=>n.id!==c.id).map(shape),viewport});
+      this.dropSamples.set(c.id,samples);
+    }
+    const target=shape(c);
+    target.small=Math.min(target.bounds.w,target.bounds.h)<24||samples.length/1600<.22;
+    if(samples.length){const center=samples.reduce((sum,p)=>({x:sum.x+p.x/samples.length,y:sum.y+p.y/samples.length}),{x:0,y:0});const point=new DOMPoint(center.x,center.y).matrixTransform(matrix);target.center={x:point.x,y:point.y};}
+    const piece=draggedBounds(c,x,y,unit);
+    const points=samples.map(p=>({x:x+(p.x-c.anchor[0])*unit,y:y+(p.y-c.anchor[1])*unit}));
+    let correct=acceptsGeometryDrop({points,piece,target,neighbors,viewport});
+    // Insets are an optional enlarged helper. The real map destination remains
+    // valid and is always evaluated at the same scale as the visible drag shape.
+    if(!correct&&c.inset){
+      const inset=q('[data-inset-hit="'+c.id+'"]');
+      if(inset){
+        const b=inset.getBoundingClientRect(),helperPiece=draggedBounds(c,x,y,unit*insetTransform(c).scale);
+        correct=acceptsInsetDrop(helperPiece,{x:b.left,y:b.top,w:b.width,h:b.height},viewport,neighbors);
+      }
     }
     this.place(c,correct);
   }
