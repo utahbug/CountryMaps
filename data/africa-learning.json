@@ -1,0 +1,826 @@
+{
+  "units": {
+    "DZA": {
+      "neighborIds": [
+        "MAR",
+        "TUN",
+        "LBY",
+        "NER",
+        "MLI",
+        "MRT"
+      ],
+      "landlocked": false,
+      "summary": "Between the Mediterranean coast and the Sahara.",
+      "capital": null,
+      "borderNote": "Also borders Western Sahara, shown separately as disputed territory."
+    },
+    "AGO": {
+      "neighborIds": [
+        "NAM",
+        "ZMB",
+        "COD",
+        "COG"
+      ],
+      "landlocked": false,
+      "summary": "Cabinda is separated from the main part of Angola.",
+      "capital": null
+    },
+    "BEN": {
+      "neighborIds": [
+        "TGO",
+        "BFA",
+        "NER",
+        "NGA"
+      ],
+      "landlocked": false,
+      "summary": "A narrow coastal country between Togo and Nigeria.",
+      "capital": null
+    },
+    "BWA": {
+      "neighborIds": [
+        "NAM",
+        "ZMB",
+        "ZWE",
+        "ZAF"
+      ],
+      "landlocked": true,
+      "summary": "Between Namibia, Zimbabwe and South Africa, with a short Zambia border.",
+      "capital": null
+    },
+    "BFA": {
+      "neighborIds": [
+        "MLI",
+        "NER",
+        "BEN",
+        "TGO",
+        "GHA",
+        "CIV"
+      ],
+      "landlocked": true,
+      "summary": "An inland meeting point for six West African neighbors.",
+      "capital": null
+    },
+    "BDI": {
+      "neighborIds": [
+        "RWA",
+        "TZA",
+        "COD"
+      ],
+      "landlocked": true,
+      "summary": "South of Rwanda, beside Lake Tanganyika.",
+      "capital": null
+    },
+    "CPV": {
+      "neighborIds": [],
+      "landlocked": false,
+      "summary": "An Atlantic island group west of Senegal.",
+      "capital": null
+    },
+    "CMR": {
+      "neighborIds": [
+        "NGA",
+        "TCD",
+        "CAF",
+        "COG",
+        "GAB",
+        "GNQ"
+      ],
+      "landlocked": false,
+      "summary": "Stretches from the Gulf of Guinea toward Lake Chad.",
+      "capital": null
+    },
+    "CAF": {
+      "neighborIds": [
+        "CMR",
+        "TCD",
+        "SDN",
+        "SSD",
+        "COD",
+        "COG"
+      ],
+      "landlocked": true,
+      "summary": "An inland link between the two Congos and Sudan.",
+      "capital": null
+    },
+    "TCD": {
+      "neighborIds": [
+        "LBY",
+        "NER",
+        "NGA",
+        "CMR",
+        "CAF",
+        "SDN"
+      ],
+      "landlocked": true,
+      "summary": "Extends north from Lake Chad into the Sahara.",
+      "capital": null
+    },
+    "COM": {
+      "neighborIds": [],
+      "landlocked": false,
+      "summary": "Islands between Mozambique and Madagascar.",
+      "capital": null
+    },
+    "COD": {
+      "neighborIds": [
+        "COG",
+        "CAF",
+        "SSD",
+        "UGA",
+        "RWA",
+        "BDI",
+        "TZA",
+        "ZMB",
+        "AGO"
+      ],
+      "landlocked": false,
+      "summary": "The larger Congo has a narrow outlet to the Atlantic.",
+      "capital": null
+    },
+    "COG": {
+      "neighborIds": [
+        "GAB",
+        "CMR",
+        "CAF",
+        "COD",
+        "AGO"
+      ],
+      "landlocked": false,
+      "summary": "West of the Democratic Republic of the Congo.",
+      "capital": null
+    },
+    "CIV": {
+      "neighborIds": [
+        "LBR",
+        "GIN",
+        "MLI",
+        "BFA",
+        "GHA"
+      ],
+      "landlocked": false,
+      "summary": "On the Gulf of Guinea between Liberia and Ghana.",
+      "capital": null
+    },
+    "DJI": {
+      "neighborIds": [
+        "ERI",
+        "ETH",
+        "SOM"
+      ],
+      "landlocked": false,
+      "summary": "At the narrow entrance between the Red Sea and Gulf of Aden.",
+      "capital": null,
+      "borderNote": "The Somalia boundary meets Somaliland, shown separately as a disputed / breakaway area."
+    },
+    "EGY": {
+      "neighborIds": [
+        "LBY",
+        "SDN"
+      ],
+      "landlocked": false,
+      "summary": "The Nile reaches the Mediterranean here; Sinai extends into Asia.",
+      "capital": null,
+      "borderNote": "Also borders Israel and the Gaza Strip (State of Palestine), outside this Africa set."
+    },
+    "GNQ": {
+      "neighborIds": [
+        "CMR",
+        "GAB"
+      ],
+      "landlocked": false,
+      "summary": "Combines a mainland section with islands in the Gulf of Guinea.",
+      "capital": null
+    },
+    "ERI": {
+      "neighborIds": [
+        "SDN",
+        "ETH",
+        "DJI"
+      ],
+      "landlocked": false,
+      "summary": "A long Red Sea coast north of Ethiopia.",
+      "capital": null
+    },
+    "SWZ": {
+      "neighborIds": [
+        "ZAF",
+        "MOZ"
+      ],
+      "landlocked": true,
+      "summary": "Between South Africa and Mozambique, without a coastline.",
+      "capital": null
+    },
+    "ETH": {
+      "neighborIds": [
+        "ERI",
+        "DJI",
+        "SOM",
+        "KEN",
+        "SSD",
+        "SDN"
+      ],
+      "landlocked": true,
+      "summary": "Inland in the Horn of Africa, west of Somalia.",
+      "capital": null,
+      "borderNote": "Part of the Somalia boundary meets Somaliland. The map distinguishes its disputed / breakaway status."
+    },
+    "GAB": {
+      "neighborIds": [
+        "GNQ",
+        "CMR",
+        "COG"
+      ],
+      "landlocked": false,
+      "summary": "On the Atlantic coast, south of Cameroon.",
+      "capital": null
+    },
+    "GMB": {
+      "neighborIds": [
+        "SEN"
+      ],
+      "landlocked": false,
+      "summary": "Follows the Gambia River through Senegal to the Atlantic.",
+      "capital": null
+    },
+    "GHA": {
+      "neighborIds": [
+        "CIV",
+        "BFA",
+        "TGO"
+      ],
+      "landlocked": false,
+      "summary": "On the Gulf of Guinea, just west of Togo.",
+      "capital": null
+    },
+    "GIN": {
+      "neighborIds": [
+        "GNB",
+        "SEN",
+        "MLI",
+        "CIV",
+        "LBR",
+        "SLE"
+      ],
+      "landlocked": false,
+      "summary": "An Atlantic country reaching inland toward Mali.",
+      "capital": null
+    },
+    "GNB": {
+      "neighborIds": [
+        "SEN",
+        "GIN"
+      ],
+      "landlocked": false,
+      "summary": "A small Atlantic country between Senegal and Guinea.",
+      "capital": null
+    },
+    "KEN": {
+      "neighborIds": [
+        "SOM",
+        "ETH",
+        "SSD",
+        "UGA",
+        "TZA"
+      ],
+      "landlocked": false,
+      "summary": "Connects the Indian Ocean coast with Lake Victoria.",
+      "capital": null
+    },
+    "LSO": {
+      "neighborIds": [
+        "ZAF"
+      ],
+      "landlocked": true,
+      "summary": "Entirely surrounded by South Africa.",
+      "capital": null
+    },
+    "LBR": {
+      "neighborIds": [
+        "SLE",
+        "GIN",
+        "CIV"
+      ],
+      "landlocked": false,
+      "summary": "On the Atlantic coast between Sierra Leone and Côte d’Ivoire.",
+      "capital": null
+    },
+    "LBY": {
+      "neighborIds": [
+        "TUN",
+        "DZA",
+        "NER",
+        "TCD",
+        "SDN",
+        "EGY"
+      ],
+      "landlocked": false,
+      "summary": "Mediterranean coastline above a broad Saharan interior.",
+      "capital": null
+    },
+    "MDG": {
+      "neighborIds": [],
+      "landlocked": false,
+      "summary": "A large island across the Mozambique Channel from mainland Africa.",
+      "capital": null
+    },
+    "MWI": {
+      "neighborIds": [
+        "ZMB",
+        "TZA",
+        "MOZ"
+      ],
+      "landlocked": true,
+      "summary": "A narrow inland country along Lake Malawi.",
+      "capital": null
+    },
+    "MLI": {
+      "neighborIds": [
+        "DZA",
+        "NER",
+        "BFA",
+        "CIV",
+        "GIN",
+        "SEN",
+        "MRT"
+      ],
+      "landlocked": true,
+      "summary": "Links the western Sahel with the Sahara.",
+      "capital": null
+    },
+    "MRT": {
+      "neighborIds": [
+        "DZA",
+        "MLI",
+        "SEN"
+      ],
+      "landlocked": false,
+      "summary": "Atlantic coastline beside the western Sahara.",
+      "capital": null,
+      "borderNote": "Also borders Western Sahara, shown separately as disputed territory."
+    },
+    "MUS": {
+      "neighborIds": [],
+      "landlocked": false,
+      "summary": "An Indian Ocean island country east of Madagascar.",
+      "capital": null
+    },
+    "MAR": {
+      "neighborIds": [
+        "DZA"
+      ],
+      "landlocked": false,
+      "summary": "At Africa’s northwest corner, across the strait from Spain.",
+      "capital": null,
+      "borderNote": "Also meets Spain at Ceuta and Melilla. Western Sahara is shown separately as disputed territory."
+    },
+    "MOZ": {
+      "neighborIds": [
+        "TZA",
+        "MWI",
+        "ZMB",
+        "ZWE",
+        "ZAF",
+        "SWZ"
+      ],
+      "landlocked": false,
+      "summary": "Its long Indian Ocean coast faces Madagascar.",
+      "capital": null
+    },
+    "NAM": {
+      "neighborIds": [
+        "AGO",
+        "ZMB",
+        "BWA",
+        "ZAF"
+      ],
+      "landlocked": false,
+      "summary": "Its northeastern arm reaches toward Zambia.",
+      "capital": null
+    },
+    "NER": {
+      "neighborIds": [
+        "DZA",
+        "LBY",
+        "TCD",
+        "NGA",
+        "BEN",
+        "BFA",
+        "MLI"
+      ],
+      "landlocked": true,
+      "summary": "Inland north of Nigeria; the similar names describe different countries.",
+      "capital": null
+    },
+    "NGA": {
+      "neighborIds": [
+        "BEN",
+        "NER",
+        "TCD",
+        "CMR"
+      ],
+      "landlocked": false,
+      "summary": "On the Gulf of Guinea, south of Niger.",
+      "capital": null
+    },
+    "RWA": {
+      "neighborIds": [
+        "UGA",
+        "TZA",
+        "BDI",
+        "COD"
+      ],
+      "landlocked": true,
+      "summary": "A small inland country between Uganda and Burundi.",
+      "capital": null
+    },
+    "STP": {
+      "neighborIds": [],
+      "landlocked": false,
+      "summary": "Two main islands in the Gulf of Guinea, west of Gabon.",
+      "capital": null
+    },
+    "SEN": {
+      "neighborIds": [
+        "MRT",
+        "MLI",
+        "GIN",
+        "GNB",
+        "GMB"
+      ],
+      "landlocked": false,
+      "summary": "Surrounds The Gambia except at its Atlantic mouth.",
+      "capital": null
+    },
+    "SYC": {
+      "neighborIds": [],
+      "landlocked": false,
+      "summary": "An Indian Ocean archipelago northeast of Madagascar.",
+      "capital": null
+    },
+    "SLE": {
+      "neighborIds": [
+        "GIN",
+        "LBR"
+      ],
+      "landlocked": false,
+      "summary": "On the Atlantic coast between Guinea and Liberia.",
+      "capital": null
+    },
+    "SOM": {
+      "neighborIds": [
+        "DJI",
+        "ETH",
+        "KEN"
+      ],
+      "landlocked": false,
+      "summary": "Forms the eastern tip of the Horn of Africa.",
+      "capital": null,
+      "borderNote": "Somaliland is shown separately as a disputed / breakaway area, not a 55th sovereign country."
+    },
+    "ZAF": {
+      "neighborIds": [
+        "NAM",
+        "BWA",
+        "ZWE",
+        "MOZ",
+        "SWZ",
+        "LSO"
+      ],
+      "landlocked": false,
+      "summary": "Wraps around Lesotho at the continent’s southern end.",
+      "capital": null
+    },
+    "SSD": {
+      "neighborIds": [
+        "SDN",
+        "ETH",
+        "KEN",
+        "UGA",
+        "COD",
+        "CAF"
+      ],
+      "landlocked": true,
+      "summary": "Inland between Sudan and the Great Lakes region.",
+      "capital": null,
+      "borderNote": "The boundary with Sudan includes unresolved disputes, including Abyei."
+    },
+    "SDN": {
+      "neighborIds": [
+        "EGY",
+        "LBY",
+        "TCD",
+        "CAF",
+        "SSD",
+        "ETH",
+        "ERI"
+      ],
+      "landlocked": false,
+      "summary": "South of Egypt, with a short Red Sea coast.",
+      "capital": null,
+      "borderNote": "Some boundaries and areas, including Abyei, remain disputed."
+    },
+    "TZA": {
+      "neighborIds": [
+        "KEN",
+        "UGA",
+        "RWA",
+        "BDI",
+        "COD",
+        "ZMB",
+        "MWI",
+        "MOZ"
+      ],
+      "landlocked": false,
+      "summary": "Links the Great Lakes to the Indian Ocean.",
+      "capital": null
+    },
+    "TGO": {
+      "neighborIds": [
+        "GHA",
+        "BFA",
+        "BEN"
+      ],
+      "landlocked": false,
+      "summary": "A slender strip between Ghana and Benin.",
+      "capital": null
+    },
+    "TUN": {
+      "neighborIds": [
+        "DZA",
+        "LBY"
+      ],
+      "landlocked": false,
+      "summary": "A Mediterranean country between Algeria and Libya.",
+      "capital": null
+    },
+    "UGA": {
+      "neighborIds": [
+        "SSD",
+        "KEN",
+        "TZA",
+        "RWA",
+        "COD"
+      ],
+      "landlocked": true,
+      "summary": "An inland country on the northern side of Lake Victoria.",
+      "capital": null
+    },
+    "ZMB": {
+      "neighborIds": [
+        "AGO",
+        "COD",
+        "TZA",
+        "MWI",
+        "MOZ",
+        "ZWE",
+        "BWA",
+        "NAM"
+      ],
+      "landlocked": true,
+      "summary": "An inland crossroads with eight neighboring countries.",
+      "capital": null
+    },
+    "ZWE": {
+      "neighborIds": [
+        "ZMB",
+        "MOZ",
+        "ZAF",
+        "BWA"
+      ],
+      "landlocked": true,
+      "summary": "Between Zambia and South Africa, west of Mozambique.",
+      "capital": null
+    }
+  },
+  "history": [
+    {
+      "id": "upper-volta",
+      "name": "Upper Volta",
+      "type": "Former name",
+      "period": "Renamed 1984",
+      "currentUnitIds": [
+        "BFA"
+      ],
+      "note": "The independent state changed its name to Burkina Faso.",
+      "sources": [
+        "https://history.state.gov/countries/burkina-faso"
+      ]
+    },
+    {
+      "id": "dahomey",
+      "name": "Republic of Dahomey",
+      "type": "Former name",
+      "period": "1960–1975",
+      "currentUnitIds": [
+        "BEN"
+      ],
+      "note": "Renamed Benin in 1975; this entry refers to the modern republic, not the earlier kingdom.",
+      "sources": [
+        "https://history.state.gov/countries/benin"
+      ]
+    },
+    {
+      "id": "swaziland",
+      "name": "Swaziland",
+      "type": "Former name",
+      "period": "Renamed 2018",
+      "currentUnitIds": [
+        "SWZ"
+      ],
+      "note": "The country adopted the name Eswatini.",
+      "sources": [
+        "https://www.un.org/en/about-us/member-states/eswatini"
+      ]
+    },
+    {
+      "id": "zaire",
+      "name": "Zaire",
+      "type": "Former name",
+      "period": "Name changed in 1997",
+      "currentUnitIds": [
+        "COD"
+      ],
+      "note": "The state became the Democratic Republic of the Congo; it is distinct from the Republic of the Congo.",
+      "sources": [
+        "https://www.un.org/fr/about-us/member-states/democratic-republic-of-the-congo"
+      ]
+    },
+    {
+      "id": "cape-verde",
+      "name": "Cape Verde",
+      "type": "Former English name",
+      "period": "UN usage changed 2013",
+      "currentUnitIds": [
+        "CPV"
+      ],
+      "note": "The country requested Cabo Verde for international usage; this was a name change, not a new state.",
+      "sources": [
+        "https://www.un.org/en/about-us/member-states/cabo-verde"
+      ]
+    },
+    {
+      "id": "gold-coast",
+      "name": "Gold Coast",
+      "type": "Colonial-era name",
+      "period": "Independence 1957",
+      "currentUnitIds": [
+        "GHA"
+      ],
+      "note": "A colonial-era name associated with the territory that became Ghana; not a separate former sovereign country.",
+      "sources": [
+        "https://history.state.gov/countries/ghana"
+      ]
+    },
+    {
+      "id": "northern-rhodesia",
+      "name": "Northern Rhodesia",
+      "type": "Colonial-era name",
+      "period": "Independence 1964",
+      "currentUnitIds": [
+        "ZMB"
+      ],
+      "note": "The British-administered territory became independent Zambia.",
+      "sources": [
+        "https://history.state.gov/countries/zambia"
+      ]
+    },
+    {
+      "id": "southern-rhodesia",
+      "name": "Southern Rhodesia / Rhodesia",
+      "type": "Colonial-era name / unrecognized state",
+      "period": "UDI 1965; Zimbabwe independent 1980",
+      "currentUnitIds": [
+        "ZWE"
+      ],
+      "note": "The minority government’s unilateral Rhodesian state lacked international recognition; Zimbabwe became independent in 1980.",
+      "sources": [
+        "https://history.state.gov/countries/zimbabwe"
+      ]
+    },
+    {
+      "id": "basutoland",
+      "name": "Basutoland",
+      "type": "Colonial-era name",
+      "period": "Independence 1966",
+      "currentUnitIds": [
+        "LSO"
+      ],
+      "note": "The British-administered territory became Lesotho.",
+      "sources": [
+        "https://history.state.gov/countries/lesotho"
+      ]
+    },
+    {
+      "id": "bechuanaland",
+      "name": "Bechuanaland Protectorate",
+      "type": "Colonial-era name",
+      "period": "Independence 1966",
+      "currentUnitIds": [
+        "BWA"
+      ],
+      "note": "The protectorate became Botswana; this is not the same territory as British Bechuanaland, now in South Africa.",
+      "sources": [
+        "https://history.state.gov/countries/botswana"
+      ]
+    },
+    {
+      "id": "nyasaland",
+      "name": "Nyasaland",
+      "type": "Colonial-era name",
+      "period": "Independence 1964",
+      "currentUnitIds": [
+        "MWI"
+      ],
+      "note": "The British-administered territory became Malawi.",
+      "sources": [
+        "https://history.state.gov/countries/malawi"
+      ]
+    },
+    {
+      "id": "tanganyika-zanzibar",
+      "name": "Tanganyika and Zanzibar",
+      "type": "Merged states",
+      "period": "Union 26 April 1964",
+      "currentUnitIds": [
+        "TZA"
+      ],
+      "note": "The two states united; the name Tanzania followed later in 1964. Zanzibar remains a distinct part of the union.",
+      "sources": [
+        "https://treaties.un.org/pages/HistoricalInfo.aspx"
+      ]
+    },
+    {
+      "id": "mali-federation",
+      "name": "Mali Federation",
+      "type": "Predecessor state / split",
+      "period": "Independent June–August 1960",
+      "currentUnitIds": [
+        "MLI",
+        "SEN"
+      ],
+      "note": "Senegal withdrew from the federation; the remaining Soudanese Republic took the name Mali in September 1960.",
+      "sources": [
+        "https://history.state.gov/countries/mali"
+      ]
+    },
+    {
+      "id": "sudan-before-split",
+      "name": "Sudan before South Sudan’s independence",
+      "type": "Split / successor state",
+      "period": "South Sudan independent 9 July 2011",
+      "currentUnitIds": [
+        "SDN",
+        "SSD"
+      ],
+      "note": "South Sudan separated from Sudan; Sudan continued as a state, and some boundary issues remain unresolved.",
+      "sources": [
+        "https://2021-2025.state.gov/countries-areas/south-sudan/"
+      ]
+    },
+    {
+      "id": "uar",
+      "name": "United Arab Republic",
+      "type": "Union / later retained name",
+      "period": "Union 1958–1961; Egyptian name until 1971",
+      "currentUnitIds": [
+        "EGY"
+      ],
+      "note": "Egypt and Syria united, then separated. Egypt retained the union’s name until 1971; Syria is outside this map.",
+      "sources": [
+        "https://www.un.org/en/node/122868"
+      ]
+    },
+    {
+      "id": "south-west-africa",
+      "name": "South West Africa",
+      "type": "Colonial-era / administered territory",
+      "period": "Namibia independent 1990",
+      "currentUnitIds": [
+        "NAM"
+      ],
+      "note": "The territory became Namibia after South African rule; its status and occupation were internationally contested.",
+      "sources": [
+        "https://www.un.org/dppa/decolonization/en/history/former-trust-and-nsgts",
+        "https://history.state.gov/milestones/1989-1992/apartheid"
+      ]
+    },
+    {
+      "id": "ethiopia-eritrea",
+      "name": "Ethiopia before Eritrean independence",
+      "type": "Split / successor state",
+      "period": "Eritrea independent 1993",
+      "currentUnitIds": [
+        "ETH",
+        "ERI"
+      ],
+      "note": "Eritrea became independent; Ethiopia continued as a state and no longer had a coastline.",
+      "sources": [
+        "https://history.state.gov/countries/eritrea"
+      ]
+    }
+  ],
+  "sources": {
+    "geography": "https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/",
+    "landlocked": "https://www.un.org/en/node/205691"
+  }
+}

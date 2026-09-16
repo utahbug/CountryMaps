@@ -34,11 +34,11 @@ document.querySelector('#run').onclick=()=>{
   for(const order of ['az','region']){
    click('[data-list-order="'+order+'"]');
    for(const c of data.countries){query(c.name);assert(q('.country-list [data-list-country="'+c.id+'"]'),'global search '+c.id+' '+order);}
-   query('Algeria');const before=view();assert(q('[data-list-country="DZA"]'),'outside-region match');assert(view()===before,'typing never moves map');click('[data-list-country="DZA"]');assert(q('#practice-region').value==='north','outside-region selection fits its region');assert(q('[data-country="DZA"]').classList.contains('selected'),'outside search selection works');
+   query('Algeria');const before=view();assert(q('[data-list-country="DZA"]'),'outside-region match');assert(view()===before,'typing never moves map');click('[data-list-country="DZA"]');assert(view()===before,'outside-region card keeps context');assert(q('[data-country="DZA"]').classList.contains('selected'),'outside search selection works');
    query('');
   }
   click('[data-action="fit"]');assert(view()==='0 0 800 730'&&q('#practice-region').value==='all','All Africa returns continent');assert(!q('.outside-region'),'All Africa restores all country styling');
-  click('[data-action="reset"]');click('[data-list-order="az"]');click('[data-list-country="DZA"]');click('[data-list-country="DZA"]');assert(view()!=='0 0 800 730','All Africa retains repeat-selection focus');click('[data-action="fit"]');
+  click('[data-action="reset"]');click('[data-list-order="az"]');click('[data-list-country="DZA"]');click('[data-list-country="DZA"]');assert(view()==='0 0 800 730','repeat card selection preserves context');click('[data-focus-unit="DZA"]');assert(view()!=='0 0 800 730','explicit focus');click('[data-action="fit"]');
   click('[popovertarget="explorer-filter-menu"]');
   assert(q('#explorer-filter-menu').matches(':popover-open'),'filter opens');
   for(const button of all('[data-list-order]'))assert(button.getBoundingClientRect().height>=44,'organization touch target');

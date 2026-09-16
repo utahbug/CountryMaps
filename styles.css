@@ -1306,3 +1306,24 @@ body:has(.compact-heading) main { margin-top:2px; }
 .explorer-workspace .country-list button { min-height:44px; padding:3px 4px; }
 #explorer-filter-menu:not(:popover-open) { display:none; }
 #explorer-filter-menu:popover-open { display:grid; gap:4px; }
+
+/* Compact reference cards share the existing map-first workspace. */
+.learning-card { border:1px solid var(--line); border-radius:6px; margin:0 0 6px; overflow:hidden; background:var(--panel); }
+.explorer-workspace .learning-card > button { display:block; width:100%; text-align:left; padding:7px 8px; border:0; border-radius:0; }
+.learning-card strong,.learning-card small,.learning-card > button > span { display:block; }
+.learning-card small { font-size:.73rem; color:#52675e; margin:2px 0; }
+.learning-card > button > span { font-size:.8rem; line-height:1.35; font-weight:400; }
+.learning-card summary { cursor:pointer; min-height:44px; padding:10px 8px; font-size:.78rem; }
+.learning-card details p { font-size:.8rem; margin:5px 8px 9px; line-height:1.45; }
+.learning-card details > button { margin:0 8px 8px; }
+.historical-reference { margin:20px 0; }
+.historical-reference > p { font-size:.85rem; max-width:75ch; }
+.history-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr)); gap:10px; }
+.history-grid details { border:1px solid var(--line); border-radius:7px; padding:10px; background:var(--panel); align-self:start; }
+.history-grid summary { cursor:pointer; min-height:44px; }
+.history-grid small,.history-grid summary span { display:block; font-size:.8rem; margin-top:5px; line-height:1.45; }
+.history-grid small { color:#52675e; }
+.history-grid p { font-size:.85rem; }
+.history-grid button { min-height:44px; padding:5px 8px; margin:2px; }
+.learning-card summary:focus-visible,.history-grid summary:focus-visible { outline:3px solid #a34224; outline-offset:-3px; }
+@media(min-width:1000px){.explorer-workspace:has(.learning-card){grid-template-columns:minmax(0,1fr) 290px}.explorer-workspace.panel-collapsed:has(.learning-card){grid-template-columns:1fr}}

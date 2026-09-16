@@ -195,3 +195,5 @@ continental/regional maps. Membership in Middle East never removes a country
 from another learning map. Preview coverage does not determine future membership.
 
 Experimental Puzzle memory sketches: see [candidate configuration and review guide](docs/MNEMONICS.md). All 17 candidates can be enabled, revised, or removed independently.
+
+Explorer country cards and historical relationships: [data model and source notes](docs/EXPLORER_REFERENCE.md).

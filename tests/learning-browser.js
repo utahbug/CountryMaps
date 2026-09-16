@@ -1,0 +1,22 @@
+import {africaRegions} from '../lib/regions.mjs';
+import {africaPracticeSubsets} from '../lib/practice-subsets.mjs';
+const ref=await(await fetch('../data/africa-learning.json')).json(),frame=document.querySelector('iframe'),out=document.querySelector('#results');
+document.querySelector('#run').onclick=()=>{let n=0;const ok=(v,m)=>{if(!v)throw Error(m);n++};try{
+ const d=frame.contentDocument,w=frame.contentWindow,q=s=>d.querySelector(s),all=s=>[...d.querySelectorAll(s)],click=s=>q(s).click(),view=()=>q('#africa-map').getAttribute('viewBox');
+ const filter=id=>click('[data-list-order="'+id+'"]'),search=text=>{q('#country-search').value=text;q('#country-search').dispatchEvent(new w.Event('input',{bubbles:true}))};
+ filter('az');ok(all('[data-learning-unit]').length===54,'54 cards');ok(new Set(all('[data-learning-unit]').map(c=>c.dataset.learningUnit)).size===54,'unique cards');
+ const initial=view();
+ const names=all('[data-learning-unit] .list-name').map(el=>el.textContent);ok(JSON.stringify(names)===JSON.stringify([...names].sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'}))),'alphabetical cards');
+ for(const id of Object.keys(ref.units)){click('[data-list-country="'+id+'"]');ok(q('[data-country="'+id+'"]').classList.contains('selected'),'map '+id);ok(q('[data-learning-unit="'+id+'"] details').open,'details '+id);ok(view()===initial,'card preserves context');}
+ for(const [id,total] of [['coastal',38],['landlocked',16],['islands',6],['small',16]]){filter(id);ok(all('[data-learning-unit]').length===total,'filter '+id);if(africaPracticeSubsets[id])ok(all('[data-learning-unit]').every(c=>africaPracticeSubsets[id].ids.includes(c.dataset.learningUnit)),'canonical '+id);search('Algeria');ok(q('[data-list-country="DZA"]'),'global search');search('');}
+ filter('region');ok(all('.country-region').length===5,'five regions');ok(all('[data-learning-unit]').length===54,'54 grouped');
+ for(const [id,r] of Object.entries(africaRegions).filter(([id])=>id!=='all')){click('[data-focus-region="'+id+'"]');const fit=view();for(const unit of r.ids){click('[data-list-country="'+unit+'"]');ok(view()===fit,'regional context');}}
+ filter('az');click('[data-focus-unit="DZA"]');ok(view()!==initial,'explicit focus');const focused=view();click('[data-list-country="EGY"]');ok(view()===focused,'card keeps manual view');
+ click('[data-learning-unit="BEN"] a[href="#history-dahomey"]');ok(q('#history-dahomey').open,'historical name link expands without leaving Explorer');
+ for(const h of ref.history){ok(q('#history-'+h.id),'history '+h.id);for(const id of h.currentUnitIds){click('#history-'+h.id+' [data-reference-unit="'+id+'"]');ok(q('[data-country="'+id+'"]').classList.contains('selected'),'modern link');}}
+ click('[data-action="fit"]');filter('az');ok(q('.map-panel').getBoundingClientRect().top<230,'map appears early');ok(d.documentElement.scrollWidth<=w.innerWidth,'no overflow');
+ for(const el of all('.learning-card > button,.learning-card summary'))ok(el.getBoundingClientRect().height>=44,'touch target');
+ ok(q('.map-readout #practice-region'),'compact header');out.textContent='PASS: '+n+' learning checks at '+w.innerWidth+' × '+w.innerHeight;
+ }catch(e){out.textContent='FAIL after '+n+': '+e.message}};
+
+document.querySelector("#run").disabled=false;

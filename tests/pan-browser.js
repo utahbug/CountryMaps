@@ -40,7 +40,7 @@ document.querySelector('#run').onclick=()=>{
    start();send('pointerup');assert(box()==='0 0 800 730','first map tap retains full continent');
    start();send('pointerup');assert(Number(box().split(' ')[2])<800,'second map tap focuses country');
    const focused=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()==='0 0 800 730'&&selected()==='Egypt','different country returns to continent');
-   q('[data-list-country="EGY"]').click();assert(Number(box().split(' ')[2])<800,'repeat via list focuses same country');
+   q('[data-list-country="EGY"]').click();assert(box()==='0 0 800 730','repeat card keeps context');q('[data-focus-unit="EGY"]').click();assert(Number(box().split(' ')[2])<800,'explicit card focus');
    q('[data-action="fit"]').click();start();send('pointerup');assert(box()==='0 0 800 730','new selection after Fit preserves fit');
    start();send('pointermove',svg,71,175,165);send('pointerup',svg,71,175,165);assert(box().split(' ')[2]==='800','pan on selected country does not focus');clean();
    const panned=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()==='0 0 800 730','new country selection resets manual pan');reset();
