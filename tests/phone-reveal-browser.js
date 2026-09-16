@@ -12,6 +12,23 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
    for(const other of all){if(el===other)continue;const o=other.getBoundingClientRect();assert(r.right<=o.left+.1||o.right<=r.left+.1||r.bottom<=o.top+.1||o.bottom<=r.top+.1,'names do not overlap');}
   }
  };
+ reset();
+ for(const path of d.querySelectorAll('path[data-country]')){
+  assert(path.querySelector('title').textContent===path.dataset.name,'native hover identifies '+path.dataset.name);
+  assert(path.getAttribute('aria-label')==='Reveal '+path.dataset.name,'map accessible name');
+  for(const pointerType of ['mouse','touch']){
+   path.dispatchEvent(new w.PointerEvent('pointerover',{bubbles:true,pointerType}));
+   path.dispatchEvent(new w.PointerEvent('pointerout',{bubbles:true,pointerType}));
+   assert(path.getAttribute('aria-pressed')==='false'&&labels().length===0,'hover never reveals');
+  }
+  const row=q('[data-list-country="'+path.dataset.country+'"]');
+  assert(row.querySelector('.list-name').textContent==='Hidden country'&&!row.querySelector('.list-number'),'concealed list without numbers');
+  row.click();
+  path.dispatchEvent(new w.PointerEvent('pointerout',{bubbles:true,pointerType:'mouse'}));
+  assert(path.getAttribute('aria-pressed')==='true'&&labels().length===1,'pointer leaving retains persistent name');
+  assert(q('[data-number="'+path.dataset.country+'"]').hasAttribute('hidden'),'no visible numeric map label');
+  row.click();
+ }
  reset();const baseline=signature(),fitted=box();assert(svg.viewBox.baseVal.width<800&&svg.viewBox.baseVal.height<730,'tighter initial fit');
  const ids=['MAR','TUN','SOM','ZAF','CPV','MUS','SYC','CAF','COD'];
  for(const id of ids){tap(id);assert(signature()===baseline,'tap preserves exact map '+id);assert(q('[data-reveal-country="'+id+'"]'),'name revealed '+id);visible();}

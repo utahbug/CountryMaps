@@ -146,7 +146,7 @@ class CountryMaps {
     const matches=findCountries(this.data,this.query),revealed=this.revealed;
     const rowHTML=c=>{
       const i=this.data.units.indexOf(c),known=this.mode==='explorer'||revealed.has(c.id);
-      return '<button'+(this.mode!=='explorer'?' aria-pressed="'+known+'"':'')+' data-list-country="'+c.id+'" class="'+(this.selected===c.id?'active':'')+'" aria-label="'+esc(this.mode==='reveal'?(known?'Hide '+c.name:'Reveal '+this.terms.singular+' '+(i+1)):c.name)+'"><span class="list-number">'+(i+1)+'</span><span class="list-name">'+esc(known?c.name+(this.config.mapOnly&&unitPresentation(this.config,c).label?' — '+unitPresentation(this.config,c).label:''):''+this.terms.title+' '+(i+1))+'</span>'+'</button>';
+      return '<button'+(this.mode!=='explorer'?' aria-pressed="'+known+'"':'')+' data-list-country="'+c.id+'" class="'+(this.selected===c.id?'active':'')+'" aria-label="'+esc(this.mode==='reveal'?(known?'Hide '+c.name:'Reveal hidden '+this.terms.singular):c.name)+'">'+(this.mode==='reveal'?'':'<span class="list-number">'+(i+1)+'</span>')+'<span class="list-name">'+esc(known?c.name+(this.config.mapOnly&&unitPresentation(this.config,c).label?' — '+unitPresentation(this.config,c).label:''):'Hidden '+this.terms.singular)+'</span>'+'</button>';
     };
     if(this.mode==='explorer')q('.list-help').hidden=this.listOrder!=='region';
     if(this.mode==='explorer')for(const button of root.querySelectorAll('[data-list-order]'))button.setAttribute('aria-pressed',String(button.dataset.listOrder===this.listOrder));
@@ -214,16 +214,16 @@ class CountryMaps {
       path.style.fill=(shown||presentation.label||this.config.mapOnly)?presentation.fill:'';
       if(presentation.label){path.style.strokeDasharray=presentation.dash;path.style.vectorEffect='non-scaling-stroke';path.style.strokeWidth='1.5px';}
       path.setAttribute('aria-pressed',String(shown));
-      path.setAttribute('aria-label',this.isPuzzle&&!shown?'Unplaced location '+(i+1):this.mode==='reveal'&&!shown?'Reveal '+this.terms.singular+' '+(i+1):c.name);
-      path.querySelector('title').textContent=this.mode==='explorer'||shown?c.name:''+this.terms.title+' '+(i+1);
-      q('[data-number="'+c.id+'"]').toggleAttribute('hidden',this.mode==='puzzle'||!shown||this.mode==='explorer');
+      path.setAttribute('aria-label',this.isPuzzle&&!shown?'Unplaced location '+(i+1):this.mode==='reveal'?(shown?'Hide ':'Reveal ')+c.name:c.name);
+      path.querySelector('title').textContent=this.mode==='explorer'||this.mode==='reveal'||shown?c.name:''+this.terms.title+' '+(i+1);
+      q('[data-number="'+c.id+'"]').toggleAttribute('hidden',this.mode==='puzzle'||this.mode==='reveal'||!shown||this.mode==='explorer');
       if(this.isPuzzle){
         const piece=q('[data-piece="'+c.id+'"]'),placed=this.engines.puzzle.placed.has(c.id);
         piece.hidden=!trayIds.has(c.id);piece.disabled=placed;piece.classList.toggle('current-piece',this.currentId===c.id);
         piece.setAttribute('aria-pressed',String(this.armed===c.id));piece.querySelector('span').textContent=(placed?'✓ ':'')+c.name+(presentation.label?' — '+presentation.label:'');
       }else{
         const row=q('[data-list-country="'+c.id+'"]');
-        if(row){row.classList.toggle('active',this.selected===c.id);if(this.mode!=='explorer'){const known=revealed.has(c.id);row.setAttribute('aria-pressed',String(known));row.querySelector('.list-name').textContent=known?c.name:''+this.terms.title+' '+(i+1);row.setAttribute('aria-label',known?'Hide '+c.name:'Reveal '+this.terms.singular+' '+(i+1));}}
+        if(row){row.classList.toggle('active',this.selected===c.id);if(this.mode!=='explorer'){const known=revealed.has(c.id);row.setAttribute('aria-pressed',String(known));row.querySelector('.list-name').textContent=known?c.name:'Hidden '+this.terms.singular;row.setAttribute('aria-label',known?'Hide '+c.name:'Reveal hidden '+this.terms.singular);}}
       }
     }
     const marker=q('.location-marker');
