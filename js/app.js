@@ -6,7 +6,7 @@ import {terminology,mapDefinitions} from '../lib/map-configs.mjs?v=learning';
 import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop,acceptsIslandDrop} from '../lib/drop-validation.mjs?v=puzzle-cleanup';
 import {practiceSet,fittedRegion,countryRegion,countryRegionId,groupedCountries} from '../lib/regions.mjs';
 import {loadMap,registry,modes,titles,findCountries,insetTransform,pieceDisplayViewBox,usesPieceScaleFrame,escapeHTML as esc} from '../lib/maps.js?v=learning';
-import {ExplorerEngine,RevealEngine,PuzzleEngine} from '../lib/engines/activities.mjs';
+import {ExplorerEngine,RevealEngine,PuzzleEngine} from '../lib/engines/activities.mjs?v=reveal-pairs';
 import {DragController} from '../lib/engines/drag-controller.mjs';
 import {placeRevealLabels} from '../lib/reveal-labels.mjs';
 import {placeCountryLabel} from '../lib/label-placement.mjs';
@@ -26,6 +26,7 @@ const controlIcons={
   reveal:'<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/>',
   reference:'<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Z"/><path d="M9 3v16M15 5v16"/>',
   puzzle:'<path d="M4 8h5V5a3 3 0 0 1 6 0v3h5v4h-2a3 3 0 0 0 0 6h2v3H4Z"/>',
+  clear:'<path d="m4 14 9-10 7 6-9 10H7l-3-3Z"/><path d="m9 9 7 6M11 20h10"/>',
   reset:'<path d="M5 8a8 8 0 1 1-1 7"/><path d="M5 3v5h5"/>',
   panel:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
   clue:'<path d="M9 18h6M10 21h4"/><path d="M8.2 14.5A6 6 0 1 1 15.8 14.5c-1 .8-1.4 1.5-1.4 2.5h-4.8c0-1-.4-1.7-1.4-2.5Z"/>',
@@ -42,7 +43,7 @@ class CountryMaps {
   constructor(data) {
     this.config=data.config;this.terms=terminology(this.config);this.regions=this.config.regions||{all:{name:'All '+data.name,ids:null,context:null}};this.fullData=data;this.data=data;this.region='all';this.fitView={x:0,y:0,w:data.width,h:data.height};this.clue={country:null,level:0};this.clueTimer=null;this.dropSamples=new Map();
     const ids=data.units.map(c=>c.id);
-    this.engines={explorer:new ExplorerEngine(ids),reveal:new RevealEngine(ids),puzzle:new PuzzleEngine(ids)};
+    this.engines={explorer:new ExplorerEngine(ids),reveal:new RevealEngine(ids,{limit:2}),puzzle:new PuzzleEngine(ids)};
     this.byId=new Map([...data.units,...data.context].map(c=>[c.id,c]));
     this.mnemonics=new MnemonicPlayer();this.pieceFilter='az';this.listOrder='az';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
     this.lastLearning={reveal:null,puzzle:null};this.view={...this.fitView};this.suppressClick=false;this.query='';this.message='';
@@ -72,7 +73,7 @@ class CountryMaps {
       this.engines.explorer=new ExplorerEngine(this.fullData.units.map(c=>c.id));
     }
     const revealIds=subset.units.map(c=>c.id);
-    if(revealIds.length!==this.engines.reveal.ids.size||revealIds.some(id=>!this.engines.reveal.ids.has(id))){this.engines.reveal=new RevealEngine(revealIds);this.lastLearning.reveal=null;}
+    if(revealIds.length!==this.engines.reveal.ids.size||revealIds.some(id=>!this.engines.reveal.ids.has(id))){this.engines.reveal=new RevealEngine(revealIds,{limit:2});this.lastLearning.reveal=null;}
     this.region=nextRegion;this.openRegion=nextRegion==='all'?null:nextRegion;this.currentId=this.data.units[0].id;
     this.mode=mode;if(mode==='puzzle'&&!this.puzzleUnits.some(c=>c.id===this.currentId))this.currentId=this.puzzleUnits[0].id;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};this.panelHidden=false;
     this.engines.puzzle.preview=false;
@@ -90,7 +91,7 @@ class CountryMaps {
     const name=esc(this.data.name);
     const puzzlePage=this.mode==='puzzle';
     const modeLinks=(this.config.mapOnly?['explorer']:modes).map(m=>!this.config.mapOnly?'<a class="icon-control" href="'+this.href(m)+'" aria-label="Go to '+titles[m]+' mode" title="Go to '+titles[m]+' mode" data-tooltip="Go to '+titles[m]+' mode"'+(m===this.mode?' aria-current="page"':'')+'>'+icon(m)+'<span class="sr-only">'+titles[m]+'</span></a>':'<a href="'+this.href(m)+'"'+(m===this.mode?' aria-current="page"':'')+'>'+(this.config.mapOnly?'Map view':titles[m])+'</a>').join('');
-    const activityToolbar=(puzzlePage?compactButton('preview','Reveal puzzle reference/answer map','reference'):this.mode==='reveal'?compactButton('reveal-all','Reveal All','reveal'):'')+compactButton('reset','Reset '+titles[this.mode],'reset')+(this.mode==='reveal'?'':compactButton('toggle-panel','Hide country pieces','panel','aria-controls="activity-side-panel" aria-expanded="true"'))+'<button type="button" class="icon-control" popovertarget="puzzle-instructions" aria-label="'+titles[this.mode]+' instructions" title="'+titles[this.mode]+' instructions" data-tooltip="Instructions">'+icon('info')+'<span class="sr-only">'+titles[this.mode]+' instructions</span></button>';
+    const activityToolbar=(puzzlePage?compactButton('preview','Reveal puzzle reference/answer map','reference'):this.mode==='reveal'?compactButton('reveal-all','Reveal All','reveal')+compactButton('clear-labels','Clear revealed labels','clear'):'')+compactButton('reset','Reset '+titles[this.mode],'reset')+(this.mode==='reveal'?'':compactButton('toggle-panel','Hide country pieces','panel','aria-controls="activity-side-panel" aria-expanded="true"'))+'<button type="button" class="icon-control" popovertarget="puzzle-instructions" aria-label="'+titles[this.mode]+' instructions" title="'+titles[this.mode]+' instructions" data-tooltip="Instructions">'+icon('info')+'<span class="sr-only">'+titles[this.mode]+' instructions</span></button>';
     const clueRow=puzzlePage?'<div class="puzzle-clue" hidden><p id="clue-text" role="status" aria-live="polite" aria-atomic="true" hidden></p>'+compactButton('clue','Clue','clue','aria-describedby="clue-text"')+'<span class="map-progress"></span></div>':'<span class="map-progress"></span>';
     const activityTitle=this.config.mapOnly?'<a class="back-link" href="'+this.href('home')+'" hidden>← '+name+'</a><h1>'+name+' <span>/ Map view</span></h1>':'<h1><a class="back-link activity-home-link" href="'+this.href('home')+'" aria-label="Back to '+esc(this.fullData.name)+' landing page"><span aria-hidden="true">← </span>'+esc(this.fullData.name)+'</a> <span>/ '+titles[this.mode]+'</span></h1>';
     root.innerHTML='<div class="puzzle-top-shell">'+'<div class="activity-heading compact-heading'+(puzzlePage?' puzzle-heading':'')+'"><div>'+activityTitle+'</div><nav class="mode-links" aria-label="'+name+' activities">'+modeLinks+'</nav></div>'+
@@ -555,6 +556,7 @@ class CountryMaps {
       this.message=this.preview?'Answer map. Your puzzle progress is saved.':'Back to your puzzle.';
       this.renderSide();this.paint();return;
     }
+    if(action==='clear-labels'&&this.mode==='reveal'){this.engines.reveal.clear();this.message='Revealed labels cleared.';this.paint();return;}
     if(action==='reveal-all'){this.engines.reveal.revealAll();this.message='All '+this.data.units.length+' '+this.terms.plural+' revealed.';this.paint();return;}
     if(action==='arm'){this.arm(this.byId.get(this.currentId));return;}
     if(action==='previous-pieces'||action==='more-pieces'){

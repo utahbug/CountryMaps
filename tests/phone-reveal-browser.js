@@ -30,8 +30,8 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
  reset();const baseline=signature(),fitted=box();assert(svg.viewBox.baseVal.width<800&&svg.viewBox.baseVal.height<730,'tighter initial fit');
  const ids=['MAR','TUN','SOM','ZAF','CPV','MUS','SYC','CAF','COD'];
  for(const id of ids){tap(id);assert(signature()===baseline,'tap preserves exact map '+id);assert(q('[data-reveal-country="'+id+'"]'),'name revealed '+id);visible();}
- assert(labels().length===9,'all nine names persist');
- for(const id of ids){tap(id);assert(!q('[data-reveal-country="'+id+'"]'),'only own name hidden '+id);assert(signature()===baseline,'hide preserves map');}
+ assert(labels().length===2&&q('[data-reveal-country=CAF]')&&q('[data-reveal-country=COD]'),'only newest pair persists');
+ for(const id of ['CAF','COD']){tap(id);assert(!q('[data-reveal-country="'+id+'"]'),'only own name hidden '+id);assert(signature()===baseline,'hide preserves map');}
  for(let i=0;i<12;i++){tap('COD');assert(labels().length===(i%2?0:1),'repeated toggle');}
  reset();const phone=w.innerWidth<=650;
  assert(q('.map-tools').hidden===phone,'navigation appropriate to device');
@@ -41,6 +41,15 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
  q('[data-action="reveal-all"]').click();assert(labels().length===54,'Reveal All has 54 persistent names');assert(signature()===manual,'Reveal All preserves viewport');visible();
  tap('COD');assert(labels().length===53&&!q('[data-reveal-country="COD"]'),'hide one after Reveal All');
  q('[data-action="reveal-all"]').click();visible();
+ const clear=q('[data-action="clear-labels"]'),recap=q('[data-learning-country]')?.dataset.learningCountry;
+ assert(clear.getAttribute('aria-label')==='Clear revealed labels'&&clear.getBoundingClientRect().height>=44,'accessible Clear control');
+ clear.click();assert(labels().length===0&&signature()===manual,'Clear removes all labels without moving map');
+ assert(q('[data-learning-country]')?.dataset.learningCountry===recap,'Clear retains learning context');
+ for(const id of ['SDN','SSD','COD'])tap(id);
+ assert(labels().length===2&&!q('[data-reveal-country="SDN"]'),'Clear restores FIFO after Reveal All');
+ assert(q('.map-progress').textContent==='2 / 54','counter follows persistent labels');
+ tap('SSD');tap('SSD');tap('COG');
+ assert(!q('[data-reveal-country="COD"]')&&q('[data-reveal-country="SSD"]')&&q('[data-reveal-country="COG"]'),'re-revealed country is newest');
  reset();assert(labels().length===0&&box()===fitted,'Reset clears all names and fits');
  send('pointerdown',q('[data-country="MAR"]'));send('pointermove',svg,71,195,185);send('pointerup',svg,71,195,185);assert(labels().length===0,'pan is not tap');if(phone)assert(box()===fitted,'phone swipe cannot move map');clean();
  for(const end of ['pointercancel','lostpointercapture']){send('pointerdown',q('[data-country="MAR"]'));send(end);send('pointerup');assert(labels().length===0,'cancel never reveals');}
@@ -60,6 +69,10 @@ export function runPhoneRevealChecks({w,d,svg,send,assert,reset,clean,box}){
  assert(q('#practice-region').getBoundingClientRect().height>=44,'region touch target');
  assert(q('.map-readout').getBoundingClientRect().height<=50,'compact map header');
 
+ const region=q('#practice-region');region.value='west';region.dispatchEvent(new w.Event('change',{bubbles:true}));
+ const regionalBox=box();tap('GHA');q('[data-action="clear-labels"]').click();
+ assert(q('#practice-region').value==='west'&&box()===regionalBox&&labels().length===0,'Clear preserves practice region and fit');
+ q('#practice-region').value='all';q('#practice-region').dispatchEvent(new w.Event('change',{bubbles:true}));
  const measure=q('.region-select-width'),control=q('#practice-region');
  assert(measure.textContent===control.selectedOptions[0].textContent,'width follows active region');
  assert(Math.abs(measure.getBoundingClientRect().width-control.getBoundingClientRect().width)<2,'select matches text-sized wrapper');
