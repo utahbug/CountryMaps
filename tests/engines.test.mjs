@@ -235,3 +235,12 @@ test('unowned nonprimary pointers and right clicks are ignored', () => {
   assert.equal(f.ctl.begin(f.event(1, { button: 2 }), {}, f.source), false);
   assert.equal(f.preview, null);
 });
+
+test('phone horizontal gesture relinquishes drag while vertical gesture stays owned',()=>{
+ const source={classList:{add(){},remove(){}},setPointerCapture(){},hasPointerCapture(){return false;}};
+ let drops=0;const drag=new DragController(()=>{},()=>drops++);
+ const e=(x,y)=>({pointerId:1,button:0,isPrimary:true,clientX:x,clientY:y});
+ drag.begin(e(50,100),{id:'TGO'},source,{horizontalScroll:true});
+ assert.equal(drag.move(e(80,102)),false);assert.equal(drag.active,null);drag.finish(e(80,102));assert.equal(drops,0);
+ drag.begin(e(50,100),{id:'TGO'},source,{horizontalScroll:true});drag.move(e(51,80));drag.move(e(120,70));assert.ok(drag.active);drag.finish(e(120,70));assert.equal(drops,1);
+});

@@ -7,7 +7,7 @@ import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop,a
 import {practiceSet,fittedRegion,countryRegion,countryRegionId,groupedCountries} from '../lib/regions.mjs';
 import {loadMap,registry,modes,titles,findCountries,insetTransform,pieceDisplayViewBox,usesPieceScaleFrame,escapeHTML as esc} from '../lib/maps.js?v=learning';
 import {ExplorerEngine,RevealEngine,PuzzleEngine} from '../lib/engines/activities.mjs?v=reveal-pairs';
-import {DragController} from '../lib/engines/drag-controller.mjs';
+import {DragController} from '../lib/engines/drag-controller.mjs?v=phone-tray';
 import {placeRevealLabels} from '../lib/reveal-labels.mjs';
 import {placeCountryLabel} from '../lib/label-placement.mjs';
 import {PanController,clampPan} from '../lib/engines/pan-controller.mjs';
@@ -154,14 +154,14 @@ class CountryMaps {
     if(order.every((c,i)=>cards[i]?.dataset.piece===c.id))return;
     // Retain the first visible unplaced card's screen position where possible.
     // Reuse nodes so selection, pointer handlers and completion styling survive.
-    const box=tray.getBoundingClientRect(),top=tray.scrollTop;
-    const anchor=cards.find(el=>!el.hidden&&!placed.has(el.dataset.piece)&&el.getBoundingClientRect().bottom>box.top&&el.getBoundingClientRect().top<box.bottom);
-    const anchorTop=anchor?.getBoundingClientRect().top;
+    const box=tray.getBoundingClientRect(),horizontal=matchMedia('(max-width:650px)').matches,scroll=horizontal?'scrollLeft':'scrollTop',start=horizontal?'left':'top',end=horizontal?'right':'bottom',offset=tray[scroll];
+    const anchor=cards.find(el=>!el.hidden&&!placed.has(el.dataset.piece)&&el.getBoundingClientRect()[end]>box[start]&&el.getBoundingClientRect()[start]<box[end]);
+    const anchorPosition=anchor?.getBoundingClientRect()[start];
     const focused=tray.contains(document.activeElement)?document.activeElement:null;
     const nodes=new Map(cards.map(el=>[el.dataset.piece,el]));
     for(const c of order)tray.append(nodes.get(c.id));
     if(focused&&!focused.disabled)focused.focus({preventScroll:true});
-    tray.scrollTop=anchor?tray.scrollTop+anchor.getBoundingClientRect().top-anchorTop:top;
+    tray[scroll]=anchor?tray[scroll]+anchor.getBoundingClientRect()[start]-anchorPosition:offset;
   }
   renderList(){
     const found=findCountries(this.data,this.query);if(this.mode==='explorer'&&this.data.reference)found.sort((a,b)=>a.name.localeCompare(b.name,'en',{sensitivity:'base'}));
@@ -672,7 +672,7 @@ root.addEventListener('pointerdown',event=>{
   const source=event.target.closest('[data-piece]');
   if(!app?.isPuzzle||!source||source.disabled)return;
   const c=app.byId.get(source.dataset.piece);
-  if(app.drag.begin(event,c,source)){
+  if(app.drag.begin(event,c,source,{horizontalScroll:event.pointerType==='touch'&&matchMedia('(max-width:650px)').matches})){
     event.preventDefault();app.suppressClick=true;app.currentId=c.id;app.armed=null;
     app.mnemonics.play(c.id,app.fullData,source);
     app.message='Place '+c.name+(app.isIsland(c)?' at its ocean location.':c.inset?' in the enlarged inset.':'.');app.paint();

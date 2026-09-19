@@ -8,7 +8,7 @@ button.onclick=()=>{
   const w=frame.contentWindow,d=w.document,q=s=>d.querySelector(s),all=s=>[...d.querySelectorAll(s)],svg=q('#africa-map');
   const reset=()=>q('[data-action="reset"]').click(),score=()=>q('progress').value,numbersHidden=()=>all('.country-number').every(number=>number.hasAttribute('hidden'));
   const send=(type,target,x,y,id=91,primary=true)=>target.dispatchEvent(new w.PointerEvent(type,{bubbles:true,cancelable:true,pointerType:'touch',pointerId:id,isPrimary:primary,button:0,clientX:x,clientY:y}));
-  const begin=id=>{const p=q('[data-piece="'+id+'"]');p.setPointerCapture=()=>{};p.hasPointerCapture=()=>false;send('pointerdown',p,10,10);return p;};
+  const begin=id=>{const p=q('[data-piece="'+id+'"]');p.setPointerCapture=()=>{};p.hasPointerCapture=()=>false;send('pointerdown',p,10,10);if(w.innerWidth<=650)send('pointermove',d,10,-4);return p;};
   const finish=(x,y)=>{send('pointermove',d,x,y);send('pointerup',d,x,y);};
   const clean=()=>assert(!q('.drag-preview')&&!q('.piece.dragging')&&!q('.status').dataset.activePointer,'drag cleanup');
   const rect=el=>{const b=el.getBoundingClientRect();return {x:b.left,y:b.top,w:b.width,h:b.height};};

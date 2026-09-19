@@ -197,3 +197,6 @@ from another learning map. Preview coverage does not determine future membership
 Experimental Puzzle memory sketches: see [candidate configuration and review guide](docs/MNEMONICS.md). All 17 candidates can be enabled, revised, or removed independently.
 
 Explorer country cards and historical relationships: [data model and source notes](docs/EXPLORER_REFERENCE.md).
+
+
+Phone Puzzle (650px and below) uses a shallow, safe-area-aware docked tray. It shows about 2–3 cards and scrolls horizontally using native `pan-x`; an upward gesture keeps ownership of the piece drag. Tap a card, then its destination, remains available. Completed cards move to the end while preserving the visible unplaced scroll anchor where possible. Larger layouts keep their sidebar. Tests include `tests/tray-browser.html`, small-country drop, clue, and mnemonic browser harnesses. Touch regressions use synthetic PointerEvents with capture stubbed; physical iPhone Safari remains a device check.
