@@ -30,7 +30,7 @@ document.querySelector('#run').onclick=()=>{let n=0;const ok=(v,m)=>{if(!v)throw
  for(const ending of ['pointercancel','lostpointercapture','reset']){const s=begin('BEN');send('pointermove',d,s.x,s.y-15);if(ending==='reset')reset();else send(ending,d,s.x,s.y);clean();}
  if(phone){
   reset();click('[data-piece-filter="islands"]');
-  for(let i=0;i<6;i++){const card=all('[data-piece]').find(e=>!e.hidden);ok(!!card,'island queued');const id=card.dataset.piece;card.click();q('[data-country="'+id+'"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));}
+  for(let i=0;i<6;i++){const card=all('[data-piece]').find(e=>!e.hidden);ok(!!card,'island queued');const id=card.dataset.piece;if(phone)ok(q('.map-readout strong').textContent===data.countries.find(c=>c.id===id).name,'title matches active piece');card.click();q('[data-country="'+id+'"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));}
   ok(score()===6&&all('[data-piece]').every(e=>e.hidden),'subset completion has no completed tray');
   click('[data-piece-filter="small"]');ok(score()===6&&all('[data-piece]').filter(e=>!e.hidden).length===1,'filter selects remaining without resetting');
   click('[data-action="preview"]');ok(side.hidden,'staged piece hidden in reference view');click('[data-action="preview"]');ok(!side.hidden,'stage restored after reference');
