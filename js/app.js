@@ -1,3 +1,4 @@
+import {PieceQueue} from '../lib/piece-queue.mjs';
 import {referenceFilters,learningCard,historySection,activityLearningCard} from '../lib/learning-reference.mjs?v=activity-recap';
 import {MnemonicPlayer} from '../lib/mnemonics.mjs?v=piece-card';
 import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
@@ -45,13 +46,14 @@ class CountryMaps {
     const ids=data.units.map(c=>c.id);
     this.engines={explorer:new ExplorerEngine(ids),reveal:new RevealEngine(ids,{limit:2}),puzzle:new PuzzleEngine(ids)};
     this.byId=new Map([...data.units,...data.context].map(c=>[c.id,c]));
-    this.mnemonics=new MnemonicPlayer();this.pieceFilter='az';this.listOrder='az';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
+    this.phoneQueue=new PieceQueue();this.mnemonics=new MnemonicPlayer();this.pieceFilter='az';this.listOrder='az';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
     this.lastLearning={reveal:null,puzzle:null};this.view={...this.fitView};this.suppressClick=false;this.query='';this.message='';
     this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
     this.drag=new DragController(state=>this.paintDrag(state),(c,x,y,stationary)=>this.drop(c,x,y,stationary));
   }
   isIsland(c){return this.config.practiceSubsets?.islands?.ids.includes(c?.id)||false;}
   get puzzleUnits(){return filteredUnits(this.data.units,learningFilters(this.config)[this.pieceFilter]);}
+  get phonePuzzle(){return this.mode==='puzzle'&&matchMedia('(max-width:650px)').matches;}
   get phoneReveal(){return this.mode==='reveal'&&this.config.activities.reveal.phoneNavigation===false&&window.matchMedia('(max-width: 650px)').matches;}
   get preview(){return this.mode==='puzzle'&&this.engines.puzzle.preview;}
   get isPuzzle(){return this.mode==='puzzle'&&!this.preview;}
@@ -202,6 +204,7 @@ class CountryMaps {
     if(this.mode==='home')return;
     if(this.phoneReveal)this.view={...this.fitView};
     const trayIds=this.isPuzzle?new Set(this.puzzleUnits.map(c=>c.id)):null;
+    if(this.phonePuzzle&&this.isPuzzle){const next=this.phoneQueue.next(this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed);if(next&&!this.puzzleUnits.some(c=>c.id===this.currentId&&!this.engines.puzzle.placed.has(c.id)))this.currentId=next;}
     const revealed=this.revealed,current=this.byId.get(this.currentId),chosen=this.byId.get(this.selected);
     const inset=this.isPuzzle&&current?.inset&&!this.isIsland(current)?current:null;
     const identified=chosen&&(this.mode!=='reveal'||chosen.classification||revealed.has(chosen.id));
@@ -260,7 +263,7 @@ class CountryMaps {
       q('[data-number="'+c.id+'"]').toggleAttribute('hidden',this.mode==='puzzle'||this.mode==='reveal'||!shown||this.mode==='explorer');
       if(this.isPuzzle){
         const piece=q('[data-piece="'+c.id+'"]'),placed=this.engines.puzzle.placed.has(c.id);
-        piece.hidden=!trayIds.has(c.id);piece.disabled=placed;piece.classList.toggle('current-piece',this.currentId===c.id);
+        piece.hidden=this.phonePuzzle?(placed||this.currentId!==c.id):!trayIds.has(c.id);piece.disabled=placed;piece.classList.toggle('current-piece',this.currentId===c.id);
         piece.setAttribute('aria-pressed',String(this.armed===c.id));piece.querySelector('span').textContent=(placed?'✓ ':'')+c.name+(presentation.label?' — '+presentation.label:'');
       }else{
         const row=q('[data-list-country="'+c.id+'"]');
@@ -298,8 +301,43 @@ class CountryMaps {
     if(this.config.mapOnly){q('.back-link').hidden=true;q('.region-control').hidden=true;q('.list-order').hidden=true;const legend=q('.territory-legend');if(this.data.context.length)legend.innerHTML='French Guiana — France · Overseas department/region, separate from the 12 sovereign countries.';const section=q('.territory-section');if(section){section.querySelector('h3').textContent='Territorial unit';section.querySelector('p').textContent='Identified separately from sovereign countries.';}}
     q('.status').classList.toggle('sr-only',this.mode==='reveal');
     q('.status').textContent=this.message;
+    this.paintPhonePiece();
     this.paintActivityLearning();
     this.positionLabel();
+  }
+  paintPhonePiece(){
+    if(this.mode!=='puzzle')return;
+    const side=q('.side-panel'),workspace=q('.workspace'),viewport=q('.map-viewport');
+    workspace.classList.toggle('phone-single-piece',this.phonePuzzle);
+    if(this.phonePuzzle){
+      if(side.parentElement!==viewport)viewport.append(side);
+      side.hidden=!this.isPuzzle;
+      q('[data-action="toggle-panel"]').hidden=true;
+      if(!this.isPuzzle)return;
+      if(!q('[data-action="skip-piece"]'))side.querySelector('.panel-title').insertAdjacentHTML('beforeend','<button type="button" class="icon-control" data-action="skip-piece" aria-label="Skip country" title="Skip country">Skip</button>');
+      const remaining=this.phoneQueue.remaining(this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed);
+      q('[data-action="skip-piece"]').disabled=remaining.length<2;
+      if(!q('.phone-subset-complete'))side.insertAdjacentHTML('beforeend','<p class="phone-subset-complete" role="status">Set complete. Choose another filter.</p>');
+      q('.phone-subset-complete').hidden=remaining.length>0;
+      if(!remaining.length)q('.phone-subset-complete').textContent=this.engines.puzzle.placed.size===this.data.units.length?`All ${this.data.units.length} placed!`:'Set complete. Choose another filter.';
+      this.positionPhonePiece();
+    }else{
+      if(side.parentElement!==workspace)workspace.append(side);
+      side.style.left='';side.style.top='';side.hidden=this.panelHidden;
+      q('[data-action="toggle-panel"]').hidden=false;
+      q('[data-action="skip-piece"]')?.remove();q('.phone-subset-complete')?.remove();
+    }
+  }
+  positionPhonePiece(){
+    if(!this.phonePuzzle||!this.isPuzzle)return;
+    const viewport=q('.map-viewport').getBoundingClientRect(),side=q('.side-panel'),size=side.getBoundingClientRect();
+    const land=[...this.svg.querySelectorAll('path.country,.context-region,[data-inset-hit]')].map(p=>p.getBoundingClientRect());
+    const margin=8,maxX=Math.max(margin,viewport.width-size.width-margin),maxY=Math.max(margin,viewport.height-size.height-margin);
+    // Prefer southwest Atlantic; choose the least obstructed measured rectangle.
+    const candidates=[.62,.72,.5,.82,.38].flatMap(y=>[margin,Math.min(maxX,viewport.width*.12)].map(x=>({x,y:Math.min(maxY,Math.max(margin,viewport.height*y))})));
+    const overlap=(p,b)=>Math.max(0,Math.min(viewport.left+p.x+size.width,b.right)-Math.max(viewport.left+p.x,b.left))*Math.max(0,Math.min(viewport.top+p.y+size.height,b.bottom)-Math.max(viewport.top+p.y,b.top));
+    candidates.sort((a,b)=>land.reduce((n,r)=>n+overlap(a,r)-overlap(b,r),0));
+    side.style.left=candidates[0].x+'px';side.style.top=candidates[0].y+'px';
   }
   paintActivityLearning(){
     const slot=q('.activity-learning-slot');if(!slot)return;
@@ -529,11 +567,12 @@ class CountryMaps {
       this.lastLearning.puzzle=c.id;
       this.selected=c.id;
       this.message=this.engines.puzzle.placed.size===this.data.units.length?'Complete! All '+this.data.units.length+' '+this.terms.plural+' are placed.':c.name+' placed.';
-      const next=this.puzzleUnits.find(n=>!this.engines.puzzle.placed.has(n.id));if(next)this.currentId=next.id;
+      const next=this.phonePuzzle?this.byId.get(this.phoneQueue.next(this.puzzleUnits.map(n=>n.id),this.engines.puzzle.placed)):this.puzzleUnits.find(n=>!this.engines.puzzle.placed.has(n.id));if(next)this.currentId=next.id;
     }else this.message='Not quite. '+c.name+' returned to the tray.';
     this.paint();
   }
   reset(){
+    this.phoneQueue.reset(this.puzzleUnits.map(c=>c.id));
     this.lastLearning[this.mode]=null;
     this.mnemonics.reset();this.clearClue();this.pan.cancel();this.drag.cancel();this.suppressClick=false;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};
     this.engines[this.mode].reset();this.currentId=(this.mode==='puzzle'?this.puzzleUnits:this.data.units)[0].id;
@@ -542,12 +581,14 @@ class CountryMaps {
   }
   setPieceFilter(id){
     if(!this.isPuzzle||!Object.hasOwn(learningFilters(this.config),id))return;
-    this.mnemonics.clear();this.drag.cancel();this.clearClue();this.armed=null;this.suppressClick=false;this.pieceFilter=id;
+    this.mnemonics.clear();this.drag.cancel();this.clearClue();this.armed=null;this.suppressClick=false;this.pieceFilter=id;this.phoneQueue.reset(this.puzzleUnits.map(c=>c.id));
+    if(this.phonePuzzle)this.currentId=this.phoneQueue.next(this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed)||this.puzzleUnits[0].id;
     if(!this.puzzleUnits.some(c=>c.id===this.currentId))this.currentId=(this.puzzleUnits.find(c=>!this.engines.puzzle.placed.has(c.id))||this.puzzleUnits[0]).id;
     this.renderSide();this.paint();q('[popovertarget="piece-filter-menu"]').focus({preventScroll:true});
   }
   action(action){
     this.pan.cancel();
+    if(action==='skip-piece'&&this.phonePuzzle&&this.isPuzzle){this.drag.cancel();this.mnemonics.clear();this.clearClue();this.armed=null;this.suppressClick=false;this.currentId=this.phoneQueue.skip(this.currentId,this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed)||this.currentId;this.paint();return;}
     if(action==='toggle-panel'){this.panelHidden=!this.panelHidden;this.paint();return;}
     if(this.phoneReveal&&['zoom-in','zoom-out','fit','left','right','up','down'].includes(action)){this.view={...this.fitView};this.paint();return;}
     if(action==='reset'){this.reset();return;}
@@ -672,7 +713,7 @@ root.addEventListener('pointerdown',event=>{
   const source=event.target.closest('[data-piece]');
   if(!app?.isPuzzle||!source||source.disabled)return;
   const c=app.byId.get(source.dataset.piece);
-  if(app.drag.begin(event,c,source,{horizontalScroll:event.pointerType==='touch'&&matchMedia('(max-width:650px)').matches})){
+  if(app.drag.begin(event,c,source,{horizontalScroll:false})){
     event.preventDefault();app.suppressClick=true;app.currentId=c.id;app.armed=null;
     app.mnemonics.play(c.id,app.fullData,source);
     app.message='Place '+c.name+(app.isIsland(c)?' at its ocean location.':c.inset?' in the enlarged inset.':'.');app.paint();
@@ -691,7 +732,7 @@ document.addEventListener('keydown',event=>{
 });
 function abandon(){app?.mnemonics.clear();app?.pan.cancel();if(app?.drag.active){app.drag.cancel();app.message='Drag cancelled. Try again.';app.paint();}}
 for(const type of ['blur','resize'])window.addEventListener(type,abandon);
-window.addEventListener('resize',()=>{if(app?.mode==='reveal')app.paint();else app?.positionLabel();});
+window.addEventListener('resize',()=>{if(app?.mode==='reveal'||app?.mode==='puzzle')app.paint();else app?.positionLabel();});
 window.addEventListener('scroll',abandon,true);
 document.addEventListener('visibilitychange',abandon);
 window.addEventListener('popstate',navigate);

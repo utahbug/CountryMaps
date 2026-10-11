@@ -1423,18 +1423,21 @@ body:has(.africa-landing) .all-maps-link { background:transparent; border-color:
 /* Reveal is a map-only workspace; its learning recap stays below the map. */
 .workspace.reveal-workspace { grid-template-columns:minmax(0,1fr); }
 
-/* Phone Puzzle: dock pieces within reach of the map; larger layouts keep the sidebar. */
+/* Phone Puzzle stages one canonical piece inside the map. */
 @media(max-width:650px){
- body:has(.puzzle-workspace) main { padding-bottom:calc(176px + env(safe-area-inset-bottom,0px)); }
- .puzzle-workspace .side-panel { position:fixed; z-index:40; left:6px; right:6px; bottom:0; max-height:none; padding:0 6px calc(4px + env(safe-area-inset-bottom,0px)); border-radius:10px 10px 0 0; background:var(--surface,#fffdf8); box-shadow:0 -2px 8px #17392b12; }
- .puzzle-workspace .side-panel[hidden] { display:none; }
- .puzzle-workspace .panel-title { margin:0; min-height:44px; gap:6px; }
- .puzzle-workspace .panel-title h2 { margin:0; font-size:.9rem; }
- .puzzle-workspace .subset-progress { position:absolute; top:14px; right:54px; margin:0; font-size:.66rem; max-width:42%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
- .puzzle-workspace .piece-tray { display:flex; gap:6px; height:108px; max-height:108px; min-height:108px; overflow-x:auto; overflow-y:hidden; padding:2px 1px 5px; scrollbar-gutter:auto; overscroll-behavior-x:contain; touch-action:pan-x; -webkit-overflow-scrolling:touch; }
- .puzzle-workspace .piece { flex:0 0 calc((100% - 12px)/2.65); height:96px; min-height:96px; padding:4px; touch-action:pan-x; overflow:hidden; }
- .puzzle-workspace .piece svg { height:43px; margin-bottom:2px; }
- .puzzle-workspace .piece span { font-size:.72rem; line-height:1.2; overflow-wrap:anywhere; }
- .puzzle-workspace .map-canvas { height:clamp(290px,calc(100svh - 364px - env(safe-area-inset-bottom,0px)),480px); min-height:290px; }
- .puzzle-workspace .side-panel .filter-popover { max-height:65svh; overflow:auto; }
+ body:has(.phone-single-piece) main { padding-bottom:0; }
+ .phone-single-piece .map-canvas { height:clamp(380px,calc(100svh - 240px),500px); min-height:380px; }
+ .phone-single-piece .side-panel { position:absolute; z-index:9; bottom:auto; right:auto; width:112px; max-height:none; padding:3px; border:1px dashed #94aa9e; background:#faf9efed; border-radius:8px; box-shadow:none; }
+ .phone-single-piece .side-panel[hidden] { display:none; }
+ .phone-single-piece .panel-title { display:flex; gap:4px; margin:0; justify-content:space-between; }
+ .phone-single-piece .panel-title h2 { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+ .phone-single-piece .panel-title .icon-control { width:44px; height:44px; padding:0; border:0; background:transparent; }
+ .phone-single-piece .subset-progress { display:none; }
+ .phone-single-piece .piece-tray { display:block; height:auto; max-height:none; padding:0; overflow:visible; scrollbar-gutter:auto; }
+ .phone-single-piece .piece { width:100%; min-height:96px; height:auto; padding:4px; overflow:hidden; touch-action:none; border:0; background:transparent; }
+ .phone-single-piece .piece[hidden] { display:none; }
+ .phone-single-piece .piece svg { height:50px; margin-bottom:3px; }
+ .phone-single-piece .piece span { font-size:.72rem; line-height:1.2; overflow-wrap:anywhere; }
+ .phone-single-piece .phone-subset-complete { font-size:.75rem; margin:4px; }
+ .phone-single-piece .filter-popover { max-height:65svh; overflow:auto; }
 }
