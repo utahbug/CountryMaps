@@ -9,7 +9,7 @@ import {referenceFilters,learningCard,historySection,activityLearningCard} from 
 import {MnemonicPlayer} from '../lib/mnemonics.mjs?v=piece-card';
 import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
-import {terminology,mapDefinitions} from '../lib/map-configs.mjs?v=country-facts';
+import {terminology,mapDefinitions} from '../lib/map-configs.mjs?v=special-geography';
 import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop,acceptsIslandDrop} from '../lib/drop-validation.mjs?v=puzzle-cleanup';
 import {practiceSet,fittedRegion,countryRegion,countryRegionId,groupedCountries} from '../lib/regions.mjs';
 import {loadMap,registry,modes,titles,findCountries,pieceDisplayViewBox,usesPieceScaleFrame,escapeHTML as esc} from '../lib/maps.js?v=learn-name';
@@ -731,12 +731,15 @@ function renderHome(){
  app?.cancelRewards();app?.mnemonics.clear();app?.clearClue();app?.toolLifecycle?.abort();app=null;
  document.title='CountryMaps · All Maps';
  document.querySelector('#data-note').textContent='';
- const cards=[...Object.keys(registry),...Object.keys(mapDefinitions).filter(id=>!registry[id]&&mapDefinitions[id].showOnHome).sort((a,b)=>a==='united-states'?-1:b==='united-states'?1:0)].map(id=>{
+ const homeIds=[...Object.keys(registry),...Object.keys(mapDefinitions).filter(id=>!registry[id]&&mapDefinitions[id].showOnHome).sort((a,b)=>a==='united-states'?-1:b==='united-states'?1:0)];
+ const renderCard=id=>{
   const config=mapDefinitions[id];
-  if(!registry[id])return '<article class="map-card map-card-planned" aria-label="'+esc(config.name)+' — Planned"><div class="map-card-preview planned-preview">'+(config.preview?'<img src="./'+esc(config.preview)+'" alt="" width="800" height="730" decoding="async">':'<strong>'+config.manifest.expectedCount+'</strong><span>'+esc(config.terminology.plural)+'</span>')+'</div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">Planned · Not available yet</span></div></article>';
+  if(!registry[id])return '<article class="map-card map-card-planned" aria-label="'+esc(config.name)+' — Planned">'+(config.homeSection==='special-geography'?'':'<div class="map-card-preview planned-preview">'+(config.preview?'<img src="./'+esc(config.preview)+'" alt="" width="800" height="730" decoding="async">':'<strong>'+config.manifest.expectedCount+'</strong><span>'+esc(config.terminology.plural)+'</span>')+'</div>')+'<div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">Planned · Not available yet</span></div></article>';
   return '<a class="map-card" href="'+mapEntry(id)+'" data-map-entry="'+id+'"><div class="map-card-preview"><img src="./assets/maps/'+id+'.svg" alt="" width="800" height="730" decoding="async"></div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">'+(config.mapOnly?'Map only for now':'Learn / Capitals / Puzzle')+'</span></div><span class="map-card-arrow" aria-hidden="true">→</span></a>';
- }).join('');
- root.innerHTML='<section class="maps-home" aria-labelledby="maps-title"><p class="eyebrow">COUNTRYMAPS</p><h1 id="maps-title">Choose a map</h1><p class="hub-intro">Explore places. Learn their shapes and locations.</p><nav class="map-cards" aria-label="Choose a map">'+cards+'</nav></section>';
+ };
+ const cards=homeIds.filter(id=>!mapDefinitions[id].homeSection).map(renderCard).join('');
+ const specialCards=homeIds.filter(id=>mapDefinitions[id].homeSection==='special-geography').map(renderCard).join('');
+ root.innerHTML='<section class="maps-home" aria-labelledby="maps-title"><p class="eyebrow">COUNTRYMAPS</p><h1 id="maps-title">Choose a map</h1><p class="hub-intro">Explore places. Learn their shapes and locations.</p><nav class="map-cards" aria-label="Choose a map">'+cards+'</nav><section class="special-geography" aria-labelledby="special-geography-title"><h2 id="special-geography-title">Special Geography</h2><div class="map-cards">'+specialCards+'</div></section></section>';
 }
 // Registry-driven navigation includes only available maps, with project-relative URLs.
 document.querySelector('.map-navigation').innerHTML='<a href="./" data-home>All Maps</a>'+Object.keys(registry).map(id=>'<a data-map-entry="'+id+'" href="'+mapEntry(id)+'">'+esc(registry[id].name)+'</a>').join('');

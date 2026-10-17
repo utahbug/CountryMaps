@@ -217,3 +217,11 @@ Small-mainland Puzzle helpers are screen-sized SVG overlays within the existing 
 ### Puzzle rewards
 
 Correct placements snap and advance immediately, with a 420 ms visual-only 6% pop and slight tilt. Temporary non-interactive SVG copies animate while canonical paths retain their exact bounds for ongoing drop validation. At full completion, the last pop finishes, the map fits all Africa, and a 1.35-second sequence briefly separates countries by 10 map units, reunites them, and adds a 1.2% finishing pulse. The fixed phone station is not transformed. An in-map Africa complete / 54 / 54 card offers Play again. Reduced motion uses a brief brightness highlight and immediate completion card with no separation. Reset, reference preview, activity navigation and page exit cancel Web Animations and remove copies; no reward timers or transforms remain. Test with tests/rewards-browser.html (including reduced-motion preference stub, repeated 54/54 completion, cancellation and next-piece availability).
+
+### Special Geography (planned)
+
+Home groups future physical-geography learning under exactly two non-interactive cards: **Oceans & Islands** (`oceans-islands`) and **Polar Regions** (`polar-regions`). Neither has data or working activities yet. Existing map cards remain unchanged.
+
+Oceans & Islands plans Oceania / Pacific, Pacific Islands, Indian Ocean Islands, Atlantic Islands, and Caribbean Islands; Mediterranean Islands is an optional later set. Configuration reserves a globe presentation with drag rotation, pinch/wheel zoom, ocean selection, and rotation/focus on the selected area. No globe is implemented.
+
+Polar Regions plans Arctic and Antarctica, allowing polar-projection maps and physical-geography learning. These are overlapping collections of geographic features, not sovereign-country manifests. Submaps are internal planning IDs, not Home cards or routes. No separate Oceania / Pacific or Antarctica Home card is created.

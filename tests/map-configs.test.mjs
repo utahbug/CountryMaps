@@ -66,3 +66,14 @@ test('capital metadata is optional, preserves role information, and enables no l
  const units=config.manifest.units.map((u,i)=>i?u:{...u,capital:{name:'Example City',role:'capital',additionalSeats:[{name:'Example Seat',role:'seat-of-government'}],source:null}});
  const prepared=prepareMap({units},config);assert.equal(prepared.units[0].capital,units[0].capital);assert.equal(prepared.units[0].capital.additionalSeats[0].role,'seat-of-government');
 });
+
+test('Special Geography exposes only two planned collections without working map routes',()=>{
+ const special=Object.values(mapDefinitions).filter(c=>c.homeSection==='special-geography');
+ assert.deepEqual(special.map(c=>c.id),['oceans-islands','polar-regions']);
+ for(const c of special){assert.equal(c.status,'planned');assert.equal(c.showOnHome,true);assert.ok(!registry[c.id]);assert.ok(!c.dataUrl);assert.equal(c.manifest.units.length,0);assert.ok(Object.values(c.activities).every(a=>a.enabled===false));}
+ assert.deepEqual(mapDefinitions['oceans-islands'].coverage.submaps,['oceania-pacific','pacific-islands','indian-ocean-islands','atlantic-islands','caribbean-islands']);
+ assert.deepEqual(mapDefinitions['polar-regions'].coverage.submaps,['arctic','antarctica']);
+ assert.equal(mapDefinitions['oceans-islands'].presentation.views.globe.rotation,'drag');
+ assert.equal(mapDefinitions['polar-regions'].presentation.views.map.projectionFamily,'polar');
+ for(const id of ['oceania-pacific','antarctica'])assert.ok(!mapDefinitions[id]);
+});
