@@ -1,3 +1,4 @@
+import {PuzzleRewards} from '../lib/puzzle-rewards.mjs';
 import {helperPlacement} from '../lib/helper-placement.mjs';
 import {factSorts,sortFactUnits,selectedFacts} from '../lib/country-facts.mjs';
 import {CapitalsEngine as RevealEngine} from '../lib/engines/capitals.mjs';
@@ -52,7 +53,7 @@ class CountryMaps {
     this.engines={explorer:new ExplorerEngine(ids),reveal:new RevealEngine(ids,{limit:2}),puzzle:new PuzzleEngine(ids)};
     this.byId=new Map([...data.units,...data.context].map(c=>[c.id,c]));
     this.phoneNav=new PhoneMapNavigation(()=>({view:{...this.view},inverse:this.svg.getScreenCTM().inverse()}),view=>{this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionInset();},(target,x,y)=>{if(this.armed)this.drop(this.byId.get(this.armed),x,y,false);else {const id=target.closest('[data-country]')?.dataset.country;if(id)this.select(this.byId.get(id));}},{width:data.width,height:data.height});
-    this.phoneQueue=new PieceQueue();this.mnemonics=new MnemonicPlayer();this.pieceFilter='az';this.listOrder='az';this.factSort='name';this.factOrder='first';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
+    this.rewards=new PuzzleRewards();this.rewardFinishing=false;this.phoneQueue=new PieceQueue();this.mnemonics=new MnemonicPlayer();this.pieceFilter='az';this.listOrder='az';this.factSort='name';this.factOrder='first';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
     this.lastLearning={reveal:null,puzzle:null};this.view={...this.fitView};this.suppressClick=false;this.query='';this.message='';
     this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
     this.drag=new DragController(state=>this.paintDrag(state),(c,x,y,stationary)=>this.drop(c,x,y,stationary));
@@ -70,7 +71,7 @@ class CountryMaps {
   enter(mode,region='all') {
     this.phoneNav.cancel();
     if(this.config.mapOnly){mode='explorer';region='all';}
-    this.mnemonics.reset();this.clearClue();this.pan.cancel();this.drag.cancel();this.toolLifecycle?.abort();
+    this.cancelRewards();this.mnemonics.reset();this.clearClue();this.pan.cancel();this.drag.cancel();this.toolLifecycle?.abort();
     const nextRegion=['explorer','reveal'].includes(mode)&&Object.hasOwn(this.regions,region)?region:'all';
     const subset=nextRegion==='all'?this.fullData:practiceSet(this.fullData,nextRegion);
     this.data=mode==='explorer'?this.fullData:subset;this.fitView=fittedRegion(subset,nextRegion);
@@ -117,6 +118,10 @@ class CountryMaps {
     '<button data-action="zoom-in" aria-label="Zoom in">+</button><button data-action="zoom-out" aria-label="Zoom out">−</button><button data-action="fit">Fit map</button><button data-action="left" aria-label="Pan left">←</button><button data-action="up" aria-label="Pan up">↑</button><button data-action="down" aria-label="Pan down">↓</button><button data-action="right" aria-label="Pan right">→</button></div><div class="map-caption"></div>'+(this.config.mapOnly?'':unitLegend(this.config))+'<p class="territory-legend"><span aria-hidden="true"></span>Special-status area — tap for details. Outside the '+this.fullData.units.length+'-'+this.terms.singular+' score.</p></section>'+(this.mode==='reveal'?'':'<aside id="activity-side-panel" class="side-panel"></aside>')+'</div>'+
     '<p role="status" aria-live="polite" class="status" data-active-pointer=""></p><div class="completion" hidden><h2>'+name+', complete.</h2><p>All '+this.data.units.length+' '+this.terms.plural+' are in place.</p><button data-action="reset">Play again</button></div>';
     this.svg=q('#africa-map');
+    q('.map-viewport').append(q('.completion'));
+    q('.completion').setAttribute('role','status');
+    q('.completion').innerHTML='<h2>'+name+' complete</h2><p>'+this.data.units.length+' / '+this.data.units.length+'</p><button data-action="reset">Play again</button>';
+
     if(this.mode==='reveal'||(this.mode==='explorer'&&this.data.id==='africa')){
       q('.map-readout').insertBefore(q('.region-control'),q('.map-progress'));
       const select=q('#practice-region'),wrap=document.createElement('div'),measure=document.createElement('span');
@@ -312,7 +317,7 @@ class CountryMaps {
     }
     const previewButton=q('[data-action="preview"]');if(previewButton){const label=this.preview?'Return to Puzzle':'Reveal puzzle reference/answer map';if(previewButton.classList.contains('icon-control')){previewButton.setAttribute('aria-label',label);previewButton.setAttribute('title',label);previewButton.dataset.tooltip=label;previewButton.querySelector('.sr-only').textContent=label;}else previewButton.textContent=label;}
     for(const action of ['zoom-out','left','right','up','down'])q('[data-action="'+action+'"]').disabled=this.view.w===this.fitView.w&&(action==='zoom-out'||!(this.mode==='explorer'||this.mode==='reveal'));
-    q('.completion').hidden=!(this.isPuzzle&&this.engines.puzzle.placed.size===this.data.units.length);
+    q('.completion').hidden=!(this.isPuzzle&&!this.rewardFinishing&&this.engines.puzzle.placed.size===this.data.units.length);
     if(this.config.mapOnly){q('.back-link').hidden=true;q('.region-control').hidden=true;q('.list-order').hidden=true;const legend=q('.territory-legend');if(this.data.context.length)legend.innerHTML='French Guiana — France · Overseas department/region, separate from the 12 sovereign countries.';const section=q('.territory-section');if(section){section.querySelector('h3').textContent='Territorial unit';section.querySelector('p').textContent='Identified separately from sovereign countries.';}}
     q('.status').classList.toggle('sr-only',this.mode==='reveal');
     q('.status').textContent=this.message;
@@ -644,18 +649,27 @@ class CountryMaps {
     }
     this.place(c,correct);
   }
+  cancelRewards(){this.rewards.cancel();this.rewardFinishing=false;}
   place(c,correct){
     this.mnemonics.clear();this.armed=null;
-    if(this.engines.puzzle.place(c.id,correct)){
+    const placed=this.engines.puzzle.place(c.id,correct);
+    const complete=placed&&this.engines.puzzle.placed.size===this.data.units.length;
+    if(complete)this.rewardFinishing=true;
+    if(placed){
       this.lastLearning.puzzle=c.id;
       this.selected=c.id;
       this.message=this.engines.puzzle.placed.size===this.data.units.length?'Complete! All '+this.data.units.length+' '+this.terms.plural+' are placed.':c.name+' placed.';
       const next=this.phonePuzzle?this.byId.get(this.phoneQueue.next(this.puzzleUnits.map(n=>n.id),this.engines.puzzle.placed)):this.puzzleUnits.find(n=>!this.engines.puzzle.placed.has(n.id));if(next){this.currentId=next.id;if(this.phonePuzzle&&['islands','small'].includes(this.pieceFilter))this.fitPhonePractice();}
     }else this.message='Not quite. '+c.name+' returned to the tray.';
     this.paint();
+    if(placed)this.rewards.placed(this.svg.querySelector('path[data-country="'+c.id+'"]'),c,{
+      complete,paths:this.data.units.map(unit=>({unit,node:this.svg.querySelector('path[data-country="'+unit.id+'"]')})),center:[this.fullData.width/2,this.fullData.height/2],
+      fit:()=>{this.phoneNav.cancel();this.pan.cancel();this.view=fittedRegion(this.fullData,'all');this.svg.setAttribute('viewBox',[this.view.x,this.view.y,this.view.w,this.view.h].join(' '));},
+      done:()=>{this.rewardFinishing=false;this.paint();}
+    });
   }
   reset(){
-    this.phoneNav.cancel();this.phoneQueue.reset(this.puzzleUnits.map(c=>c.id));
+    this.cancelRewards();this.phoneNav.cancel();this.phoneQueue.reset(this.puzzleUnits.map(c=>c.id));
     this.lastLearning[this.mode]=null;
     this.mnemonics.reset();this.clearClue();this.pan.cancel();this.drag.cancel();this.suppressClick=false;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};
     this.engines[this.mode].reset();this.currentId=(this.mode==='puzzle'?this.puzzleUnits:this.data.units)[0].id;if(this.phonePuzzle)this.fitPhonePractice();
@@ -677,7 +691,7 @@ class CountryMaps {
     if(this.phoneReveal&&['zoom-in','zoom-out','fit','left','right','up','down'].includes(action)){this.view={...this.fitView};this.paint();return;}
     if(action==='reset'){this.reset();return;}
     if(action==='clue'){this.requestClue();return;}
-    if(action==='preview'){this.mnemonics.clear();
+    if(action==='preview'){this.cancelRewards();this.mnemonics.clear();
       this.drag.cancel();this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};
       this.engines.puzzle.preview=!this.engines.puzzle.preview;
       this.message=this.preview?'Answer map. Your puzzle progress is saved.':'Back to your puzzle.';
@@ -714,7 +728,7 @@ class CountryMaps {
 
 function renderHome(){
  root.classList.remove('africa-activity','capitals-activity');
- app?.mnemonics.clear();app?.clearClue();app?.toolLifecycle?.abort();app=null;
+ app?.cancelRewards();app?.mnemonics.clear();app?.clearClue();app?.toolLifecycle?.abort();app=null;
  document.title='CountryMaps · All Maps';
  document.querySelector('#data-note').textContent='';
  const cards=[...Object.keys(registry),...Object.keys(mapDefinitions).filter(id=>!registry[id]&&mapDefinitions[id].showOnHome).sort((a,b)=>a==='united-states'?-1:b==='united-states'?1:0)].map(id=>{
@@ -729,7 +743,7 @@ document.querySelector('.map-navigation').innerHTML='<a href="./" data-home>All 
 
 async function navigate(){
   const version=++navigationVersion,params=new URLSearchParams(location.search),id=params.get('map')||(location.pathname===new URL('africa/',projectRoot).pathname||location.pathname===new URL('africa/index.html',projectRoot).pathname?'africa':null),mode=params.get('mode')==='capitals'?'reveal':modes.includes(params.get('mode'))?params.get('mode'):'home';
-  app?.mnemonics.clear();app?.pan.cancel();app?.drag.cancel();
+  app?.cancelRewards();app?.mnemonics.clear();app?.pan.cancel();app?.drag.cancel();
   if(!id){renderHome();return;}
   try{
     const data=await loadMap(id);if(version!==navigationVersion)return;
@@ -824,5 +838,5 @@ window.addEventListener('resize',()=>{if(app?.mode==='reveal'||app?.mode==='puzz
 window.addEventListener('scroll',abandon,true);
 document.addEventListener('visibilitychange',abandon);
 window.addEventListener('popstate',navigate);
-window.addEventListener('pagehide',()=>{app?.phoneNav.cancel();app?.mnemonics.clear();app?.clearClue();app?.paintClue();app?.pan.cancel();app?.drag.cancel();});
+window.addEventListener('pagehide',()=>{app?.cancelRewards();app?.phoneNav.cancel();app?.mnemonics.clear();app?.clearClue();app?.paintClue();app?.pan.cancel();app?.drag.cancel();});
 navigate();

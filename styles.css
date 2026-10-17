@@ -1523,3 +1523,10 @@ body:has(.global-navigation) main { margin-top:2px; }
 .helper-overlay [data-inset-hit] { pointer-events:all; cursor:pointer; touch-action:manipulation; }
 .helper-overlay .inset text { font-size:12px; }
 .helper-overlay .inset-country { vector-effect:non-scaling-stroke; stroke-width:1; }
+
+/* Completion is visible in-map and never consumes layout space. */
+.map-viewport .completion { position:absolute; left:12px; bottom:12px; z-index:10; max-width:calc(100% - 24px); padding:12px 16px; background:#edf5eb; border:1px solid #a9bfaf; border-top:3px solid #669566; border-radius:7px; color:#214e3f; }
+.map-viewport .completion h2 { margin:0; font-size:1.15rem; }
+.map-viewport .completion p { margin:3px 0; color:#526357; }
+.map-viewport .completion button { min-height:44px; padding:4px 8px; border:0; background:transparent; color:#285d52; text-decoration:underline; font:inherit; }
+.map-viewport .completion button:hover { background:#dcece6; }

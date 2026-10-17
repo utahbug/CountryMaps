@@ -42,6 +42,7 @@ document.querySelector('#run').onclick=async()=>{
   send('pointerdown',fresh,41,50,50);clue();assert(level()==='0','first clue ignored while dragging');send('pointerup',d,41,point.x,point.y);assert(score()===1&&!q('.drag-preview'),'correct drag still places normally');
   reset();
   for(const c of data.countries){choose(c.id);clue();clue();const target=q(c.inset&&!islands.has(c.id)?'[data-inset-hit="'+c.id+'"]':'[data-country="'+c.id+'"]');target.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));assert(q('[data-piece="'+c.id+'"]').disabled,'place '+c.id);assert(level()==='0'&&!q('.clue-target'),'placement clears clue '+c.id);}
+  for(let elapsed=0;q('.completion').hidden&&elapsed<6000;elapsed+=50)await new Promise(resolve=>setTimeout(resolve,50));
   assert(score()===54&&q('[data-action="clue"]').disabled&&!q('.completion').hidden,'completion unchanged, clue disabled');
   reset();choose('COD');clue();const panel=q('.map-panel').getBoundingClientRect(),readout=q('.map-readout').getBoundingClientRect(),hint=q('.puzzle-clue').getBoundingClientRect(),map=q('.map-viewport').getBoundingClientRect();
   assert(hint.top>=readout.top&&hint.bottom<=readout.bottom+.1&&map.top-readout.bottom<2,'clue contained in compact country row beside map');

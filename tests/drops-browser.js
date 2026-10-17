@@ -2,7 +2,7 @@ import {insetTransform} from '../lib/maps.js';
 const data=await (await fetch('../data/africa.json')).json(),frame=document.querySelector('iframe'),results=document.querySelector('#results'),button=document.querySelector('#run');
 const islands=new Set(['CPV','COM','MDG','MUS','STP','SYC']);
 const ids=['GMB','BEN','TGO','RWA','BDI','DJI','SWZ','LSO','MWI','CPV','COM','MUS','SYC','STP'];
-button.onclick=()=>{
+button.onclick=async()=>{
  let checks=0;const assert=(value,label)=>{if(!value)throw Error(label);checks++;};
  try{
   const w=frame.contentWindow,d=w.document,q=s=>d.querySelector(s),all=s=>[...d.querySelectorAll(s)],svg=q('#africa-map');
@@ -77,6 +77,7 @@ button.onclick=()=>{
    begin(c.id);const point=new w.DOMPoint(...c.anchor).matrixTransform(svg.getScreenCTM());
    finish(point.x,point.y);assert(q('[data-piece="'+c.id+'"]').disabled,'all-country aligned drop '+c.id);
   }
+  for(let elapsed=0;q('.completion').hidden&&elapsed<6000;elapsed+=50)await new Promise(resolve=>setTimeout(resolve,50));
   assert(score()===54&&!q('.completion').hidden,'54/54 completion unchanged');assert(numbersHidden(),'numeric map labels hidden after completion');reset();assert(score()===0&&!q('.clue-target'),'Reset clean');assert(numbersHidden(),'numeric map labels hidden after Reset');clean();assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');
   results.textContent='PASS: '+checks+' overlap/drop checks at '+w.innerWidth+' × '+w.innerHeight+'. All 14 requested countries and 54 aligned placements. Synthetic touch; capture stubbed.';
  }catch(error){results.textContent='FAIL after '+checks+' checks: '+error.message;}
