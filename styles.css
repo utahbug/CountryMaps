@@ -1441,3 +1441,20 @@ body:has(.africa-landing) .all-maps-link { background:transparent; border-color:
  .phone-single-piece .phone-subset-complete { font-size:.75rem; margin:4px; }
  .phone-single-piece .filter-popover { max-height:65svh; overflow:auto; }
 }
+/* Phone staging is HTML over the SVG: navigation never transforms this box. */
+@media(max-width:650px){
+ .phone-single-piece .map-canvas {touch-action:none;}
+ .phone-single-piece .side-panel {width:112px;height:146px;padding:3px;}
+ .phone-single-piece .panel-title {position:absolute;left:3px;bottom:3px;height:44px;}
+ .phone-single-piece [data-action="skip-piece"] {position:absolute;top:50px;left:-3px;width:110px!important;height:44px;font-weight:400;border:0;background:#faf9efe8;border-radius:5px;}
+ .phone-single-piece .piece {height:96px;min-height:96px;}
+ .phone-single-piece .phone-fit {position:absolute;right:8px;bottom:8px;min-height:44px;border:0;background:#faf9efed;padding:4px 10px;font-size:.8rem;}
+ .phone-single-piece .phone-subset-complete {padding-bottom:44px;}
+}
+@media(max-width:650px){
+ .phone-single-piece .panel-title button[data-action="skip-piece"] {font-weight:400;box-shadow:none;}
+ .phone-single-piece button.phone-fit {font-weight:400;border:0;box-shadow:none;}
+}
+@media(max-width:650px){
+ .phone-single-piece .piece svg {height:42px;}
+}

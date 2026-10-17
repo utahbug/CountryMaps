@@ -1,3 +1,4 @@
+import {PhoneMapNavigation} from '../lib/engines/phone-map-navigation.mjs';
 import {PieceQueue} from '../lib/piece-queue.mjs';
 import {referenceFilters,learningCard,historySection,activityLearningCard} from '../lib/learning-reference.mjs?v=activity-recap';
 import {MnemonicPlayer} from '../lib/mnemonics.mjs?v=piece-card';
@@ -46,6 +47,7 @@ class CountryMaps {
     const ids=data.units.map(c=>c.id);
     this.engines={explorer:new ExplorerEngine(ids),reveal:new RevealEngine(ids,{limit:2}),puzzle:new PuzzleEngine(ids)};
     this.byId=new Map([...data.units,...data.context].map(c=>[c.id,c]));
+    this.phoneNav=new PhoneMapNavigation(()=>({view:{...this.view},inverse:this.svg.getScreenCTM().inverse()}),view=>{this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));},(target,x,y)=>{if(this.armed)this.drop(this.byId.get(this.armed),x,y,false);else {const id=target.closest('[data-country]')?.dataset.country;if(id)this.select(this.byId.get(id));}},{width:data.width,height:data.height});
     this.phoneQueue=new PieceQueue();this.mnemonics=new MnemonicPlayer();this.pieceFilter='az';this.listOrder='az';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
     this.lastLearning={reveal:null,puzzle:null};this.view={...this.fitView};this.suppressClick=false;this.query='';this.message='';
     this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
@@ -60,6 +62,7 @@ class CountryMaps {
   get revealed(){return this.mode==='reveal'?this.engines.reveal.revealed:this.preview?new Set(this.data.units.map(c=>c.id)):this.engines.puzzle.placed;}
   href(mode){if(mode==='home'&&this.data.id==='africa')return mapEntry('africa');return '?map='+this.data.id+(mode==='home'?'':'&mode='+mode)+(['explorer','reveal'].includes(mode)&&this.region!=='all'?'&region='+this.region:'');}
   enter(mode,region='all') {
+    this.phoneNav.cancel();
     if(this.config.mapOnly){mode='explorer';region='all';}
     this.mnemonics.reset();this.clearClue();this.pan.cancel();this.drag.cancel();this.toolLifecycle?.abort();
     const nextRegion=['explorer','reveal'].includes(mode)&&Object.hasOwn(this.regions,region)?region:'all';
@@ -321,25 +324,35 @@ class CountryMaps {
       if(!q('.phone-subset-complete'))side.insertAdjacentHTML('beforeend','<p class="phone-subset-complete" role="status">Set complete. Choose another filter.</p>');
       q('.phone-subset-complete').hidden=remaining.length>0;
       if(!remaining.length)q('.phone-subset-complete').textContent=this.engines.puzzle.placed.size===this.data.units.length?`All ${this.data.units.length} placed!`:'Set complete. Choose another filter.';
+      if(!q('[data-action="phone-fit"]'))viewport.insertAdjacentHTML('beforeend','<button class="phone-fit" data-action="phone-fit" aria-label="Fit selected practice area" title="Fit selected practice area">Fit map</button>');
+      const allOption=q('[data-piece-filter="az"]');if(allOption)allOption.textContent='All Africa';
       this.positionPhonePiece();
     }else{
       if(side.parentElement!==workspace)workspace.append(side);
       side.style.left='';side.style.top='';side.hidden=this.panelHidden;
       q('[data-action="toggle-panel"]').hidden=false;
-      q('[data-action="skip-piece"]')?.remove();q('.phone-subset-complete')?.remove();
+      q('[data-action="phone-fit"]')?.remove();q('[data-action="skip-piece"]')?.remove();q('.phone-subset-complete')?.remove();
     }
   }
   positionPhonePiece(){
     if(!this.phonePuzzle||!this.isPuzzle)return;
-    const viewport=q('.map-viewport').getBoundingClientRect(),side=q('.side-panel'),size=side.getBoundingClientRect();
-    const land=[...this.svg.querySelectorAll('path.country,.context-region,[data-inset-hit]')].map(p=>p.getBoundingClientRect());
-    const margin=8,maxX=Math.max(margin,viewport.width-size.width-margin),maxY=Math.max(margin,viewport.height-size.height-margin);
-    // Prefer southwest Atlantic; choose the least obstructed measured rectangle.
-    const candidates=[.62,.72,.5,.82,.38].flatMap(y=>[margin,Math.min(maxX,viewport.width*.12)].map(x=>({x,y:Math.min(maxY,Math.max(margin,viewport.height*y))})));
-    const overlap=(p,b)=>Math.max(0,Math.min(viewport.left+p.x+size.width,b.right)-Math.max(viewport.left+p.x,b.left))*Math.max(0,Math.min(viewport.top+p.y+size.height,b.bottom)-Math.max(viewport.top+p.y,b.top));
-    candidates.sort((a,b)=>land.reduce((n,r)=>n+overlap(a,r)-overlap(b,r),0));
-    side.style.left=candidates[0].x+'px';side.style.top=candidates[0].y+'px';
+    const viewport=q('.map-viewport'),side=q('.side-panel');
+    side.style.left='8px';side.style.top=Math.max(8,Math.min(viewport.clientHeight-194,viewport.clientHeight*.43))+'px';
   }
+  fitPhonePractice(){
+    if(!this.phonePuzzle)return;
+    this.phoneNav.cancel();
+    if(this.pieceFilter==='az')this.fitView=fittedRegion(this.fullData,'all');
+    else if(this.regions[this.pieceFilter])this.fitView=fittedRegion(practiceSet(this.fullData,this.pieceFilter),this.pieceFilter);
+    else {
+      // Scattered practice subsets use the active country's neighborhood, not a
+      // continent-wide bounding box; the next piece gets its own local context.
+      const c=this.byId.get(this.currentId),size=this.pieceFilter==='islands'?300:360;
+      this.fitView={x:c.anchor[0]-size/2,y:c.anchor[1]-size/2,w:size,h:size};
+    }
+    this.view={...this.fitView};
+  }
+
   paintActivityLearning(){
     const slot=q('.activity-learning-slot');if(!slot)return;
     const id=this.lastLearning[this.mode],unit=this.data.units.find(c=>c.id===id);
@@ -568,15 +581,15 @@ class CountryMaps {
       this.lastLearning.puzzle=c.id;
       this.selected=c.id;
       this.message=this.engines.puzzle.placed.size===this.data.units.length?'Complete! All '+this.data.units.length+' '+this.terms.plural+' are placed.':c.name+' placed.';
-      const next=this.phonePuzzle?this.byId.get(this.phoneQueue.next(this.puzzleUnits.map(n=>n.id),this.engines.puzzle.placed)):this.puzzleUnits.find(n=>!this.engines.puzzle.placed.has(n.id));if(next)this.currentId=next.id;
+      const next=this.phonePuzzle?this.byId.get(this.phoneQueue.next(this.puzzleUnits.map(n=>n.id),this.engines.puzzle.placed)):this.puzzleUnits.find(n=>!this.engines.puzzle.placed.has(n.id));if(next){this.currentId=next.id;if(this.phonePuzzle&&['islands','small'].includes(this.pieceFilter))this.fitPhonePractice();}
     }else this.message='Not quite. '+c.name+' returned to the tray.';
     this.paint();
   }
   reset(){
-    this.phoneQueue.reset(this.puzzleUnits.map(c=>c.id));
+    this.phoneNav.cancel();this.phoneQueue.reset(this.puzzleUnits.map(c=>c.id));
     this.lastLearning[this.mode]=null;
     this.mnemonics.reset();this.clearClue();this.pan.cancel();this.drag.cancel();this.suppressClick=false;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};
-    this.engines[this.mode].reset();this.currentId=(this.mode==='puzzle'?this.puzzleUnits:this.data.units)[0].id;
+    this.engines[this.mode].reset();this.currentId=(this.mode==='puzzle'?this.puzzleUnits:this.data.units)[0].id;if(this.phonePuzzle)this.fitPhonePractice();
     this.message='Reset. Ready to begin again.';
     this.renderSide();this.paint();
   }
@@ -585,11 +598,12 @@ class CountryMaps {
     this.mnemonics.clear();this.drag.cancel();this.clearClue();this.armed=null;this.suppressClick=false;this.pieceFilter=id;this.phoneQueue.reset(this.puzzleUnits.map(c=>c.id));
     if(this.phonePuzzle)this.currentId=this.phoneQueue.next(this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed)||this.puzzleUnits[0].id;
     if(!this.puzzleUnits.some(c=>c.id===this.currentId))this.currentId=(this.puzzleUnits.find(c=>!this.engines.puzzle.placed.has(c.id))||this.puzzleUnits[0]).id;
-    this.renderSide();this.paint();q('[popovertarget="piece-filter-menu"]').focus({preventScroll:true});
+    this.fitPhonePractice();this.renderSide();this.paint();q('[popovertarget="piece-filter-menu"]').focus({preventScroll:true});
   }
   action(action){
-    this.pan.cancel();
-    if(action==='skip-piece'&&this.phonePuzzle&&this.isPuzzle){this.drag.cancel();this.mnemonics.clear();this.clearClue();this.armed=null;this.suppressClick=false;this.currentId=this.phoneQueue.skip(this.currentId,this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed)||this.currentId;this.paint();return;}
+    this.pan.cancel();this.phoneNav.cancel();
+    if(action==='phone-fit'){this.drag.cancel();this.fitPhonePractice();this.paint();return;}
+    if(action==='skip-piece'&&this.phonePuzzle&&this.isPuzzle){this.drag.cancel();this.mnemonics.clear();this.clearClue();this.armed=null;this.suppressClick=false;this.currentId=this.phoneQueue.skip(this.currentId,this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed)||this.currentId;if(['islands','small'].includes(this.pieceFilter))this.fitPhonePractice();this.paint();return;}
     if(action==='toggle-panel'){this.panelHidden=!this.panelHidden;this.paint();return;}
     if(this.phoneReveal&&['zoom-in','zoom-out','fit','left','right','up','down'].includes(action)){this.view={...this.fitView};this.paint();return;}
     if(action==='reset'){this.reset();return;}
@@ -677,6 +691,7 @@ document.addEventListener('click',event=>{
   const ref=event.target.closest('[data-reference-unit],[data-focus-unit]');if(ref){app.selectReference(ref.dataset.referenceUnit||ref.dataset.focusUnit,!!ref.dataset.focusUnit);q('.map-panel').scrollIntoView({block:'start',behavior:'smooth'});return;}
   const cardSummary=event.target.closest('[data-card-country]');if(cardSummary){app.selectReference(cardSummary.dataset.cardCountry,false,false);return;}
   const row=event.target.closest('[data-list-country]');if(row){if(app.mode==='explorer'&&app.data.reference?.units[row.dataset.listCountry])app.selectReference(row.dataset.listCountry,false,false);else app.select(app.byId.get(row.dataset.listCountry));return;}
+  if(app.phonePuzzle&&event.target.closest('#africa-map')&&(event.detail>0||(typeof event.pointerId==='number'&&event.pointerId>=0)))return;
   const island=event.target.closest('[data-island-hit]');if(island){if(app.armed===island.dataset.islandHit)app.drop(app.byId.get(app.armed),event.clientX,event.clientY,false);return;}
   const inset=event.target.closest('[data-inset-hit]');if(inset){if(app.armed===inset.dataset.insetHit)app.place(app.byId.get(app.armed),true);return;}
   // Pointer taps are completed by PanController because capture retargets click.
@@ -706,6 +721,8 @@ root.addEventListener('pointerout',event=>{
  if(event.pointerType==='mouse'&&card&&!card.contains(event.relatedTarget)&&app?.mnemonics.host===card&&!app.drag.active)app.mnemonics.clear();
 });
 root.addEventListener('pointerdown',event=>{
+  if(app?.phonePuzzle&&app.isPuzzle&&event.target.closest('#africa-map')){if(!app.drag.active&&app.phoneNav.begin(event,app.svg))event.preventDefault();return;}
+  if(app?.phoneNav.active)return;
   if((app?.mode==='explorer'||app?.mode==='reveal')&&event.target.closest('.navigable-map')){
     const matrix=app.svg.getScreenCTM();
     if(app.pan.begin(event,app.svg,app.view,matrix?.inverse(),(event.target.closest('[data-country],[data-territory]')?.dataset.country||event.target.closest('[data-territory]')?.dataset.territory)))event.preventDefault();
@@ -720,22 +737,22 @@ root.addEventListener('pointerdown',event=>{
     app.message='Place '+c.name+(app.isIsland(c)?' at its ocean location.':c.inset?' in the enlarged inset.':'.');app.paint();
   }
 });
-document.addEventListener('pointermove',event=>{if(app?.pan.move(event)||app?.drag.move(event))event.preventDefault();},{passive:false});
-document.addEventListener('pointerup',event=>{if(!app?.pan.finish(event))app?.drag.finish(event);});
-for(const type of ['pointercancel','lostpointercapture'])document.addEventListener(type,event=>{if(app?.drag.active?.pointerId===event.pointerId)app.mnemonics.clear();app?.pan.lost(event);app?.drag.lost(event);});
+document.addEventListener('pointermove',event=>{if(app?.phoneNav.move(event)||app?.pan.move(event)||app?.drag.move(event))event.preventDefault();},{passive:false});
+document.addEventListener('pointerup',event=>{if(!app?.phoneNav.finish(event)&&!app?.pan.finish(event))app?.drag.finish(event);});
+for(const type of ['pointercancel','lostpointercapture'])document.addEventListener(type,event=>{if(app?.drag.active?.pointerId===event.pointerId)app.mnemonics.clear();app?.phoneNav.lost(event);app?.pan.lost(event);app?.drag.lost(event);});
 document.addEventListener('keydown',event=>{
   if(!app)return;
   if(event.key==='Escape'){
-    app.mnemonics.clear();app.pan.cancel();app.drag.cancel();app.armed=null;app.message='Selection cancelled.';app.paint();return;
+    app.mnemonics.clear();app.phoneNav.cancel();app.pan.cancel();app.drag.cancel();app.armed=null;app.message='Selection cancelled.';app.paint();return;
   }
   const target=event.target.closest('[data-country],[data-territory],[data-inset-hit]');
   if(target&&(event.key==='Enter'||event.key===' ')){event.preventDefault();target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}
 });
-function abandon(){app?.mnemonics.clear();app?.pan.cancel();if(app?.drag.active){app.drag.cancel();app.message='Drag cancelled. Try again.';app.paint();}}
+function abandon(){app?.phoneNav.cancel();app?.mnemonics.clear();app?.pan.cancel();if(app?.drag.active){app.drag.cancel();app.message='Drag cancelled. Try again.';app.paint();}}
 for(const type of ['blur','resize'])window.addEventListener(type,abandon);
 window.addEventListener('resize',()=>{if(app?.mode==='reveal'||app?.mode==='puzzle')app.paint();else app?.positionLabel();});
 window.addEventListener('scroll',abandon,true);
 document.addEventListener('visibilitychange',abandon);
 window.addEventListener('popstate',navigate);
-window.addEventListener('pagehide',()=>{app?.mnemonics.clear();app?.clearClue();app?.paintClue();app?.pan.cancel();app?.drag.cancel();});
+window.addEventListener('pagehide',()=>{app?.phoneNav.cancel();app?.mnemonics.clear();app?.clearClue();app?.paintClue();app?.pan.cancel();app?.drag.cancel();});
 navigate();
