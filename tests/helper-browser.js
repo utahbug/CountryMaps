@@ -1,0 +1,15 @@
+const data=await(await fetch('../data/africa.json')).json();const frame=document.querySelector('iframe'),out=document.querySelector('#results');
+document.querySelector('#run').onclick=()=>{let n=0;const ok=(v,m)=>{if(!v)throw Error(m);n++;};try{const w=frame.contentWindow,d=w.document,q=s=>d.querySelector(s),click=s=>q(s).click(),svg=q('#africa-map'),score=()=>q('progress').value;const select=id=>click('[data-piece="'+id+'"]');
+const send=(type,target,x,y,id=41)=>target.dispatchEvent(new w.PointerEvent(type,{bubbles:true,cancelable:true,pointerType:'touch',pointerId:id,isPrimary:true,button:0,clientX:x,clientY:y}));
+const bounded=()=>{const r=q('[data-inset-hit]').getBoundingClientRect(),v=q('.map-viewport').getBoundingClientRect();ok(r.left>=v.left&&r.top>=v.top&&r.right<=v.right+.1&&r.bottom<=v.bottom+.1,'helper inside viewport');ok(w.getComputedStyle(q('.helper-overlay')).position==='absolute','no layout reservation');ok(r.width>=120&&r.height>=130,'screen readable');return r;};
+click('[data-action="reset"]');const original=q('.map-viewport').getBoundingClientRect();
+for(const c of data.countries.filter(c=>c.inset&&!['CPV','COM','MDG','MUS','STP','SYC'].includes(c.id))){
+ select(c.id);const r=bounded(),v=q('.map-viewport').getBoundingClientRect();ok(v.width===original.width&&v.height===original.height,'helper never expands map '+c.id);
+ click('[data-action="zoom-in"]');const z=bounded();ok(Math.abs(z.width-r.width)<.1&&Math.abs(z.height-r.height)<.1,'zoom independent size');
+ if(w.innerWidth<=650){svg.setPointerCapture=()=>{};svg.hasPointerCapture=()=>false;send('pointerdown',svg,v.left+v.width*.75,v.top+v.height*.3);send('pointermove',d,v.left+v.width*.75+30,v.top+v.height*.3+20);send('pointerup',d,v.left+v.width*.75+30,v.top+v.height*.3+20);bounded();}
+ const target=q('[data-inset-hit]'),b=target.getBoundingClientRect(),piece=q('[data-piece="'+c.id+'"]'),p=piece.getBoundingClientRect(),before=score();piece.setPointerCapture=()=>{};piece.hasPointerCapture=()=>false;
+ send('pointerdown',piece,p.left+30,p.top+30);send('pointermove',d,b.left+b.width/2,b.top+b.height/2);send('pointerup',d,b.left+b.width/2,b.top+b.height/2);ok(score()===before+1,'helper drag places '+c.id);ok(!q('.drag-preview'),'drag cleans up');click('[data-action="reset"]');
+ select(c.id);q('[data-inset-hit]').dispatchEvent(new w.MouseEvent('click',{bubbles:true,cancelable:true}));ok(score()===1,'helper tap places '+c.id);click('[data-action="reset"]');
+}
+for(const id of ['CPV','COM','MUS','SYC','STP','MDG']){select(id);ok(q('.helper-overlay').hasAttribute('hidden')&&!q('[data-inset-hit]'),'no island helper '+id);}
+select('RWA');for(const filter of ['north','west','central','east','southern','small']){click('[data-piece-filter="'+filter+'"]');if(q('[data-inset-hit]'))bounded();ok(score()===0,'filter preserves score');}click('[data-piece-filter="az"]');click('[data-action="reset"]');ok(!q('[data-inset-hit]'),'Reset removes helper');ok(d.documentElement.scrollWidth<=w.innerWidth,'no overflow');out.textContent='PASS: '+n+' helper checks at '+w.innerWidth+'px';}catch(e){out.textContent='FAIL after '+n+': '+e.message;}};

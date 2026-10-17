@@ -209,3 +209,7 @@ Africa now offers Explorer / Capitals / Puzzle. See [capital data, sources and s
 
 ## Explorer comparison data
 All 54 Africa units now include labeled political dates, 2024 land areas and 2025 population estimates. Map/list/search selection keeps the map visible and updates its facts panel. Country cards offer date, area, population and name sorting. See [sources and date conventions](docs/COUNTRY-FACTS.md).
+
+### Mainland helper placement
+
+Small-mainland Puzzle helpers are screen-sized SVG overlays within the existing map viewport. Placement prefers southwest ocean space, samples current rendered land, and avoids the phone piece/Skip/Fit controls; it recalculates after pan, zoom, filters and resize. No page space is reserved. The real-country locator remains on the geographic layer. Drop validation uses the helper’s rendered scale; final placement remains canonical. Islands retain their separate ocean tolerance/ripple behavior. `tests/helper-browser.html` checks viewport containment, constant size, and helper drag/tap placement; `tests/helper-placement.test.mjs` covers placement preference and obstacle avoidance.
