@@ -225,3 +225,11 @@ Home groups future physical-geography learning under exactly two non-interactive
 Oceans & Islands plans Oceania / Pacific, Pacific Islands, Indian Ocean Islands, Atlantic Islands, and Caribbean Islands; Mediterranean Islands is an optional later set. Configuration reserves a globe presentation with drag rotation, pinch/wheel zoom, ocean selection, and rotation/focus on the selected area. No globe is implemented.
 
 Polar Regions plans Arctic and Antarctica, allowing polar-projection maps and physical-geography learning. These are overlapping collections of geographic features, not sovereign-country manifests. Submaps are internal planning IDs, not Home cards or routes. No separate Oceania / Pacific or Antarctica Home card is created.
+
+### Shared compact map layout
+
+All map activities fit actual unit/context bounds with 2% geographic breathing room, rather than the padded source canvas. Responsive SVG aspect ratios and viewport-height caps keep geography prominent. Learn facts stay map-adjacent (below the map on narrow screens); the full country collection remains secondary. Capitals uses inside/nearby labels with stable Atlantic fallback slots for small units, and no duplicate lower description.
+
+Direct navigation: Learn and Capitals support pointer pan, touch pinch and wheel zoom; focus the map and use arrows, +/−, or Home for keyboard navigation. Capitals retains a compact Fit alternative. Phone Puzzle retains its separate fixed piece station and existing gesture/placement controller.
+
+Controls belong near the content they affect. Puzzle actions live in its current-piece/map header. Ambiguous actions use icon-plus-short-text on desktop; compact phone controls retain accessible names, tooltips and 44px targets. Future maps inherit these rules through the shared renderer and CSS.

@@ -1531,3 +1531,76 @@ body:has(.global-navigation) main { margin-top:2px; }
 .special-geography .map-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
 .special-geography .map-card{justify-content:center}
 @media(max-width:340px){.special-geography .map-cards{grid-template-columns:1fr}}
+
+/* Shared compact map composition: fit geography, not a padded source canvas. */
+:root { --map-chrome:220px; --map-breathing:6px; }
+body:has(.workspace) main,body:has(.workspace) .global-navigation {width:min(1180px,calc(100% - 20px));}
+.workspace {max-width:1100px;margin-inline:auto;align-items:start;}
+.map-panel {padding:0;min-width:0;}
+.workspace .map-canvas {display:block;width:100%;height:auto;aspect-ratio:var(--map-aspect,1.1);min-height:0;max-height:calc(100svh - var(--map-chrome));}
+.workspace .map-viewport {min-height:0;}
+.workspace .side-panel {max-height:calc(100svh - 180px);}
+.workspace.reveal-workspace {max-width:min(100%,calc((100svh - 200px)*var(--map-aspect,1.1)));}
+.reveal-workspace .map-panel {position:relative;}
+.reveal-workspace .map-tools {position:absolute;right:4px;bottom:4px;padding:0;z-index:6;background:transparent;}
+.reveal-workspace .map-tools button:not([data-action='fit']) {display:none;}
+.reveal-workspace .map-tools button[data-action='fit'] {width:44px;min-width:44px;padding:0!important;background:#faf9efc9;}
+.workspace .map-canvas.navigable-map {touch-action:none;}
+.workspace .map-readout {padding-block:0;min-height:44px;}
+.activity-heading.compact-heading {margin-block:0;}
+.explorer-facts {left:6px;bottom:6px;padding:8px;width:205px;max-width:30%;}
+.explorer-facts .country-facts-grid {font-size:.8rem;gap:3px;}
+.activity-learning-slot:empty {height:0;padding:0;}
+body:has(.africa-landing) main {margin-top:0;}
+.africa-landing {position:relative;max-width:720px;}
+.africa-landing-map {margin-top:2px;max-height:calc(100svh - 170px);}
+.africa-landing-activities {position:absolute;left:1%;top:58%;z-index:1;flex-direction:column;align-items:flex-start;gap:0;}
+.africa-landing-activities a {background:#faf9efb8;}
+@media(max-width:650px){
+ :root {--map-chrome:230px;}
+ .workspace {max-width:100%;}
+ .workspace .map-canvas {height:auto;min-height:0;max-height:calc(100svh - var(--map-chrome));}
+ .workspace.phone-single-piece .map-canvas {height:clamp(350px,calc(100svh - 230px),540px);min-height:350px;}
+ .workspace .side-panel {max-height:none;}
+ .workspace.reveal-workspace {max-width:100%;}
+ .explorer-facts {max-width:none;width:auto;margin:2px 4px;}
+ .africa-landing-activities {left:0;top:56%;}
+ .africa-landing-activities a {font-size:.8rem;padding-inline:5px;}
+}
+
+.workspace .unit-type-legend {gap:4px 10px;padding:3px 8px;font-size:.72rem;}
+.workspace .unit-type-legend i {width:16px;height:12px;}
+
+/* Actions follow their context; unfamiliar desktop actions have short labels. */
+.puzzle-top-shell {justify-content:flex-start;gap:4px 12px;max-width:1100px;margin-inline:auto;}
+.puzzle-top-shell .compact-heading {flex:0 1 auto;}
+.puzzle-top-shell .activity-commandbar {margin:0;}
+.activity-commandbar.actions-in-map {display:contents;}
+.map-readout.puzzle-readout {display:flex;flex-wrap:wrap;gap:2px 8px;padding:0 6px;}
+.puzzle-readout .toolbar-actions {display:flex;flex-wrap:wrap;gap:0;margin-left:0;}
+.action-label {display:none;}
+@media(min-width:651px){
+ .toolbar-actions button.icon-control:has(.action-label),.puzzle-clue button.icon-control:has(.action-label){width:auto!important;min-width:44px;padding:0 6px!important;display:inline-flex;gap:5px;align-items:center;}
+ .action-label {display:inline;font-size:.78rem;font-weight:500;}
+ .puzzle-readout .toolbar-actions {margin-left:4px;}
+}
+@media(max-width:650px){
+ .puzzle-readout .toolbar-actions {flex:0 0 auto;}
+ .puzzle-readout .toolbar-actions .icon-control {width:44px;min-width:44px;padding:0!important;background:transparent;border:0;}
+}
+
+.actions-in-map .toolbar {display:none;}
+.map-readout.puzzle-readout {justify-content:flex-start;}
+.map-readout.puzzle-readout>strong {flex:0 1 auto;}
+.map-readout.puzzle-readout .puzzle-clue {flex:0 1 auto;margin-left:0;}
+.icon-control .control-icon {flex-shrink:0;}
+@media(min-width:651px){
+ .map-readout .toolbar-actions button.icon-control:has(.action-label),.map-readout .puzzle-clue button.icon-control:has(.action-label){flex:0 0 auto!important;width:max-content!important;max-width:none!important;min-width:44px!important;}
+}
+@media(max-width:650px){.workspace.phone-single-piece .map-canvas{height:clamp(340px,42svh,400px);min-height:340px;}}
+
+/* Keep live feedback for assistive technology without a permanent instruction band. */
+.workspace~.status {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;}
+
+.puzzle-top-shell {display:flex;flex-wrap:wrap;}
+.puzzle-top-shell .activity-commandbar {flex:0 1 auto;justify-content:flex-start;}

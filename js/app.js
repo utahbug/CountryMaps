@@ -2,7 +2,7 @@ import {PuzzleRewards} from '../lib/puzzle-rewards.mjs';
 import {helperPlacement} from '../lib/helper-placement.mjs';
 import {factSorts,sortFactUnits,selectedFacts} from '../lib/country-facts.mjs';
 import {CapitalsEngine as RevealEngine} from '../lib/engines/capitals.mjs';
-import {capitalLabelPositions} from '../lib/capital-labels.mjs';
+import {capitalLabelPositions} from '../lib/capital-labels.mjs?v=compact-layout';
 import {PhoneMapNavigation} from '../lib/engines/phone-map-navigation.mjs';
 import {PieceQueue} from '../lib/piece-queue.mjs';
 import {referenceFilters,learningCard,historySection,activityLearningCard} from '../lib/learning-reference.mjs?v=country-facts';
@@ -11,7 +11,7 @@ import {learningFilters,filteredUnits} from '../lib/practice-subsets.mjs';
 import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-presentation.mjs';
 import {terminology,mapDefinitions} from '../lib/map-configs.mjs?v=special-geography';
 import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop,acceptsIslandDrop} from '../lib/drop-validation.mjs?v=puzzle-cleanup';
-import {practiceSet,fittedRegion,countryRegion,countryRegionId,groupedCountries} from '../lib/regions.mjs';
+import {practiceSet,fittedRegion,countryRegion,countryRegionId,groupedCountries} from '../lib/regions.mjs?v=compact-layout';
 import {loadMap,registry,modes,titles,findCountries,pieceDisplayViewBox,usesPieceScaleFrame,escapeHTML as esc} from '../lib/maps.js?v=learn-name';
 import {ExplorerEngine,PuzzleEngine} from '../lib/engines/activities.mjs?v=reveal-pairs';
 import {DragController} from '../lib/engines/drag-controller.mjs?v=phone-tray';
@@ -52,7 +52,7 @@ class CountryMaps {
     const ids=data.units.map(c=>c.id);
     this.engines={explorer:new ExplorerEngine(ids),reveal:new RevealEngine(ids,{limit:2}),puzzle:new PuzzleEngine(ids)};
     this.byId=new Map([...data.units,...data.context].map(c=>[c.id,c]));
-    this.phoneNav=new PhoneMapNavigation(()=>({view:{...this.view},inverse:this.svg.getScreenCTM().inverse()}),view=>{this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionInset();},(target,x,y)=>{if(this.armed)this.drop(this.byId.get(this.armed),x,y,false);else {const id=target.closest('[data-country]')?.dataset.country;if(id)this.select(this.byId.get(id));}},{width:data.width,height:data.height});
+    this.phoneNav=new PhoneMapNavigation(()=>({view:{...this.view},inverse:this.svg.getScreenCTM().inverse()}),view=>{this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionInset();this.positionLabel();},(target,x,y)=>{if(this.armed)this.drop(this.byId.get(this.armed),x,y,false);else {const node=target.closest('[data-country],[data-territory]'),id=node?.dataset.country||node?.dataset.territory;if(id)this.select(this.byId.get(id));}},{width:data.width,height:data.height});
     this.rewards=new PuzzleRewards();this.rewardFinishing=false;this.phoneQueue=new PieceQueue();this.mnemonics=new MnemonicPlayer();this.pieceFilter='az';this.listOrder='az';this.factSort='name';this.factOrder='first';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
     this.lastLearning={reveal:null,puzzle:null};this.view={...this.fitView};this.suppressClick=false;this.query='';this.message='';
     this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
@@ -63,7 +63,7 @@ class CountryMaps {
   isIsland(c){return this.config.practiceSubsets?.islands?.ids.includes(c?.id)||false;}
   get puzzleUnits(){return filteredUnits(this.data.units,learningFilters(this.config)[this.pieceFilter]);}
   get phonePuzzle(){return this.mode==='puzzle'&&matchMedia('(max-width:650px)').matches;}
-  get phoneReveal(){return this.mode==='reveal'&&this.config.activities.reveal.phoneNavigation===false&&window.matchMedia('(max-width: 650px)').matches;}
+  get phoneReveal(){return false;} // Direct navigation now works in every Capitals viewport.
   get preview(){return this.mode==='puzzle'&&this.engines.puzzle.preview;}
   get isPuzzle(){return this.mode==='puzzle'&&!this.preview;}
   get revealed(){return this.mode==='reveal'?this.engines.reveal.revealed:this.preview?new Set(this.data.units.map(c=>c.id)):this.engines.puzzle.placed;}
@@ -75,11 +75,6 @@ class CountryMaps {
     const nextRegion=['explorer','reveal'].includes(mode)&&Object.hasOwn(this.regions,region)?region:'all';
     const subset=nextRegion==='all'?this.fullData:practiceSet(this.fullData,nextRegion);
     this.data=mode==='explorer'?this.fullData:subset;this.fitView=fittedRegion(subset,nextRegion);
-    if(mode==='reveal'){
-      const shapes=[...subset.units,...subset.context],x=Math.min(...shapes.map(c=>c.bounds[0])),y=Math.min(...shapes.map(c=>c.bounds[1]));
-      const right=Math.max(...shapes.map(c=>c.bounds[2])),bottom=Math.max(...shapes.map(c=>c.bounds[3])),pad=Math.max(right-x,bottom-y)*.02;
-      this.fitView={x:x-pad,y:y-pad,w:right-x+pad*2,h:bottom-y+pad*2};
-    }
     this.byId=new Map([...this.data.units,...this.data.context].map(c=>[c.id,c]));
     if(nextRegion!==this.region){
       this.engines.explorer=new ExplorerEngine(this.fullData.units.map(c=>c.id));
@@ -97,8 +92,9 @@ class CountryMaps {
   }
   renderLanding() {
     root.classList.remove('africa-activity','capitals-activity');
+    const landingFit=fittedRegion(this.fullData);
     const descriptions=['Learn about countries','Learn countries and capitals','Place the countries'];
-    root.innerHTML='<section class="africa-landing" aria-labelledby="africa-title"><header class="africa-landing-heading"><h1 id="africa-title">'+esc(this.data.name)+'</h1><p>'+this.data.units.length+' '+this.terms.plural+'</p></header><nav class="africa-landing-activities" aria-label="Africa activities">'+modes.map((mode,i)=>'<a href="'+this.href(mode)+'" title="'+titles[mode]+' — '+descriptions[i]+'" data-tooltip="'+descriptions[i]+'">'+icon(mode)+'<span>'+titles[mode]+'</span></a>').join('')+'</nav><svg class="africa-landing-map" viewBox="0 0 '+this.fullData.width+' '+this.fullData.height+'" role="img" aria-label="Map of '+esc(this.data.name)+'">'+this.data.context.map(c=>'<path d="'+c.path+'" fill="#e4e0d8"/>').join('')+this.data.units.map(c=>'<path d="'+c.path+'" '+unitSvgAttributes(this.config,c,{stroke:'#fffdf8','stroke-width':1})+'/>').join('')+'</svg></section>';
+    root.innerHTML='<section class="africa-landing" aria-labelledby="africa-title"><header class="africa-landing-heading"><h1 id="africa-title">'+esc(this.data.name)+'</h1><p>'+this.data.units.length+' '+this.terms.plural+'</p></header><nav class="africa-landing-activities" aria-label="Africa activities">'+modes.map((mode,i)=>'<a href="'+this.href(mode)+'" title="'+titles[mode]+' — '+descriptions[i]+'" data-tooltip="'+descriptions[i]+'">'+icon(mode)+'<span>'+titles[mode]+'</span></a>').join('')+'</nav><svg class="africa-landing-map" viewBox="'+[landingFit.x,landingFit.y,landingFit.w,landingFit.h].join(' ')+'" role="img" aria-label="Map of '+esc(this.data.name)+'">'+this.data.context.map(c=>'<path d="'+c.path+'" fill="#e4e0d8"/>').join('')+this.data.units.map(c=>'<path d="'+c.path+'" '+unitSvgAttributes(this.config,c,{stroke:'#fffdf8','stroke-width':1})+'/>').join('')+'</svg></section>';
   }
   renderActivity() {
     const name=esc(this.data.name);
@@ -118,6 +114,15 @@ class CountryMaps {
     '<button data-action="zoom-in" aria-label="Zoom in">+</button><button data-action="zoom-out" aria-label="Zoom out">−</button><button data-action="fit">Fit map</button><button data-action="left" aria-label="Pan left">←</button><button data-action="up" aria-label="Pan up">↑</button><button data-action="down" aria-label="Pan down">↓</button><button data-action="right" aria-label="Pan right">→</button></div><div class="map-caption"></div>'+(this.config.mapOnly?'':unitLegend(this.config))+'<p class="territory-legend"><span aria-hidden="true"></span>Special-status area — tap for details. Outside the '+this.fullData.units.length+'-'+this.terms.singular+' score.</p></section>'+(this.mode==='reveal'?'':'<aside id="activity-side-panel" class="side-panel"></aside>')+'</div>'+
     '<p role="status" aria-live="polite" class="status" data-active-pointer=""></p><div class="completion" hidden><h2>'+name+', complete.</h2><p>All '+this.data.units.length+' '+this.terms.plural+' are in place.</p><button data-action="reset">Play again</button></div>';
     this.svg=q('#africa-map');
+    this.svg.setAttribute('tabindex','0');
+    this.svg.setAttribute('aria-description','Drag to pan. Pinch or scroll to zoom. With the map focused, use arrow keys to pan, plus or minus to zoom, and Home to fit.');
+    // Contextual actions sit beside the map/current piece, not at the page edge.
+    if(puzzlePage){q('.map-readout').append(q('.toolbar-actions'));q('.activity-commandbar').classList.add('actions-in-map');}
+    const shortActions={preview:'Reference',reset:'Reset','toggle-panel':puzzlePage?'Pieces':'List',clue:'Clue','clear-labels':'Clear'};
+    for(const button of root.querySelectorAll('.toolbar-actions button,.puzzle-clue button')){
+      const text=shortActions[button.dataset.action]||(button.hasAttribute('popovertarget')?'Help':null);
+      if(text)button.insertAdjacentHTML('beforeend','<span class="action-label" aria-hidden="true">'+text+'</span>');
+    }
     q('.map-viewport').append(q('.completion'));
     q('.completion').setAttribute('role','status');
     q('.completion').innerHTML='<h2>'+name+' complete</h2><p>'+this.data.units.length+' / '+this.data.units.length+'</p><button data-action="reset">Play again</button>';
@@ -133,7 +138,7 @@ class CountryMaps {
       q('.workspace').classList.add('learning-workspace');
       q('.workspace').insertAdjacentHTML('afterend','<section class="current-country-reference" aria-labelledby="current-countries-heading"><h2 id="current-countries-heading">Current countries · '+this.data.units.length+'</h2><div class="fact-sort-controls"><label>Sort <select id="fact-sort" aria-label="Sort country cards">'+Object.entries(factSorts).map(([id,sort])=>'<option value="'+id+'">'+sort.label+'</option>').join('')+'</select></label><label>Order <select id="fact-order" aria-label="Country card order"></select></label><a href="docs/COUNTRY-FACTS.md">Data &amp; date notes</a></div><div class="learning-grid"></div></section>');
     }
-    if(['reveal','puzzle'].includes(this.mode)&&this.data.reference)q('.map-panel').insertAdjacentHTML('beforeend','<div class="activity-learning-slot" aria-live="polite" aria-atomic="true"></div>');
+    if(this.mode==='puzzle'&&this.data.reference)q('.map-panel').insertAdjacentHTML('beforeend','<div class="activity-learning-slot" aria-live="polite" aria-atomic="true"></div>');
     this.renderSide();this.paint();
     if(this.mode==='explorer'&&this.data.reference)root.insertAdjacentHTML('beforeend',historySection(this.data.reference,this.byId,esc));
   }
@@ -230,7 +235,7 @@ class CountryMaps {
     q('.workspace').classList.toggle('phone-reveal',this.phoneReveal);
     q('.workspace').classList.toggle('regional-explorer',this.mode==='explorer'&&this.region!=='all');
     q('.workspace').classList.toggle('reveal-workspace',this.mode==='reveal');
-    q('.workspace').classList.toggle('explorer-workspace',this.mode==='explorer'&&this.data.id==='africa');
+    q('.workspace').classList.toggle('explorer-workspace',this.mode==='explorer');
     q('.workspace').classList.toggle('panel-collapsed',this.panelHidden);
     const sidePanel=q('.side-panel');if(sidePanel)sidePanel.hidden=this.panelHidden;
     const panelToggle=q('[data-action="toggle-panel"]');
@@ -246,13 +251,15 @@ class CountryMaps {
     if(this.phonePuzzle&&this.isPuzzle)q('.map-readout strong').textContent=current.name;
     if(this.mode==='reveal'||(this.mode==='explorer'&&this.data.id==='africa')){q('.map-readout strong').textContent=this.fullData.name;q('.map-readout strong').title=this.fullData.name;}
     q('.map-progress').textContent=this.mode==='explorer'?this.data.units.length+' '+this.terms.plural+(this.config.mapOnly&&this.data.context.length?' + '+this.data.context.length+' territorial unit':''):revealed.size+' / '+this.data.units.length+(this.mode==='reveal'?'':this.preview?' revealed':' placed');
-    q('.map-tools').hidden=this.isPuzzle||this.phoneReveal;
-    q('.territory-legend').hidden=this.mode==='reveal'||!this.data.context.length||(this.mode==='explorer'&&this.data.id==='africa');
-    q('.map-caption').hidden=this.mode==='reveal'||this.isPuzzle||(this.mode==='explorer'&&this.data.id==='africa');
+    q('.map-tools').hidden=this.isPuzzle;
+    q('.workspace').style.setProperty('--map-aspect',this.fitView.w/this.fitView.h);
+    if(this.mode==='reveal'){const fit=q('[data-action="fit"]');fit.textContent='⌖';fit.title='Fit practice area';fit.setAttribute('aria-label','Fit practice area');}
+    q('.territory-legend').hidden=true;
+    q('.map-caption').hidden=true;
     const territorySection=q('.territory-section');if(territorySection)territorySection.hidden=!this.data.context.length;
     this.svg.classList.toggle('puzzle-map',this.isPuzzle);
     this.svg.classList.toggle('explorer-map',this.mode==='explorer');
-    q('[data-action="fit"]').textContent=this.mode==='explorer'&&this.data.id!=='africa'?''+this.regions.all.name+' / Fit map':'Fit map';
+    q('[data-action="fit"]').textContent=this.mode==='reveal'?'⌖':'Fit map';
     if(this.mode==='reveal'||(this.mode==='explorer'&&this.data.id==='africa')){
       for(const button of q('.map-tools').querySelectorAll('button')){
         const label=button.dataset.action==='fit'?(this.mode==='reveal'?'Fit map':'All Africa / Fit map'):button.getAttribute('aria-label');
@@ -394,11 +401,11 @@ class CountryMaps {
     const items=labels.map(label=>{const c=this.byId.get(label.dataset.revealCountry),path=q('[data-country="'+c.id+'"]'),anchor=new DOMPoint(...c.anchor).matrixTransform(matrix),size=label.getBoundingClientRect();
       const x=anchor.x-size.width/2,y=anchor.y-size.height/2;
       const fitsInside=[0,.25,.5,.75,1].every(a=>[0,.25,.5,.75,1].every(b=>path.isPointInFill(new DOMPoint(x+a*size.width,y+b*size.height).matrixTransform(inverse))));
-      return {id:c.id,w:size.width,h:size.height,anchor:{x:anchor.x-frame.left,y:anchor.y-frame.top},fitsInside,slot:this.engines.reveal.slots.get(c.id)};
+      return {id:c.id,w:size.width,h:size.height,anchor:{x:anchor.x-frame.left,y:anchor.y-frame.top},country:{x:path.getBoundingClientRect().left-frame.left,y:path.getBoundingClientRect().top-frame.top,w:path.getBoundingClientRect().width,h:path.getBoundingClientRect().height},neighbors:[...this.svg.querySelectorAll('[data-country]')].filter(n=>n!==path).map(n=>{const b=n.getBoundingClientRect();return {x:b.left-frame.left,y:b.top-frame.top,w:b.width,h:b.height};}),fitsInside,slot:this.engines.reveal.slots.get(c.id)};
     });
     const positions=capitalLabelPositions(viewport,items),lines=[];
     for(const item of items){const p=positions[item.id],label=labels.find(el=>el.dataset.revealCountry===item.id);label.style.left=p.x+'px';label.style.top=p.y+'px';label.dataset.strategy=p.strategy;
-      if(p.strategy==='fallback'){const x=Math.max(8,Math.min(viewport.w-8,item.anchor.x)),y=Math.max(8,Math.min(viewport.h-8,item.anchor.y));lines.push('<polyline points="'+x+','+y+' '+(p.x+p.w)+','+(p.y+p.h/2)+'"/>');}
+      if(p.strategy!=='inside'){const x=Math.max(8,Math.min(viewport.w-8,item.anchor.x)),y=Math.max(8,Math.min(viewport.h-8,item.anchor.y));lines.push('<polyline points="'+x+','+y+' '+(p.x+p.w)+','+(p.y+p.h/2)+'"/>');}
     }
     layer.querySelector('.reveal-connectors')?.remove();layer.insertAdjacentHTML('beforeend','<svg class="reveal-connectors" viewBox="0 0 '+viewport.w+' '+viewport.h+'" aria-hidden="true">'+lines.join('')+'</svg>');
   }
@@ -807,8 +814,14 @@ root.addEventListener('pointerout',event=>{
  const card=event.target.closest('[data-piece]');
  if(event.pointerType==='mouse'&&card&&!card.contains(event.relatedTarget)&&app?.mnemonics.host===card&&!app.drag.active)app.mnemonics.clear();
 });
+root.addEventListener('wheel',event=>{
+ if(!app||!['explorer','reveal'].includes(app.mode)||!event.target.closest('#africa-map')||app.drag.active||app.phoneNav.active||app.pan.active)return;
+ event.preventDefault();const v=app.view,p=new DOMPoint(event.clientX,event.clientY).matrixTransform(app.svg.getScreenCTM().inverse());
+ const w=Math.max(55,Math.min(app.fitView.w*1.2,v.w*Math.exp(Math.max(-100,Math.min(100,event.deltaY))*.002))),scale=w/v.w;
+ app.view={x:p.x-(p.x-v.x)*scale,y:p.y-(p.y-v.y)*scale,w,h:v.h*scale};app.paint();
+},{passive:false});
 root.addEventListener('pointerdown',event=>{
-  if(app?.phonePuzzle&&app.isPuzzle&&event.target.closest('#africa-map')){if(!app.drag.active&&app.phoneNav.begin(event,app.svg))event.preventDefault();return;}
+  if((app?.phonePuzzle&&app.isPuzzle||app?.mode==='reveal'||app?.mode==='explorer'&&event.pointerType==='touch')&&event.target.closest('#africa-map')){if(!app.drag.active&&app.phoneNav.begin(event,app.svg))event.preventDefault();return;}
   if(app?.phoneNav.active)return;
   if((app?.mode==='explorer'||app?.mode==='reveal')&&event.target.closest('.navigable-map')){
     const matrix=app.svg.getScreenCTM();
@@ -832,6 +845,7 @@ document.addEventListener('keydown',event=>{
   if(event.key==='Escape'){
     app.mnemonics.clear();app.phoneNav.cancel();app.pan.cancel();app.drag.cancel();app.armed=null;app.message='Selection cancelled.';app.paint();return;
   }
+  if(event.target===app.svg&&['explorer','reveal'].includes(app.mode)){const action={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down','+':'zoom-in','=':'zoom-in','-':'zoom-out',Home:'fit'}[event.key];if(action){event.preventDefault();app.action(action);return;}}
   const target=event.target.closest('[data-country],[data-territory],[data-inset-hit]');
   if(target&&(event.key==='Enter'||event.key===' ')){event.preventDefault();target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}
 });
