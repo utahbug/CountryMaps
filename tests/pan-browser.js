@@ -46,16 +46,16 @@ document.querySelector('#run').onclick=()=>{
    const panned=box();send('pointerdown',q('[data-country="EGY"]'));send('pointerup');assert(box()===panned,'new country selection preserves manual pan');reset();
    for(const id of ['CAF','COD']){
     q('[data-list-country="'+id+'"]').click();
-    const label=q('.selected-country-overlay'),before=label.getBoundingClientRect(),map=svg.getBoundingClientRect();
-    assert(!label.hidden&&label.textContent===selected(),'overlay agrees with top name');
-    assert(w.getComputedStyle(label).pointerEvents==='none','overlay cannot intercept input');
-    assert(before.left>=map.left&&before.right<=map.right&&before.top>=map.top&&before.bottom<=map.bottom,'long label stays inside map viewport');
+    const label=q('.explorer-facts'),before=label.getBoundingClientRect(),map=svg.getBoundingClientRect();
+    assert(!label.hidden&&label.querySelector('strong').textContent===selected(),'overlay agrees with top name');
+    assert(w.innerWidth<=650||w.getComputedStyle(label).pointerEvents==='none','overlay cannot intercept map input');
+    assert(before.left>=0&&before.right<=w.innerWidth&&(w.innerWidth<=650?before.top>=map.bottom:before.top>=map.top&&before.bottom<=map.bottom),'facts stay in map interface');
     assert(label.scrollWidth<=label.clientWidth,'long name wraps without overflow');
     q('[data-action="zoom-in"]').click();q('[data-action="right"]').click();
-    const after=label.getBoundingClientRect();assert(before.x!==after.x||before.y!==after.y,'label follows country during zoom and pan');
-    assert(after.left>=map.left&&after.right<=map.right&&after.top>=map.top&&after.bottom<=map.bottom,'moved label remains inside viewport');
+    const after=label.getBoundingClientRect();assert(before.x===after.x&&before.y===after.y,'facts remain viewport anchored during zoom and pan');
+    assert(after.left>=0&&after.right<=w.innerWidth,'facts remain inside horizontal viewport');
    }
-   reset();assert(q('.selected-country-overlay').hidden,'Reset hides selected label');
+   reset();assert(q('.explorer-facts').hidden,'Reset hides selected facts');
    reset();const revealMode=new URL(w.location.href).searchParams.get('mode')==='reveal';
    for(let i=0;i<10;i++){
     start();send('pointerup');

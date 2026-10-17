@@ -1,0 +1,1155 @@
+{
+  "retrieved": "2026-10-17",
+  "statisticalSource": {
+    "name": "World Bank World Development Indicators",
+    "updated": "2026-10-08",
+    "populationIndicator": "SP.POP.TOTL",
+    "landAreaIndicator": "AG.LND.TOTL.K2",
+    "license": "CC BY 4.0"
+  },
+  "units": {
+    "DZA": {
+      "politicalDate": {
+        "date": "1962-07-05",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 2381740,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=DZA",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 47435312,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=DZA",
+        "kind": "estimate"
+      }
+    },
+    "AGO": {
+      "politicalDate": {
+        "date": "1975-11-11",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from Portugal.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 1246700,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=AGO",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 39040039,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=AGO",
+        "kind": "estimate"
+      }
+    },
+    "BEN": {
+      "politicalDate": {
+        "date": "1960-08-01",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 112760,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=BEN",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 14814460,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=BEN",
+        "kind": "estimate"
+      }
+    },
+    "BWA": {
+      "politicalDate": {
+        "date": "1966-09-30",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 566730,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=BWA",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 2562122,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=BWA",
+        "kind": "estimate"
+      }
+    },
+    "BFA": {
+      "politicalDate": {
+        "date": "1960-08-05",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 273600,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=BFA",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 24074580,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=BFA",
+        "kind": "estimate"
+      }
+    },
+    "BDI": {
+      "politicalDate": {
+        "date": "1962-07-01",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from UN trusteeship under Belgian administration.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 25680,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=BDI",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 14390003,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=BDI",
+        "kind": "estimate"
+      }
+    },
+    "CPV": {
+      "politicalDate": {
+        "date": "1975-07-05",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from Portugal.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 4030,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=CPV",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 527326,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=CPV",
+        "kind": "estimate"
+      }
+    },
+    "CMR": {
+      "politicalDate": {
+        "date": "1960-01-01",
+        "label": "Independence",
+        "type": "independence",
+        "note": "French-administered Cameroon became independent; British Southern Cameroons joined in 1961.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html",
+        "additionalSources": [
+          "https://mandates.un.org/mandate/A/RES/1608%28XV%29"
+        ]
+      },
+      "landArea": {
+        "value": 472710,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=CMR",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 29879337,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=CMR",
+        "kind": "estimate"
+      }
+    },
+    "CAF": {
+      "politicalDate": {
+        "date": "1960-08-13",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 622980,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=CAF",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 5513282,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=CAF",
+        "kind": "estimate"
+      }
+    },
+    "TCD": {
+      "politicalDate": {
+        "date": "1960-08-11",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 1259200,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=TCD",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 21003705,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=TCD",
+        "kind": "estimate"
+      }
+    },
+    "COM": {
+      "politicalDate": {
+        "date": "1975-07-06",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France; Mayotte remains French-administered and is claimed by Comoros.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html",
+        "additionalSources": [
+          "https://www.un.int/comoros/fr/statements_speeches/la-65eme-session-ordinaire-de-lassemblee-generale-des-nations-unies"
+        ]
+      },
+      "landArea": {
+        "value": 1869.7,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=COM",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 882847,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=COM",
+        "kind": "estimate"
+      }
+    },
+    "COD": {
+      "politicalDate": {
+        "date": "1960-06-30",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from Belgium.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 2267050,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=COD",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 112832473,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=COD",
+        "kind": "estimate"
+      }
+    },
+    "COG": {
+      "politicalDate": {
+        "date": "1960-08-15",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 341500,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=COG",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 6484437,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=COG",
+        "kind": "estimate"
+      }
+    },
+    "CIV": {
+      "politicalDate": {
+        "date": "1960-08-07",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 318000,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=CIV",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 32711547,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=CIV",
+        "kind": "estimate"
+      }
+    },
+    "DJI": {
+      "politicalDate": {
+        "date": "1977-06-27",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 23180,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=DJI",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 1184076,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=DJI",
+        "kind": "estimate"
+      }
+    },
+    "EGY": {
+      "politicalDate": {
+        "date": "1922-02-28",
+        "label": "Independence declared",
+        "type": "independence",
+        "note": "British protectorate ended in 1922 with reserved powers; republic declared in 1953.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 995450,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=EGY",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 118365995,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=EGY",
+        "kind": "estimate"
+      }
+    },
+    "GNQ": {
+      "politicalDate": {
+        "date": "1968-10-12",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from Spain.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 28051.5,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=GNQ",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 1938431,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=GNQ",
+        "kind": "estimate"
+      }
+    },
+    "ERI": {
+      "politicalDate": {
+        "date": "1993-05-24",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from Ethiopia.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 120800,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=ERI",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 3607003,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=ERI",
+        "kind": "estimate"
+      }
+    },
+    "SWZ": {
+      "politicalDate": {
+        "date": "1968-09-06",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 17200,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=SWZ",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 1256174,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=SWZ",
+        "kind": "estimate"
+      }
+    },
+    "ETH": {
+      "politicalDate": {
+        "date": "1995-08-21",
+        "label": "Federal constitution",
+        "type": "current-state",
+        "note": "An ancient state; this dates the current federal constitution, not independence.",
+        "source": "https://www.refworld.org/legal/legislation/natlegbod/1995/en/18206"
+      },
+      "landArea": {
+        "value": 1122134.8,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=ETH",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 135472051,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=ETH",
+        "kind": "estimate"
+      }
+    },
+    "GAB": {
+      "politicalDate": {
+        "date": "1960-08-17",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 257670,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=GAB",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 2593130,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=GAB",
+        "kind": "estimate"
+      }
+    },
+    "GMB": {
+      "politicalDate": {
+        "date": "1965-02-18",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 10120,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=GMB",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 2822093,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=GMB",
+        "kind": "estimate"
+      }
+    },
+    "GHA": {
+      "politicalDate": {
+        "date": "1957-03-06",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 227533,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=GHA",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 35064272,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=GHA",
+        "kind": "estimate"
+      }
+    },
+    "GIN": {
+      "politicalDate": {
+        "date": "1958-10-02",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 245720,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=GIN",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 15099727,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=GIN",
+        "kind": "estimate"
+      }
+    },
+    "GNB": {
+      "politicalDate": {
+        "date": "1973-09-24",
+        "label": "Independence declared",
+        "type": "declaration",
+        "note": "Declared in 1973; Portugal recognized independence on 10 September 1974.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 28120,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=GNB",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 2249515,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=GNB",
+        "kind": "estimate"
+      }
+    },
+    "KEN": {
+      "politicalDate": {
+        "date": "1963-12-12",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 580880,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=KEN",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 57532493,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=KEN",
+        "kind": "estimate"
+      }
+    },
+    "LSO": {
+      "politicalDate": {
+        "date": "1966-10-04",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 30360,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=LSO",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 2363325,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=LSO",
+        "kind": "estimate"
+      }
+    },
+    "LBR": {
+      "politicalDate": {
+        "date": "1847-07-26",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Declared an independent republic in 1847; not a former European colony.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 96320,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=LBR",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 5731206,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=LBR",
+        "kind": "estimate"
+      }
+    },
+    "LBY": {
+      "politicalDate": {
+        "date": "1951-12-24",
+        "label": "Independence",
+        "type": "independence",
+        "note": "The independent Kingdom of Libya was established in 1951.",
+        "source": "https://digitallibrary.un.org/record/478541/files/S_2467-EN.pdf"
+      },
+      "landArea": {
+        "value": 1759540,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=LBY",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 7458555,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=LBY",
+        "kind": "estimate"
+      }
+    },
+    "MDG": {
+      "politicalDate": {
+        "date": "1960-06-26",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 581800,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=MDG",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 32740678,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MDG",
+        "kind": "estimate"
+      }
+    },
+    "MWI": {
+      "politicalDate": {
+        "date": "1964-07-06",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 94280,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=MWI",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 22216120,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MWI",
+        "kind": "estimate"
+      }
+    },
+    "MLI": {
+      "politicalDate": {
+        "date": "1960-09-22",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Became the Republic of Mali after the Mali Federation broke apart.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 1220190,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=MLI",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 25198821,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MLI",
+        "kind": "estimate"
+      }
+    },
+    "MRT": {
+      "politicalDate": {
+        "date": "1960-11-28",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 1030700,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=MRT",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 5315065,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MRT",
+        "kind": "estimate"
+      }
+    },
+    "MUS": {
+      "politicalDate": {
+        "date": "1968-03-12",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 2000,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=MUS",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 1243741,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MUS",
+        "kind": "estimate"
+      }
+    },
+    "MAR": {
+      "politicalDate": {
+        "date": "1956-03-02",
+        "label": "Independence restored",
+        "type": "restoration",
+        "note": "The French protectorate ended in 1956; Morocco’s state history is much older.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html",
+        "additionalSources": [
+          "https://history.state.gov/historicaldocuments/frus1955-57v18/d34"
+        ]
+      },
+      "landArea": {
+        "value": 446300,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=MAR",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 38430770,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MAR",
+        "kind": "estimate"
+      }
+    },
+    "MOZ": {
+      "politicalDate": {
+        "date": "1975-06-25",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from Portugal.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 786380,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=MOZ",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 35631653,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MOZ",
+        "kind": "estimate"
+      }
+    },
+    "NAM": {
+      "politicalDate": {
+        "date": "1990-03-21",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Became independent from South African administration.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 823290,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=NAM",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 3092816,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=NAM",
+        "kind": "estimate"
+      }
+    },
+    "NER": {
+      "politicalDate": {
+        "date": "1960-08-03",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 1266700,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=NER",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 27917831,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=NER",
+        "kind": "estimate"
+      }
+    },
+    "NGA": {
+      "politicalDate": {
+        "date": "1960-10-01",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 910770,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=NGA",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 237527782,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=NGA",
+        "kind": "estimate"
+      }
+    },
+    "RWA": {
+      "politicalDate": {
+        "date": "1962-07-01",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from Belgium-administered UN trusteeship.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 23762.988,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=RWA",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 14569341,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=RWA",
+        "kind": "estimate"
+      }
+    },
+    "STP": {
+      "politicalDate": {
+        "date": "1975-07-12",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from Portugal.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 960,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=STP",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 240254,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=STP",
+        "kind": "estimate"
+      }
+    },
+    "SEN": {
+      "politicalDate": {
+        "date": "1960-08-20",
+        "label": "Separate state",
+        "type": "current-state",
+        "note": "Left the Mali Federation in August; Independence Day is celebrated on 4 April.",
+        "source": "https://www.presidence.sn/fr/presidence/lindependance-4-avril-1960/"
+      },
+      "landArea": {
+        "value": 192530,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=SEN",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 18931966,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=SEN",
+        "kind": "estimate"
+      }
+    },
+    "SYC": {
+      "politicalDate": {
+        "date": "1976-06-29",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 457,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=SYC",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 122730,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=SYC",
+        "kind": "estimate"
+      }
+    },
+    "SLE": {
+      "politicalDate": {
+        "date": "1961-04-27",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 72180,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=SLE",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 8819794,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=SLE",
+        "kind": "estimate"
+      }
+    },
+    "SOM": {
+      "politicalDate": {
+        "date": "1960-07-01",
+        "label": "Independence & union",
+        "type": "unification",
+        "note": "British Somaliland and former Italian Somaliland united as the Somali Republic.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 627340,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=SOM",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 19654739,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=SOM",
+        "kind": "estimate"
+      }
+    },
+    "ZAF": {
+      "politicalDate": {
+        "date": "1910-05-31",
+        "label": "Union established",
+        "type": "unification",
+        "note": "Union formed in 1910; republic in 1961; first non-racial national elections in 1994.",
+        "source": "https://www.thepresidency.gov.za/history"
+      },
+      "landArea": {
+        "value": 1213090,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=ZAF",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 64747319,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=ZAF",
+        "kind": "estimate"
+      }
+    },
+    "SSD": {
+      "politicalDate": {
+        "date": "2011-07-09",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Became independent from Sudan after a referendum.",
+        "source": "https://www.un.org/en/about-us/member-states/south-sudan"
+      },
+      "landArea": {
+        "value": 631930,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=SSD",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 12188788,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=SSD",
+        "kind": "estimate"
+      }
+    },
+    "SDN": {
+      "politicalDate": {
+        "date": "1956-01-01",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from Egypt and the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 1868000,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=SDN",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 51662147,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=SDN",
+        "kind": "estimate"
+      }
+    },
+    "TZA": {
+      "politicalDate": {
+        "date": "1964-04-26",
+        "label": "Union formed",
+        "type": "unification",
+        "note": "Tanganyika (independent in 1961) united with Zanzibar (independent in 1963).",
+        "source": "https://www.un.tzembassy.go.tz/tanzania/about-tanzania"
+      },
+      "landArea": {
+        "value": 884000,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=TZA",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 70545865,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=TZA",
+        "kind": "estimate"
+      }
+    },
+    "TGO": {
+      "politicalDate": {
+        "date": "1960-04-27",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from French-administered UN trusteeship.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 54390,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=TGO",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 8591626,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=TGO",
+        "kind": "estimate"
+      }
+    },
+    "TUN": {
+      "politicalDate": {
+        "date": "1956-03-20",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from France.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 155360,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=TUN",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 12348573,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=TUN",
+        "kind": "estimate"
+      }
+    },
+    "UGA": {
+      "politicalDate": {
+        "date": "1962-10-09",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 200520,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=UGA",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 51384894,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=UGA",
+        "kind": "estimate"
+      }
+    },
+    "ZMB": {
+      "politicalDate": {
+        "date": "1964-10-24",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 743390,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=ZMB",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 21913874,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=ZMB",
+        "kind": "estimate"
+      }
+    },
+    "ZWE": {
+      "politicalDate": {
+        "date": "1980-04-18",
+        "label": "Independence",
+        "type": "independence",
+        "note": "Independence from the UK.",
+        "source": "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/fields/2088.html"
+      },
+      "landArea": {
+        "value": 386850,
+        "year": 2024,
+        "source": "https://data.worldbank.org/indicator/AG.LND.TOTL.K2?locations=ZWE",
+        "unit": "km²"
+      },
+      "population": {
+        "value": 16950795,
+        "year": 2025,
+        "source": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=ZWE",
+        "kind": "estimate"
+      }
+    }
+  }
+}
