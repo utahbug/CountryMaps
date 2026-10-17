@@ -74,7 +74,7 @@ p {
   font-weight: 750;
   text-decoration: none;
 }
-main {
+:is(main,.global-navigation) {
   width: min(1120px, calc(100% - 32px));
   margin: 28px auto;
 }
@@ -920,21 +920,20 @@ progress::-webkit-progress-bar{background:#e5eae5}progress::-webkit-progress-val
 .map-navigation{display:flex;flex-wrap:wrap;gap:.3rem 1rem;margin-top:.75rem}.map-navigation a{display:inline-flex;align-items:center;min-height:44px}
 
 /* Root hub and explicit return navigation; map workspaces remain unchanged. */
-.site-header .all-maps-link{font-size:1rem;font-weight:650;min-height:44px;display:inline-flex;align-items:center;padding:0 .65rem;border:1px solid #ffffff66;border-radius:6px;white-space:nowrap}
 .maps-home{max-width:900px;margin:0 auto}.hub-intro{margin-bottom:22px}
 
 .map-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
 .map-card{position:relative;display:flex;flex-direction:column;gap:12px;background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--primary);border-radius:8px;padding:14px;text-decoration:none;min-width:0}
 .map-card:hover{background:var(--accent)}.map-card-preview{width:100%;height:160px;background:#eef3ef;border-radius:4px;overflow:hidden}.map-card-preview img{display:block;width:100%;height:100%;object-fit:contain;padding:5px}
 .map-card-copy{width:100%;padding-right:12px}.map-card h2{margin:0 0 5px;font-size:1.2rem;line-height:1.25}.map-card-activities{display:block;color:var(--primary);font-size:.85rem;line-height:1.45;min-height:2.9em}.map-card-arrow{position:absolute;right:12px;bottom:14px;color:var(--primary);font-size:1.4rem}
-@media(max-width:650px){.map-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.map-card{padding:10px;gap:9px}.map-card-preview{height:105px}.map-card h2{font-size:1rem}.map-card-activities{font-size:.78rem}.map-card-copy{padding-right:5px}.map-card-arrow{font-size:1rem;right:8px;bottom:9px}.hub-intro{margin-bottom:16px}.maps-home .eyebrow{margin-bottom:6px}.maps-home h1{font-size:1.8rem}.site-header .all-maps-link{font-size:.9rem}}
+@media(max-width:650px){.map-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.map-card{padding:10px;gap:9px}.map-card-preview{height:105px}.map-card h2{font-size:1rem}.map-card-activities{font-size:.78rem}.map-card-copy{padding-right:5px}.map-card-arrow{font-size:1rem;right:8px;bottom:9px}.hub-intro{margin-bottom:16px}.maps-home .eyebrow{margin-bottom:6px}.maps-home h1{font-size:1.8rem}}
 @media(max-width:340px){.map-cards{grid-template-columns:1fr}.map-card{flex-direction:row;align-items:center}.map-card-preview{flex:0 0 96px}.map-card-activities{min-height:0}}
 
 .map-card-planned{border-top-color:var(--subtle);border-style:dashed}.map-card-planned:hover{background:var(--panel)}.planned-preview{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--subtle);background:#eeeae1}.planned-preview strong{font-size:2.4rem;line-height:1.1}.planned-preview span{font-size:.9rem}
 
 /* Map-first activity shell. The same compact structure serves all activities. */
 @media (min-width:651px) {
-  body:has(.workspace) main { width:min(1480px,calc(100% - 24px)); margin:12px auto 20px; }
+  body:has(.workspace) :is(main,.global-navigation) { width:min(1480px,calc(100% - 24px)); margin:12px auto 20px; }
   .activity-heading { align-items:center; margin-bottom:6px; }
   .activity-heading h1 { margin:2px 0 0; font-size:clamp(1.35rem,2vw,1.8rem); }
   .back-link { font-size:.8rem; }
@@ -984,7 +983,7 @@ progress::-webkit-progress-bar{background:#e5eae5}progress::-webkit-progress-val
 .territory-map-label { pointer-events:none; }
 
 @media (max-width:650px) {
-  body:has(.workspace) main { width:calc(100% - 16px); margin:8px auto 16px; }
+  body:has(.workspace) :is(main,.global-navigation) { width:calc(100% - 16px); margin:8px auto 16px; }
   .activity-heading { margin-bottom:5px; gap:5px; }
   .activity-heading > div { display:flex; align-items:baseline; gap:8px; }
   .activity-heading h1 { margin:0; font-size:1.25rem; }
@@ -1375,11 +1374,11 @@ body:has(.compact-heading) main { margin-top:2px; }
 .learning-card details > button.card-map-focus:focus-visible { outline:2px solid #285d52; outline-offset:-3px; background:#dce9db; }
 
 /* Give Puzzle the available width without changing geographic or drag scaling. */
-body:has(.puzzle-workspace) main { width:calc(100% - 16px); margin:8px auto; }
+body:has(.puzzle-workspace) :is(main,.global-navigation) { width:calc(100% - 16px); margin:8px auto; }
 .puzzle-workspace { gap:6px; }
 .puzzle-workspace .side-panel { padding:8px; }
 @media(max-width:650px){
- body:has(.puzzle-workspace) main { width:calc(100% - 12px); margin:6px auto; }
+ body:has(.puzzle-workspace) :is(main,.global-navigation) { width:calc(100% - 12px); margin:6px auto; }
  .puzzle-workspace .side-panel { padding:6px; }
 }
 
@@ -1396,7 +1395,7 @@ body:has(.puzzle-workspace) main { width:calc(100% - 16px); margin:8px auto; }
 @media(max-width:650px){.activity-learning-slot{height:126px;}}
 
 /* Africa entry: the existing colorful geography is the primary visual. */
-body:has(.africa-landing) main { width:min(1240px,calc(100% - 32px)); margin:18px auto; }
+body:has(.africa-landing) :is(main,.global-navigation) { width:min(1240px,calc(100% - 32px)); margin:18px auto; }
 .africa-landing { display:grid; grid-template-columns:minmax(300px,.8fr) minmax(0,1.6fr); grid-template-rows:auto 1fr; gap:12px 24px; align-items:start; }
 .africa-landing-heading { padding-top:28px; }
 .africa-landing-heading h1 { margin:0; color:var(--primary); font-size:clamp(2rem,4vw,3.2rem); line-height:1.15; }
@@ -1406,7 +1405,6 @@ body:has(.africa-landing) main { width:min(1240px,calc(100% - 32px)); margin:18p
 .africa-landing-activities a { position:relative; display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:44px; padding:7px 9px; color:var(--primary); text-decoration:none; border-radius:5px; font-size:.94rem; font-weight:650; }
 .africa-landing-activities a:hover { background:#e5efe6; }
 .africa-landing-activities a:focus-visible { outline:2px solid var(--primary); outline-offset:2px; background:#e5efe6; }
-body:has(.africa-landing) .all-maps-link { background:transparent; border-color:transparent; }
 @media(max-width:899px){
  body:has(.africa-landing) main { margin:12px auto; }
  .africa-landing { grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto auto; gap:10px; }
@@ -1415,7 +1413,7 @@ body:has(.africa-landing) .all-maps-link { background:transparent; border-color:
  .africa-landing-activities { justify-content:center; grid-row:3; }
 }
 @media(max-width:450px){
- body:has(.africa-landing) main { width:calc(100% - 24px); }
+ body:has(.africa-landing) :is(main,.global-navigation) { width:calc(100% - 24px); }
  .africa-landing-activities { gap:2px; }
  .africa-landing-activities a { padding:7px 8px; gap:5px; font-size:.88rem; }
 }
@@ -1459,7 +1457,7 @@ body:has(.africa-landing) .all-maps-link { background:transparent; border-color:
  .phone-single-piece .piece svg {height:42px;}
 }
 /* Persistent, legible activity choices kept beside the activity title/map. */
-main.africa-activity {max-width:1180px!important;}
+main.africa-activity,body:has(main.africa-activity) .global-navigation {max-width:1180px!important;}
 .africa-activity .activity-heading {justify-content:flex-start;gap:6px 18px;}
 .africa-activity .activity-heading .mode-links .icon-control {width:auto;min-width:88px;gap:5px;padding:0 9px;}
 .africa-activity .mode-name {font-size:.83rem;}
@@ -1505,3 +1503,10 @@ main.africa-activity {max-width:1180px!important;}
  .fact-sort-controls { gap:4px 8px; }
  .fact-sort-controls label { font-size:.76rem; }
 }
+
+/* Global home navigation sits outside the local activity modes. */
+.global-navigation { margin:0 auto!important; }
+.global-navigation .all-maps-link { display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:0 4px; color:var(--primary); font-size:.86rem; font-weight:600; text-decoration:none; border-radius:4px; }
+.global-navigation .all-maps-link svg { flex:none; }
+.global-navigation .all-maps-link:hover,.global-navigation .all-maps-link:focus-visible { background:var(--accent); }
+body:has(.global-navigation) main { margin-top:2px; }
