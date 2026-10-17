@@ -10,7 +10,7 @@ import {unitPresentation,unitSvgAttributes,unitLegend} from '../lib/unit-present
 import {terminology,mapDefinitions} from '../lib/map-configs.mjs?v=country-facts';
 import {draggedBounds,dragPreviewGeometry,acceptsInsetDrop,acceptsGeometryDrop,acceptsIslandDrop} from '../lib/drop-validation.mjs?v=puzzle-cleanup';
 import {practiceSet,fittedRegion,countryRegion,countryRegionId,groupedCountries} from '../lib/regions.mjs';
-import {loadMap,registry,modes,titles,findCountries,insetTransform,pieceDisplayViewBox,usesPieceScaleFrame,escapeHTML as esc} from '../lib/maps.js?v=country-facts';
+import {loadMap,registry,modes,titles,findCountries,insetTransform,pieceDisplayViewBox,usesPieceScaleFrame,escapeHTML as esc} from '../lib/maps.js?v=learn-name';
 import {ExplorerEngine,PuzzleEngine} from '../lib/engines/activities.mjs?v=reveal-pairs';
 import {DragController} from '../lib/engines/drag-controller.mjs?v=phone-tray';
 import {placeRevealLabels} from '../lib/reveal-labels.mjs';
@@ -296,7 +296,7 @@ class CountryMaps {
     this.paintInset(inset);
     if(this.isPuzzle&&this.isIsland(current)){const scale=this.svg.getScreenCTM()?.a||1;q('#inset-layer').innerHTML='<circle data-island-hit="'+current.id+'" cx="'+current.anchor[0]+'" cy="'+current.anchor[1]+'" r="'+26/scale+'" fill="transparent" aria-hidden="true"/>';q('#inset-layer').dataset.country='island-'+current.id;}
     this.paintClue();
-    q('.map-caption').textContent=this.phoneReveal?'Tap to reveal / hide. Use Explorer for zooming and closer inspection.':this.isPuzzle?(this.isIsland(current)?'Drop or tap near the island’s ocean location.':inset?'Drop inside the enlarged helper inset. The ring marks its real location.':'Pieces snap when dropped inside their matching '+this.terms.singular+'.'):this.mode==='explorer'?(this.data.reference?'Select a country to open its card below · Drag to pan · Use Focus on map for a closer view.':this.region==='all'?'Drag to pan · Repeat a selection to toggle focus / full map.':this.regions[this.region].name+' · '+this.terms.title+' selections keep your zoom and pan.'):'Tap to reveal / hide · Drag to pan · Fit map restores the practice area.';
+    q('.map-caption').textContent=this.phoneReveal?'Tap to reveal / hide. Use Learn for zooming and closer inspection.':this.isPuzzle?(this.isIsland(current)?'Drop or tap near the island’s ocean location.':inset?'Drop inside the enlarged helper inset. The ring marks its real location.':'Pieces snap when dropped inside their matching '+this.terms.singular+'.'):this.mode==='explorer'?(this.data.reference?'Select a country to open its card below · Drag to pan · Use Focus on map for a closer view.':this.region==='all'?'Drag to pan · Repeat a selection to toggle focus / full map.':this.regions[this.region].name+' · '+this.terms.title+' selections keep your zoom and pan.'):'Tap to reveal / hide · Drag to pan · Fit map restores the practice area.';
     if(this.isPuzzle){
       this.orderPuzzleTray();
       const subset=this.puzzleUnits,subsetPlaced=subset.filter(c=>this.engines.puzzle.placed.has(c.id)).length;
@@ -670,9 +670,9 @@ class CountryMaps {
   registerTool(){
     if(this.mode==='home'||!document.modelContext?.registerTool)return;
     this.toolLifecycle=new AbortController();
-    try{Promise.resolve(document.modelContext.registerTool({name:'select_map_country',description:'Select a configured '+this.terms.singular+' in Explorer or cycle its country/capital labels in Capitals. Does not solve puzzle pieces.',inputSchema:{type:'object',properties:{countryId:{type:'string'}},required:['countryId'],additionalProperties:false},annotations:{readOnlyHint:false},execute:input=>{
+    try{Promise.resolve(document.modelContext.registerTool({name:'select_map_country',description:'Select a configured '+this.terms.singular+' in Learn or cycle its country/capital labels in Capitals. Does not solve puzzle pieces.',inputSchema:{type:'object',properties:{countryId:{type:'string'}},required:['countryId'],additionalProperties:false},annotations:{readOnlyHint:false},execute:input=>{
       const c=this.byId.get(input?.countryId);
-      if(!c||this.mode==='puzzle'||this.mode==='home'||this.drag.active||this.pan.active)throw Error('Choose a valid '+this.terms.singular+' in Explorer or Capitals.');
+      if(!c||this.mode==='puzzle'||this.mode==='home'||this.drag.active||this.pan.active)throw Error('Choose a valid '+this.terms.singular+' in Learn or Capitals.');
       this.select(c);return {countryId:c.id,name:c.name};
     }},{signal:this.toolLifecycle.signal})).catch(()=>{});}catch{}
   }
@@ -686,7 +686,7 @@ function renderHome(){
  const cards=[...Object.keys(registry),...Object.keys(mapDefinitions).filter(id=>!registry[id]&&mapDefinitions[id].showOnHome).sort((a,b)=>a==='united-states'?-1:b==='united-states'?1:0)].map(id=>{
   const config=mapDefinitions[id];
   if(!registry[id])return '<article class="map-card map-card-planned" aria-label="'+esc(config.name)+' — Planned"><div class="map-card-preview planned-preview">'+(config.preview?'<img src="./'+esc(config.preview)+'" alt="" width="800" height="730" decoding="async">':'<strong>'+config.manifest.expectedCount+'</strong><span>'+esc(config.terminology.plural)+'</span>')+'</div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">Planned · Not available yet</span></div></article>';
-  return '<a class="map-card" href="'+mapEntry(id)+'" data-map-entry="'+id+'"><div class="map-card-preview"><img src="./assets/maps/'+id+'.svg" alt="" width="800" height="730" decoding="async"></div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">'+(config.mapOnly?'Map only for now':'Explorer / Capitals / Puzzle')+'</span></div><span class="map-card-arrow" aria-hidden="true">→</span></a>';
+  return '<a class="map-card" href="'+mapEntry(id)+'" data-map-entry="'+id+'"><div class="map-card-preview"><img src="./assets/maps/'+id+'.svg" alt="" width="800" height="730" decoding="async"></div><div class="map-card-copy"><h2>'+esc(config.name)+'</h2><span class="map-card-activities">'+(config.mapOnly?'Map only for now':'Learn / Capitals / Puzzle')+'</span></div><span class="map-card-arrow" aria-hidden="true">→</span></a>';
  }).join('');
  root.innerHTML='<section class="maps-home" aria-labelledby="maps-title"><p class="eyebrow">COUNTRYMAPS</p><h1 id="maps-title">Choose a map</h1><p class="hub-intro">Explore places. Learn their shapes and locations.</p><nav class="map-cards" aria-label="Choose a map">'+cards+'</nav></section>';
 }
