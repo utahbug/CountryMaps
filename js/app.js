@@ -56,6 +56,8 @@ class CountryMaps {
     this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
     this.drag=new DragController(state=>this.paintDrag(state),(c,x,y,stationary)=>this.drop(c,x,y,stationary));
   }
+  // Madagascar is large enough for the existing geometry clue.
+  isOceanClue(c){return this.isIsland(c)&&c?.id!=='MDG';}
   isIsland(c){return this.config.practiceSubsets?.islands?.ids.includes(c?.id)||false;}
   get puzzleUnits(){return filteredUnits(this.data.units,learningFilters(this.config)[this.pieceFilter]);}
   get phonePuzzle(){return this.mode==='puzzle'&&matchMedia('(max-width:650px)').matches;}
@@ -110,7 +112,7 @@ class CountryMaps {
     '<div class="workspace"><section class="map-panel" aria-label="'+name+' map"><div class="map-readout'+(puzzlePage?' puzzle-readout':'')+'"><strong></strong>'+clueRow+'</div>'+(this.config.mapOnly?unitLegend(this.config):'')+'<div class="map-viewport"><div class="reveal-label-layer" aria-hidden="true"></div><svg class="selected-label-leader" aria-hidden="true"></svg><div class="selected-country-overlay" hidden aria-hidden="true"></div><aside class="special-status-card" hidden aria-live="polite"></aside><svg id="africa-map" class="map-canvas" viewBox="0 0 '+this.fullData.width+' '+this.fullData.height+'" role="group" aria-label="Interactive '+name+' '+this.terms.singular+' map">'+
     '<defs><pattern id="territory-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#e6e2d7"/><path d="M0 8L8 0" stroke="#aaa391" stroke-width="1"/></pattern></defs>'+
     this.data.units.map((c,i)=>'<g><path data-country="'+c.id+'" data-name="'+esc(c.name)+'" data-anchor-x="'+((c.anchor[0]-c.bounds[0])/(c.bounds[2]-c.bounds[0]))+'" data-anchor-y="'+((c.anchor[1]-c.bounds[1])/(c.bounds[3]-c.bounds[1]))+'" class="country" d="'+c.path+'" role="button" tabindex="0" aria-pressed="false"><title></title></path><text hidden data-number="'+c.id+'" class="country-number" x="'+c.anchor[0]+'" y="'+c.anchor[1]+'">'+(i+1)+'</text></g>').join('')+
-    this.data.context.map(c=>'<g class="territory-geometry"><path data-territory="'+c.id+'" d="'+c.path+'" class="context-region" role="button" tabindex="0" aria-label="'+esc(c.name+' — '+c.classification)+'" aria-pressed="false"><title>'+esc(c.name+' — '+c.classification)+'</title></path>'+(this.data.id==='africa'?'':'<text data-territory-label="'+c.id+'" class="territory-map-label" text-anchor="middle" x="'+c.anchor[0]+'" y="'+(c.anchor[1]-8)+'">'+esc(c.name+(this.config.mapOnly&&c.parentSovereignState?' — '+c.parentSovereignState.name:''))+'</text>')+'</g>').join('')+'<circle hidden class="location-marker"/><g id="inset-layer"></g></svg></div><div class="map-tools" aria-label="Map view controls">'+
+    this.data.context.map(c=>'<g class="territory-geometry"><path data-territory="'+c.id+'" d="'+c.path+'" class="context-region" role="button" tabindex="0" aria-label="'+esc(c.name+' — '+c.classification)+'" aria-pressed="false"><title>'+esc(c.name+' — '+c.classification)+'</title></path>'+(this.data.id==='africa'?'':'<text data-territory-label="'+c.id+'" class="territory-map-label" text-anchor="middle" x="'+c.anchor[0]+'" y="'+(c.anchor[1]-8)+'">'+esc(c.name+(this.config.mapOnly&&c.parentSovereignState?' — '+c.parentSovereignState.name:''))+'</text>')+'</g>').join('')+'<circle hidden class="location-marker"/><g id="inset-layer"></g><g id="ocean-clue-layer" aria-hidden="true" pointer-events="none"></g></svg></div><div class="map-tools" aria-label="Map view controls">'+
     '<button data-action="zoom-in" aria-label="Zoom in">+</button><button data-action="zoom-out" aria-label="Zoom out">−</button><button data-action="fit">Fit map</button><button data-action="left" aria-label="Pan left">←</button><button data-action="up" aria-label="Pan up">↑</button><button data-action="down" aria-label="Pan down">↓</button><button data-action="right" aria-label="Pan right">→</button></div><div class="map-caption"></div>'+(this.config.mapOnly?'':unitLegend(this.config))+'<p class="territory-legend"><span aria-hidden="true"></span>Special-status area — tap for details. Outside the '+this.fullData.units.length+'-'+this.terms.singular+' score.</p></section>'+(this.mode==='reveal'?'':'<aside id="activity-side-panel" class="side-panel"></aside>')+'</div>'+
     '<p role="status" aria-live="polite" class="status" data-active-pointer=""></p><div class="completion" hidden><h2>'+name+', complete.</h2><p>All '+this.data.units.length+' '+this.terms.plural+' are in place.</p><button data-action="reset">Play again</button></div>';
     this.svg=q('#africa-map');
@@ -465,6 +467,7 @@ class CountryMaps {
   clearClue(){
     clearTimeout(this.clueTimer);this.clueTimer=null;
     this.clue={country:null,level:0};
+    q('#ocean-clue-layer')?.replaceChildren();
     for(const target of root.querySelectorAll('.clue-target'))target.classList.remove('clue-target');
   }
   paintClue(){
@@ -475,10 +478,10 @@ class CountryMaps {
     if(!this.isPuzzle)return;
     this.clue.country=this.currentId;
     const c=this.byId.get(this.currentId),region=countryRegion(c.id,this.regions);
-    const clueButton=q('[data-action="clue"]'),clueLabel=this.clue.level?'Clue: highlight destination for '+c.name:'Clue: show region for '+c.name;
+    const clueButton=q('[data-action="clue"]'),clueLabel=this.clue.level?(this.isOceanClue(c)?'Clue: show ocean area for ':'Clue: highlight destination for ')+c.name:'Clue: show region for '+c.name;
     clueButton.disabled=placed;clueButton.setAttribute('aria-label',clueLabel);clueButton.setAttribute('title',clueLabel);clueButton.dataset.tooltip=clueLabel;clueButton.querySelector('.sr-only').textContent=clueLabel;
     const clueText=q('#clue-text');
-    clueText.textContent=placed?(this.engines.puzzle.placed.size===this.data.units.length?'Complete':'Choose another piece'):this.clue.level?(this.clue.level===1?(region?.name||this.fullData.name):this.clueTimer?'Location highlighted':'Show location again'):'';
+    clueText.textContent=placed?(this.engines.puzzle.placed.size===this.data.units.length?'Complete':'Choose another piece'):this.clue.level?(this.clue.level===1?(region?.name||this.fullData.name):this.clueTimer?(this.isOceanClue(c)?'Look in this ocean area':'Location highlighted'):'Show location again'):'';
     clueText.hidden=!clueText.textContent;
     bar.dataset.level=String(this.clue.level);
   }
@@ -487,16 +490,24 @@ class CountryMaps {
     this.paintClue();
     if(!this.clue.level){this.clue.level=1;this.paintClue();return;}
     clearTimeout(this.clueTimer);this.clue.level=2;
-    const id=this.currentId;
-    const targets=[...root.querySelectorAll('[data-country="'+id+'"],[data-inset-target="'+id+'"],[data-inset-hit="'+id+'"]')];
+    const id=this.currentId,c=this.byId.get(id),ocean=this.isOceanClue(c);
+    const layer=q('#ocean-clue-layer');layer.replaceChildren();
+    if(ocean){
+      // Coarse group center, not the drop anchor; cover the whole archipelago.
+      const [x0,y0,x1,y1]=c.bounds,step=20;
+      const x=Math.round((x0+x1)/2/step)*step,y=Math.round((y0+y1)/2/step)*step;
+      const r=Math.max(28,Math.hypot(x1-x0,y1-y0)*.7,36/(this.svg.getScreenCTM()?.a||1));
+      layer.innerHTML='<g class="ocean-clue" data-ocean-clue="'+id+'" transform="translate('+x+' '+y+')"><circle r="'+r+'"/><circle r="'+r+'"/></g>';
+    }
+    const targets=ocean?[]:[...root.querySelectorAll('[data-country="'+id+'"],[data-inset-target="'+id+'"],[data-inset-hit="'+id+'"]')];
     for(const target of targets)target.classList.remove('clue-target');
     // Restart the pulse when a learner requests the destination again.
     void this.svg.getBoundingClientRect();
     for(const target of targets)target.classList.add('clue-target');
     this.clueTimer=setTimeout(()=>{
       for(const target of targets)target.classList.remove('clue-target');
-      this.clueTimer=null;this.paintClue();
-    },2800);
+      layer.replaceChildren();this.clueTimer=null;this.paintClue();
+    },ocean?2200:2800);
     this.paintClue();
   }
   paintInset(c){

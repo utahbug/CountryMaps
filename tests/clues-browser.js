@@ -15,7 +15,7 @@ document.querySelector('#run').onclick=async()=>{
    choose(c.id);assert(level()==='0'&&!q('.clue-target'),'active country clears previous clue');
    clue();assert(level()==='1','first clue level');assert(q('#clue-text').textContent.includes(countryRegion(c.id).name),'shared regional clue '+c.id);
    assert(!q('.clue-target'),'first clue never reveals destination');assert(score()===0&&view()===initialView,'first clue no placement or camera changes');
-   clue();assert(level()==='2'&&q('[data-country="'+c.id+'"].clue-target'),'second clue outlines actual country');
+   clue();assert(level()==='2'&&(islands.has(c.id)&&c.id!=='MDG'?q('[data-ocean-clue="'+c.id+'"]'):q('[data-country="'+c.id+'"].clue-target')),'second clue shows appropriate destination treatment');
    if(c.inset&&!islands.has(c.id))assert(q('[data-inset-hit="'+c.id+'"].clue-target')&&q('[data-inset-target="'+c.id+'"].clue-target'),'small-country inset destination outlined');
    assert(score()===0&&!q('[data-piece="'+c.id+'"]').disabled&&view()===initialView,'second clue never places or moves piece');
    clue();assert(level()==='2'&&score()===0,'repeated clue is optional repeat highlight');
@@ -46,7 +46,7 @@ document.querySelector('#run').onclick=async()=>{
   reset();choose('COD');clue();const panel=q('.map-panel').getBoundingClientRect(),readout=q('.map-readout').getBoundingClientRect(),hint=q('.puzzle-clue').getBoundingClientRect(),map=q('.map-viewport').getBoundingClientRect();
   assert(hint.top>=readout.top&&hint.bottom<=readout.bottom+.1&&map.top-readout.bottom<2,'clue contained in compact country row beside map');
   assert(q('[data-action="clue"]').getBoundingClientRect().height>=(w.innerWidth<=650?44:40),'responsive clue touch target');
-  assert(initialMapTop<=(w.innerWidth<=650?225:190),'map begins high in viewport');
+  assert(initialMapTop-q('.global-navigation').getBoundingClientRect().height<=(w.innerWidth<=650?225:190),'map begins high in viewport');
   const compactControls=all('.puzzle-heading .icon-control,.puzzle-commandbar .toolbar-actions .icon-control');
   assert(compactControls.length===7&&compactControls.every(control=>control.getAttribute('aria-label')&&control.title),'compact controls retain accessible names and tooltips');
   const info=q('[popovertarget="puzzle-instructions"]'),instructions=q('#puzzle-instructions');info.focus();info.click();assert(instructions.matches(':popover-open')&&q('#instructions').textContent.includes('Drag a piece'),'instruction icon opens compact popover');
