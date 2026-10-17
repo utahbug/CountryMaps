@@ -1458,3 +1458,24 @@ body:has(.africa-landing) .all-maps-link { background:transparent; border-color:
 @media(max-width:650px){
  .phone-single-piece .piece svg {height:42px;}
 }
+/* Persistent, legible activity choices kept beside the activity title/map. */
+main.africa-activity {max-width:1180px!important;}
+.africa-activity .activity-heading {justify-content:flex-start;gap:6px 18px;}
+.africa-activity .activity-heading .mode-links .icon-control {width:auto;min-width:88px;gap:5px;padding:0 9px;}
+.africa-activity .mode-name {font-size:.83rem;}
+.africa-activity .puzzle-top-shell {position:sticky;top:0;z-index:25;background:var(--bg,#f5f1e7);}
+.capital-country-label {max-width:174px!important;width:max-content;white-space:normal;overflow-wrap:anywhere;line-height:1.25!important;font-size:13px!important;padding:5px 7px!important;text-align:center;}
+.capital-country-label strong {display:block;font-weight:700;}
+.capital-name {display:block;margin-top:3px;font-size:.9em;font-weight:400;font-style:italic;color:#304f47;}
+.capital-name small {font-size:.82em;font-style:normal;}
+.capital-country-label[data-strategy='fallback'] {background:#f5f6eafa;border-left:2px solid #78998d;text-align:left;}
+.capitals-activity .reveal-connectors {z-index:3;pointer-events:none;}
+.capitals-activity .reveal-label-layer {pointer-events:none;}
+@media(max-width:650px){
+ .africa-activity .activity-heading {flex-wrap:wrap;gap:2px;}
+ .africa-activity .activity-heading .mode-links {width:100%;display:flex;justify-content:flex-start;}
+ .africa-activity .activity-heading .mode-links .icon-control {flex:0 1 auto;min-width:0;width:auto;padding:0 8px;gap:4px;}
+ .africa-activity .mode-name {font-size:.8rem;}
+ .capital-country-label {max-width:164px!important;font-size:12px!important;}
+ .capitals-activity .map-canvas {height:clamp(380px,53svh,500px);}
+}

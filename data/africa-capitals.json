@@ -1,0 +1,347 @@
+{
+  "verified": "2026-10-17",
+  "baseline": {
+    "name": "World Bank Country API",
+    "url": "https://api.worldbank.org/v2/country?format=json&per_page=400",
+    "license": "CC BY 4.0; see https://data.worldbank.org/summary-terms-of-use"
+  },
+  "units": {
+    "AGO": {
+      "name": "Luanda",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "BDI": {
+      "name": "Gitega",
+      "role": "political-capital",
+      "source": "https://primature.gov.bi/presentation-generale/",
+      "shortRole": "political",
+      "additionalSeats": [
+        {
+          "name": "Bujumbura",
+          "role": "economic-capital",
+          "shortRole": "economic"
+        }
+      ],
+      "note": "Gitega became the political capital in 2019; Bujumbura remains the economic capital."
+    },
+    "BEN": {
+      "name": "Porto-Novo",
+      "role": "official-capital",
+      "source": "https://www.diplomatie.gouv.fr/fr/information-par-pays/benin/presentation-du-benin",
+      "shortRole": "official",
+      "additionalSeats": [
+        {
+          "name": "Cotonou",
+          "role": "seat-of-government",
+          "shortRole": "government seat"
+        }
+      ],
+      "note": "Porto-Novo is the official capital; Cotonou houses the government.",
+      "sources": [
+        "https://rgph5.instad.bj/wp-content/uploads/2023/03/Tome-1_RGPH2.pdf"
+      ]
+    },
+    "BFA": {
+      "name": "Ouagadougou",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "BWA": {
+      "name": "Gaborone",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "CAF": {
+      "name": "Bangui",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "CIV": {
+      "name": "Yamoussoukro",
+      "role": "political-capital",
+      "source": "https://www.presidence.ci/la-cote-divoire/notre-patrimoine-2/",
+      "shortRole": "political",
+      "additionalSeats": [
+        {
+          "name": "Abidjan",
+          "role": "economic-capital",
+          "shortRole": "economic"
+        }
+      ],
+      "note": "Yamoussoukro is the political and administrative capital; Abidjan remains the economic capital and an important government center."
+    },
+    "CMR": {
+      "name": "Yaoundé",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "COD": {
+      "name": "Kinshasa",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "COG": {
+      "name": "Brazzaville",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "COM": {
+      "name": "Moroni",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "CPV": {
+      "name": "Praia",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "DJI": {
+      "name": "Djibouti",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "DZA": {
+      "name": "Algiers",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "EGY": {
+      "name": "Cairo",
+      "role": "constitutional-capital",
+      "source": "https://hrightsstudies.sis.gov.eg/media/4918/dustor-eng-1.pdf",
+      "shortRole": "constitutional",
+      "additionalSeats": [
+        {
+          "name": "New Administrative Capital",
+          "role": "seat-of-government",
+          "shortRole": "government seat"
+        }
+      ],
+      "sources": [
+        "https://sis.gov.eg/en/media-center/events/the-inauguration-of-the-state-strategic-command-headquarters-the-octagon-in-the-new-capital/"
+      ],
+      "note": "Article 222 names Cairo as capital. Government institutions operate in the New Administrative Capital; this is not presented as a constitutional replacement for Cairo."
+    },
+    "ERI": {
+      "name": "Asmara",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "ETH": {
+      "name": "Addis Ababa",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "GAB": {
+      "name": "Libreville",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "GHA": {
+      "name": "Accra",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "GIN": {
+      "name": "Conakry",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "GMB": {
+      "name": "Banjul",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "GNB": {
+      "name": "Bissau",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "GNQ": {
+      "name": "Ciudad de la Paz",
+      "role": "capital",
+      "source": "https://www.guineaecuatorialpress.com/noticias/el_presidente_de_la_republica_proclama_la_ciudad_de_la_paz_como_capital_de_la_republica_de_guinea_ecuatorial_con_la_firma_de_un_decreto_ley",
+      "note": "Declared capital on 2 January 2026, replacing Malabo."
+    },
+    "KEN": {
+      "name": "Nairobi",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "LBR": {
+      "name": "Monrovia",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "LBY": {
+      "name": "Tripoli",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "LSO": {
+      "name": "Maseru",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "MAR": {
+      "name": "Rabat",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "MDG": {
+      "name": "Antananarivo",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "MLI": {
+      "name": "Bamako",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "MOZ": {
+      "name": "Maputo",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "MRT": {
+      "name": "Nouakchott",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "MUS": {
+      "name": "Port Louis",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "MWI": {
+      "name": "Lilongwe",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "NAM": {
+      "name": "Windhoek",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "NER": {
+      "name": "Niamey",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "NGA": {
+      "name": "Abuja",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "RWA": {
+      "name": "Kigali",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "SDN": {
+      "name": "Khartoum",
+      "role": "capital",
+      "source": "https://mociat.gov.sd/en/chaired-by-burhan-the-sovereignty-council-and-the-council-of-ministers-hold-a-joint-meeting-in-the-capital-khartoum-the-meeting-approves-the-states-emergency-budget-for-the-year-2026/",
+      "note": "Khartoum remains the capital. Wartime relocation to Port Sudan did not create a second national capital; the government announced its return in January 2026."
+    },
+    "SEN": {
+      "name": "Dakar",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "SLE": {
+      "name": "Freetown",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "SOM": {
+      "name": "Mogadishu",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "SSD": {
+      "name": "Juba",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "STP": {
+      "name": "São Tomé",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "SWZ": {
+      "name": "Mbabane",
+      "role": "administrative-capital",
+      "source": "https://au.int/en/cities/lobambaroyal-and-legislative-mbabane-administrative",
+      "shortRole": "administrative",
+      "additionalSeats": [
+        {
+          "name": "Lobamba",
+          "role": "royal-and-legislative-capital",
+          "shortRole": "royal / legislative"
+        }
+      ]
+    },
+    "SYC": {
+      "name": "Victoria",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "TCD": {
+      "name": "N'Djamena",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "TGO": {
+      "name": "Lomé",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "TUN": {
+      "name": "Tunis",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "TZA": {
+      "name": "Dodoma",
+      "role": "capital",
+      "source": "https://oagmis.oag.go.tz/portal/acts/52",
+      "note": "Dodoma is the capital under the 2018 declaration act. Dar es Salaam is the former capital and major commercial center, not an additional current capital in this lesson."
+    },
+    "UGA": {
+      "name": "Kampala",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "ZAF": {
+      "name": "Pretoria",
+      "role": "administrative-capital",
+      "source": "https://www.gov.za/south-africa-glance",
+      "shortRole": "administrative",
+      "additionalSeats": [
+        {
+          "name": "Cape Town",
+          "role": "legislative-capital",
+          "shortRole": "legislative"
+        },
+        {
+          "name": "Bloemfontein",
+          "role": "judicial-capital",
+          "shortRole": "judicial"
+        }
+      ],
+      "note": "These are the government’s conventional three capital roles; not every national court sits in Bloemfontein."
+    },
+    "ZMB": {
+      "name": "Lusaka",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    },
+    "ZWE": {
+      "name": "Harare",
+      "role": "capital",
+      "source": "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    }
+  }
+}
