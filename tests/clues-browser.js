@@ -13,6 +13,12 @@ document.querySelector('#run').onclick=async()=>{
   reset();assert(score()===0&&level()==='0','initial state');const initialView=view(),initialMapTop=q('.map-viewport').getBoundingClientRect().top;
   for(const c of data.countries){
    choose(c.id);assert(level()==='0'&&!q('.clue-target'),'active country clears previous clue');
+   assert(!!q('[data-ocean-clue="'+c.id+'"]')===(islands.has(c.id)&&c.id!=='MDG'),'automatic pre-placement ocean clue '+c.id);
+   if(islands.has(c.id)&&c.id!=='MDG'){
+    const ripple=q('[data-ocean-clue]');choose(c.id);assert(q('[data-ocean-clue]')===ripple,'same active piece does not replay');
+    assert(q('#ocean-clue-layer').getAttribute('pointer-events')==='none','ripple cannot intercept placement');
+    assert(Number(ripple.querySelector('circle').getAttribute('r'))>=28,'broad ocean area');
+   }
    clue();assert(level()==='1','first clue level');assert(q('#clue-text').textContent.includes(countryRegion(c.id).name),'shared regional clue '+c.id);
    assert(!q('.clue-target'),'first clue never reveals destination');assert(score()===0&&view()===initialView,'first clue no placement or camera changes');
    clue();assert(level()==='2'&&(islands.has(c.id)&&c.id!=='MDG'?q('[data-ocean-clue="'+c.id+'"]'):q('[data-country="'+c.id+'"].clue-target')),'second clue shows appropriate destination treatment');
@@ -20,6 +26,7 @@ document.querySelector('#run').onclick=async()=>{
    assert(score()===0&&!q('[data-piece="'+c.id+'"]').disabled&&view()===initialView,'second clue never places or moves piece');
    clue();assert(level()==='2'&&score()===0,'repeated clue is optional repeat highlight');
   }
+  reset();choose('CPV');await new Promise(resolve=>setTimeout(resolve,2500));assert(!q('[data-ocean-clue]'),'automatic ripple expires');choose('CPV');assert(!q('[data-ocean-clue]'),'same selection does not restart expired ripple');choose('COM');assert(q('[data-ocean-clue="COM"]'),'new island starts ripple');reset();assert(!q('[data-ocean-clue]'),'Reset removes ocean clue');
   reset();choose('DZA');clue();clue();await new Promise(resolve=>setTimeout(resolve,3000));assert(!q('.clue-target')&&level()==='2','pulse expires completely');clue();assert(q('.clue-target'),'expired clue can be requested again');
   reset();assert(level()==='0'&&!q('.clue-target')&&score()===0,'Reset clears pulse and clue');
   clue();assert(level()==='1'&&!q('.clue-target'),'Reset restores region-first progression');
@@ -48,9 +55,9 @@ document.querySelector('#run').onclick=async()=>{
   assert(hint.top>=readout.top&&hint.bottom<=readout.bottom+.1&&map.top-readout.bottom<2,'clue contained in compact country row beside map');
   assert(q('[data-action="clue"]').getBoundingClientRect().height>=(w.innerWidth<=650?44:40),'responsive clue touch target');
   assert(initialMapTop-q('.global-navigation').getBoundingClientRect().height<=(w.innerWidth<=650?225:190),'map begins high in viewport');
-  const compactControls=all('.puzzle-heading .icon-control,.puzzle-commandbar .toolbar-actions .icon-control');
+  const compactControls=all('.puzzle-heading .icon-control,.map-readout .toolbar-actions .icon-control');
   assert(compactControls.length===7&&compactControls.every(control=>control.getAttribute('aria-label')&&control.title),'compact controls retain accessible names and tooltips');
-  const info=q('[popovertarget="puzzle-instructions"]'),instructions=q('#puzzle-instructions');info.focus();info.click();assert(instructions.matches(':popover-open')&&q('#instructions').textContent.includes('Drag a piece'),'instruction icon opens compact popover');
+  const info=q('[popovertarget="puzzle-instructions"]:not([popovertargetaction])'),instructions=q('#puzzle-instructions');info.focus();if(instructions.matches(':popover-open'))instructions.hidePopover();info.click();await new Promise(resolve=>w.requestAnimationFrame(resolve));assert(instructions.matches(':popover-open')&&q('#instructions').textContent.includes('Drag a piece'),'instruction icon opens compact popover');
   instructions.querySelector('[popovertargetaction="hide"]').click();await new Promise(resolve=>w.requestAnimationFrame(resolve));assert(!instructions.matches(':popover-open')&&d.activeElement===info,'instruction popover dismisses and restores focus');
   assert(d.documentElement.scrollWidth<=w.innerWidth,'no horizontal overflow');assert(q('#clue-text').scrollWidth<=q('#clue-text').clientWidth+1,'long clue wraps');
   if(w.innerWidth<=650)assert(w.getComputedStyle(q('.map-panel')).position==='sticky','phone clue stays with sticky map');

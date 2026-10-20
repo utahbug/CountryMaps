@@ -23,8 +23,13 @@ document.querySelector('#run').onclick=()=>{let n=0;const ok=(v,m)=>{if(!v)throw
  click('[data-action="reset"]');click('[data-piece-filter="small"]');
  for(const id of ['GMB','TGO','BEN','RWA','BDI','DJI','SWZ','LSO','MWI','CPV','COM','MUS','SYC','STP']){
   for(let i=0;i<54&&active()?.dataset.piece!==id;i++)click('[data-action="skip-piece"]');
-  ok(active()?.dataset.piece===id,'queue reaches '+id);pinch();pan();const before=score(),card=active(),b=card.getBoundingClientRect(),p=point(id);card.setPointerCapture=()=>{};card.hasPointerCapture=()=>false;
-  send('pointerdown',card,b.x+50,b.y+30,40);send('pointermove',d,p.x,p.y,40);send('pointerup',d,p.x,p.y,40);ok(score()===before+1,'small/island transformed placement '+id);ok(box()===fixed,'small-country box stays fixed');
+  ok(active()?.dataset.piece===id,'queue reaches '+id);const ripple=q('[data-ocean-clue="'+id+'"]'),transform=ripple?.getAttribute('transform');pinch();pan();
+  if(['CPV','COM','MUS','SYC','STP'].includes(id)){
+   ok(!!ripple,'pre-placement island ripple '+id);ok(q('[data-ocean-clue="'+id+'"]')===ripple&&ripple.getAttribute('transform')===transform,'pan/pinch preserve geographic ripple, no replay');
+   ok(ripple.closest('svg')===svg,'ripple shares transformed map space');
+  }
+  const before=score(),card=active(),b=card.getBoundingClientRect(),p=point(id);card.setPointerCapture=()=>{};card.hasPointerCapture=()=>false;
+  send('pointerdown',card,b.x+50,b.y+30,40);send('pointermove',d,p.x,p.y,40);send('pointerup',d,p.x,p.y,40);ok(score()===before+1,'small/island transformed placement '+id);ok(box()===fixed,'small-country box stays fixed');ok(!q('[data-ocean-clue="'+id+'"]'),'placed island ripple removed');
  }
  for(const end of ['pointercancel','lostpointercapture']){send('pointerdown',svg,150,300);send('pointerdown',svg,220,300,32,false);send(end,d,220,300,32,false);const v=view();send('pointermove',d,300,400);ok(view()===v,'cancel clears both pointers');}
  send('pointerdown',svg,150,300);click('[data-action="reset"]');const resetView=view();send('pointermove',d,300,400);ok(view()===resetView&&score()===0,'Reset clears gesture');

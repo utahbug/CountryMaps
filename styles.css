@@ -1507,9 +1507,9 @@ body:has(.global-navigation) main { margin-top:2px; }
 
 /* Broad ocean-area clue; no center dot or exact destination outline. */
 #ocean-clue-layer,#ocean-clue-layer * { pointer-events:none; }
-.ocean-clue circle { fill:none; stroke:#4b8992; stroke-width:1.8; vector-effect:non-scaling-stroke; transform-origin:0 0; opacity:0; animation:ocean-ripple 1.6s ease-out forwards; }
+.ocean-clue circle { fill:none; stroke:#287783; stroke-width:2.5; vector-effect:non-scaling-stroke; transform-origin:0 0; opacity:0; animation:ocean-ripple 1.6s ease-out forwards; }
 .ocean-clue circle+circle { animation-delay:.45s; }
-@keyframes ocean-ripple { 0% { transform:scale(.55); opacity:0; } 20% { opacity:.65; } 100% { transform:scale(1.2); opacity:0; } }
+@keyframes ocean-ripple { 0% { transform:scale(.55); opacity:0; } 20% { opacity:.85; } 100% { transform:scale(1.2); opacity:0; } }
 @media(prefers-reduced-motion:reduce) { .ocean-clue circle { animation:none; opacity:.55; } .ocean-clue circle+circle { display:none; } }
 
 .helper-overlay { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:3; overflow:hidden; }

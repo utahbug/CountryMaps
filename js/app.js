@@ -315,6 +315,7 @@ class CountryMaps {
     this.paintInset(inset);
     if(this.isPuzzle&&this.isIsland(current)){const scale=this.svg.getScreenCTM()?.a||1;q('#inset-layer').innerHTML='<circle data-island-hit="'+current.id+'" cx="'+current.anchor[0]+'" cy="'+current.anchor[1]+'" r="'+26/scale+'" fill="transparent" aria-hidden="true"/>';q('#inset-layer').dataset.country='island-'+current.id;}
     this.paintClue();
+    this.syncOceanClue();
     q('.map-caption').textContent=this.phoneReveal?'Tap to reveal / hide. Use Learn for zooming and closer inspection.':this.isPuzzle?(this.isIsland(current)?'Drop or tap near the island’s ocean location.':inset?'Drop inside the enlarged helper inset. The ring marks its real location.':'Pieces snap when dropped inside their matching '+this.terms.singular+'.'):this.mode==='explorer'?(this.data.reference?'Select a country to open its card below · Drag to pan · Use Focus on map for a closer view.':this.region==='all'?'Drag to pan · Repeat a selection to toggle focus / full map.':this.regions[this.region].name+' · '+this.terms.title+' selections keep your zoom and pan.'):'Tap to reveal / hide · Drag to pan · Fit map restores the practice area.';
     if(this.isPuzzle){
       this.orderPuzzleTray();
@@ -481,10 +482,31 @@ class CountryMaps {
     label.dataset.strategy=position.strategy;
     if(position.leader&&leader){leader.setAttribute('viewBox','0 0 '+frame.width+' '+frame.height);leader.innerHTML='<polyline points="'+[position.leader.start,position.strategy==='lane'?{x:position.leader.end.x,y:position.leader.start.y}:null,position.leader.end].filter(Boolean).map(p=>p.x+','+p.y).join(' ')+'"/>';}
   }
+  clearOceanClue(){
+    clearTimeout(this.oceanTimer);this.oceanTimer=null;
+    q('#ocean-clue-layer')?.replaceChildren();
+  }
+  showOceanClue(c){
+    this.clearOceanClue();
+    const layer=q('#ocean-clue-layer');if(!layer)return;
+    // Broad, quantized archipelago area, not an exact drop anchor.
+    const [x0,y0,x1,y1]=c.bounds,step=20;
+    const x=Math.round((x0+x1)/2/step)*step,y=Math.round((y0+y1)/2/step)*step;
+    const r=Math.max(28,Math.hypot(x1-x0,y1-y0)*.7,40/(this.svg.getScreenCTM()?.a||1));
+    layer.innerHTML='<g class="ocean-clue" data-ocean-clue="'+c.id+'" transform="translate('+x+' '+y+')"><circle r="'+r+'"/><circle r="'+r+'"/></g>';
+    this.oceanTimer=setTimeout(()=>this.clearOceanClue(),2400);
+  }
+  syncOceanClue(){
+    const c=this.byId.get(this.currentId);
+    const active=this.isPuzzle&&!this.engines.puzzle.placed.has(c?.id)?c?.id:null;
+    if(active===this.oceanActive)return;
+    this.oceanActive=active;this.clearOceanClue();
+    if(active&&this.isOceanClue(c))this.showOceanClue(c);
+  }
   clearClue(){
     clearTimeout(this.clueTimer);this.clueTimer=null;
     this.clue={country:null,level:0};
-    q('#ocean-clue-layer')?.replaceChildren();
+    this.clearOceanClue();
     for(const target of root.querySelectorAll('.clue-target'))target.classList.remove('clue-target');
   }
   paintClue(){
@@ -508,14 +530,7 @@ class CountryMaps {
     if(!this.clue.level){this.clue.level=1;this.paintClue();return;}
     clearTimeout(this.clueTimer);this.clue.level=2;
     const id=this.currentId,c=this.byId.get(id),ocean=this.isOceanClue(c);
-    const layer=q('#ocean-clue-layer');layer.replaceChildren();
-    if(ocean){
-      // Coarse group center, not the drop anchor; cover the whole archipelago.
-      const [x0,y0,x1,y1]=c.bounds,step=20;
-      const x=Math.round((x0+x1)/2/step)*step,y=Math.round((y0+y1)/2/step)*step;
-      const r=Math.max(28,Math.hypot(x1-x0,y1-y0)*.7,36/(this.svg.getScreenCTM()?.a||1));
-      layer.innerHTML='<g class="ocean-clue" data-ocean-clue="'+id+'" transform="translate('+x+' '+y+')"><circle r="'+r+'"/><circle r="'+r+'"/></g>';
-    }
+    if(ocean)this.showOceanClue(c);
     const targets=ocean?[]:[...root.querySelectorAll('[data-country="'+id+'"],[data-inset-target="'+id+'"],[data-inset-hit="'+id+'"]')];
     for(const target of targets)target.classList.remove('clue-target');
     // Restart the pulse when a learner requests the destination again.
@@ -523,7 +538,7 @@ class CountryMaps {
     for(const target of targets)target.classList.add('clue-target');
     this.clueTimer=setTimeout(()=>{
       for(const target of targets)target.classList.remove('clue-target');
-      layer.replaceChildren();this.clueTimer=null;this.paintClue();
+      this.clueTimer=null;this.paintClue();
     },ocean?2200:2800);
     this.paintClue();
   }
