@@ -9,7 +9,7 @@ document.querySelector('#run').onclick=async()=>{let n=0;const ok=(v,m)=>{if(!v)
  if(route.includes('explorer')){const y=w.scrollY;q('.country-list [data-list-country]').click();ok(w.scrollY===y,'locator keeps map visible');}
  if(route.includes('puzzle')){ok(q('.map-readout .toolbar-actions'),'actions next to current piece');for(const btn of d.querySelectorAll('.map-readout .toolbar-actions button:not([hidden])')){if(w.getComputedStyle(btn).display==='none')continue;const icon=btn.querySelector('svg').getBoundingClientRect();ok(icon.width>=18,'readable action icon');if(w.innerWidth>650)ok(w.getComputedStyle(btn.querySelector('.action-label')).display!=='none','desktop action label');}}
  if(route.includes('capitals')){
- ok(!q('.activity-learning-slot'),'no duplicate description');ok([...q('.map-tools').children].filter(e=>e.getBoundingClientRect().width).length===1,'one compact Fit alternative');
+ ok(!q('.activity-learning-slot'),'no duplicate description');ok([...q('.map-tools').children].filter(e=>e.getBoundingClientRect().width).length===7,'single-pointer zoom/pan/Fit alternatives');
  svg.setPointerCapture=()=>{};svg.hasPointerCapture=()=>false;
  const send=(t,target,x,y,id=1)=>target.dispatchEvent(new w.PointerEvent(t,{bubbles:true,cancelable:true,pointerType:'touch',pointerId:id,isPrimary:id===1,button:0,clientX:x,clientY:y}));
  const x=b.x+b.width*.6,y=b.y+b.height*.4;

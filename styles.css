@@ -1604,3 +1604,37 @@ body:has(.africa-landing) main {margin-top:0;}
 
 .puzzle-top-shell {display:flex;flex-wrap:wrap;}
 .puzzle-top-shell .activity-commandbar {flex:0 1 auto;justify-content:flex-start;}
+
+/* Accessibility baseline: visible focus, non-color state, text reflow, reduced motion. */
+:where(button,a,input,select,summary,[tabindex]):focus-visible {outline:3px solid #863a22;outline-offset:2px;}
+.site-header a:focus-visible {outline-color:#fff;}
+.country-list button[aria-pressed='true'] {font-weight:700;border-inline-start:3px solid #285d52;}
+.country-list button[aria-pressed='true']::after {content:'✓';margin-left:auto;padding-left:5px;}
+.country[aria-pressed='true'] {stroke:#174e43;stroke-width:2.5;vector-effect:non-scaling-stroke;}
+.country:focus-visible,.context-region:focus-visible {stroke:#863a22;stroke-width:3.5;vector-effect:non-scaling-stroke;}
+.instructions-popover {max-height:calc(100svh - 24px);overflow:auto;}
+.filter-popover button {white-space:normal;overflow-wrap:anywhere;}
+.map-readout strong,.map-progress,.action-label {white-space:normal;overflow-wrap:anywhere;}
+.activity-learning-slot {height:auto;min-height:0;}
+.activity-learning-card {height:auto;max-height:none;overflow:visible;}
+.activity-learning-card p {display:block;-webkit-line-clamp:unset;overflow:visible;}
+.piece span {overflow-wrap:anywhere;}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;}}
+/* Single-pointer alternatives remain available alongside pinch/drag gestures. */
+.reveal-workspace .map-tools button:not([data-action='fit']) {display:inline-flex;}
+.reveal-workspace .map-tools {position:static;justify-content:flex-end;flex-wrap:wrap;}
+.country,.country.shown {stroke:#405647;stroke-width:1;}
+@media(max-width:650px){
+ .phone-single-piece .map-tools {display:flex;flex-wrap:wrap;gap:0;padding:0;}
+ .phone-single-piece .map-tools button {min-width:44px;min-height:44px;padding:4px;border:0;background:transparent;}
+ .phone-single-piece .phone-fit {display:none;}
+ .phone-single-piece .piece {height:auto;min-height:96px;}
+ .phone-single-piece .side-panel {height:auto;min-height:146px;max-height:none;padding:3px 3px 48px;}
+}
+/* Text enlargement may grow controls and headings; never force a wide row. */
+.activity-heading {flex-wrap:wrap;min-width:0;}
+.activity-heading>div,.activity-heading h1 {min-width:0;max-width:100%;overflow-wrap:anywhere;}
+.fact-sort-controls label {min-width:0;max-width:100%;flex-wrap:wrap;}
+.fact-sort-controls select {min-width:0;max-width:100%;}
+.activity-heading.compact-heading h1,.activity-heading.compact-heading h1 span {white-space:normal;}
+.country:focus-visible,.context-region:focus-visible {stroke:#863a22;stroke-width:3.5;vector-effect:non-scaling-stroke;}

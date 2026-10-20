@@ -233,3 +233,7 @@ All map activities fit actual unit/context bounds with 2% geographic breathing r
 Direct navigation: Learn and Capitals support pointer pan, touch pinch and wheel zoom; focus the map and use arrows, +/−, or Home for keyboard navigation. Capitals retains a compact Fit alternative. Phone Puzzle retains its separate fixed piece station and existing gesture/placement controller.
 
 Controls belong near the content they affect. Puzzle actions live in its current-piece/map header. Ambiguous actions use icon-plus-short-text on desktop; compact phone controls retain accessible names, tooltips and 44px targets. Future maps inherit these rules through the shared renderer and CSS.
+
+## Accessibility release baseline
+
+WCAG 2.1 AA is required across current and future CountryMaps pages and interactions. Shared implementation rules, audit instructions, manual release checks, and validation limits are in [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md). Automated tests do not establish conformance by themselves.
