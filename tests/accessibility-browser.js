@@ -15,7 +15,7 @@ document.querySelector('#run').onclick=async()=>{
   const phonePuzzle=route.includes('mode=puzzle')&&w.innerWidth<=650;
   if(phonePuzzle){d.querySelector('[data-piece-filter="central"]').click();d.querySelector('[data-action="skip-piece"]').click();d.querySelector('[data-action="skip-piece"]').click();await wait();}
   doubleText(w);await wait();row.doubleTextOverflow=d.documentElement.scrollWidth>w.innerWidth;
-  if(phonePuzzle){const skip=d.querySelector('[data-action="skip-piece"]').getBoundingClientRect(),controls=d.querySelector('.map-tools').getBoundingClientRect();row.stationControlOverlap=skip.bottom>controls.top;}
+  if(phonePuzzle){const skip=d.querySelector('[data-action="skip-piece"]').getBoundingClientRect(),controls=d.querySelector('.map-tools').getBoundingClientRect();row.stationControlOverlap=skip.left<controls.right&&skip.right>controls.left&&skip.top<controls.bottom&&skip.bottom>controls.top;}
   report.push(row);out.textContent=JSON.stringify(report,null,2);
  }out.dataset.complete='true';}catch(error){out.textContent='FAIL: '+error.message;}
 };

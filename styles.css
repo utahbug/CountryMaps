@@ -1644,3 +1644,12 @@ body:has(.africa-landing) main {margin-top:0;}
 .explorer-facts.facts-below .country-facts-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
 .explorer-facts {overflow-wrap:anywhere;}
 .explorer-facts .country-facts-grid div {min-width:0;}
+/* Shared overlay navigation: large targets, restrained artwork, no control strip. */
+.workspace .map-viewport .map-tools {position:absolute;top:6px;right:6px;bottom:auto;left:auto;z-index:7;display:flex;flex-wrap:nowrap;gap:0;padding:0;background:#fafbf7e8;border-radius:6px;}
+.workspace .map-viewport .map-tools button[data-action] {display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;padding:0!important;border:0;background:transparent;box-shadow:none;border-radius:4px;}
+.workspace .map-viewport .map-tools button[hidden] {display:none!important;}
+.workspace .map-viewport .map-tools button:hover:not(:disabled) {background:#e8efe9;}
+.workspace .map-viewport .map-tools button:focus-visible {outline:2px solid var(--primary);outline-offset:-3px;}
+.map-tools .control-icon {width:22px;height:22px;}
+.map-canvas {touch-action:none;}
+.capitals-map-hint {position:absolute;z-index:3;pointer-events:none;margin:0;padding:4px 6px;color:#365347;background:#f5f8f2e8;border-radius:4px;font-size:.78rem;line-height:1.5;max-width:150px;}
