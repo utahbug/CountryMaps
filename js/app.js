@@ -244,6 +244,9 @@ class CountryMaps {
     if(this.phoneReveal)this.view={...this.fitView};
     const trayIds=this.isPuzzle?new Set(this.puzzleUnits.map(c=>c.id)):null;
     if(this.phonePuzzle&&this.isPuzzle){const next=this.phoneQueue.next(this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed);if(next&&!this.puzzleUnits.some(c=>c.id===this.currentId&&!this.engines.puzzle.placed.has(c.id)))this.currentId=next;}
+    if(this.phonePuzzle&&this.isPuzzle&&!this.drag.active)this.armed=this.engines.puzzle.placed.has(this.currentId)?null:this.currentId;
+    if(this.wasPhonePuzzle&&!this.phonePuzzle)this.armed=null;
+    this.wasPhonePuzzle=this.phonePuzzle;
     const revealed=this.revealed,current=this.byId.get(this.currentId),chosen=this.byId.get(this.selected);
     const inset=this.isPuzzle&&current?.inset&&!this.isIsland(current)?current:null;
     const identified=chosen&&(this.mode!=='reveal'||chosen.classification||revealed.has(chosen.id));
@@ -261,6 +264,7 @@ class CountryMaps {
     panelToggle.setAttribute('aria-expanded',String(!this.panelHidden));
     }
     q('#instructions').textContent=this.phoneReveal?'Tap a '+this.terms.singular+' to reveal or hide its name. '+this.data.name+' stays fitted while you study.':this.mode==='explorer'?(this.data.reference?'Select a country for map-side facts · Drag to pan · Browse cards below or use Focus on map for a closer view.':this.region==='all'?'Select a '+this.terms.singular+' in the full map. Repeat the selection to toggle '+this.terms.singular+' focus.':'Select '+this.terms.plural+' while the regional view stays in place. Use '+this.regions.all.name+' to restore the full map.'):this.mode==='reveal'?'Tap a '+this.terms.singular+' to reveal or hide its name. Your map view stays in place.':this.preview?'The answer map. Your placed pieces are saved.':'Drag a piece to its shape, or select it and tap a location. With a keyboard, activate a piece, then focus its named map destination and press Enter or Space.';
+    if(this.phonePuzzle&&this.isPuzzle)q('#instructions').textContent='The displayed piece is ready: tap its destination, or drag it into place. Correct placements load the next piece. Skip saves it for later. With a keyboard, focus its named map destination and press Enter or Space.';
     q('#instructions').append(' Map keyboard controls: arrow keys pan, + and − zoom, Home fits the map.');
     if(this.mode==='reveal')q('#instructions').textContent='Tap once for the country, again for its capital, and again to clear it. Compare up to two countries; selecting a third replaces the oldest. Clear removes labels without moving the map. Reset clears labels and fits the practice area. Hatched special-status areas have separate information. Map keyboard controls: arrow keys pan, + and − zoom, Home fits the map.';
     if(this.mode==='reveal')q('#instructions').insertAdjacentHTML('beforeend',' <a href="docs/CAPITALS.md">Capital data and sources (World Bank, CC BY 4.0; government updates)</a>');
@@ -308,7 +312,7 @@ class CountryMaps {
       if(this.isPuzzle){
         const piece=q('[data-piece="'+c.id+'"]'),placed=this.engines.puzzle.placed.has(c.id);
         piece.hidden=this.phonePuzzle?(placed||this.currentId!==c.id):!trayIds.has(c.id);piece.disabled=placed;piece.classList.toggle('current-piece',this.currentId===c.id);
-        piece.setAttribute('aria-pressed',String(this.armed===c.id));piece.setAttribute('aria-label',(placed?'Completed: ':'Piece: ')+c.name);piece.querySelector('span').textContent=(placed?'✓ ':'')+c.name+(presentation.label?' — '+presentation.label:'');
+        piece.classList.toggle('incorrect-piece',this.phonePuzzle&&this.incorrectPiece===c.id);piece.setAttribute('aria-pressed',String(this.armed===c.id));piece.setAttribute('aria-label',(placed?'Completed: ':'Piece: ')+c.name);piece.querySelector('span').textContent=(placed?'✓ ':'')+c.name+(presentation.label?' — '+presentation.label:'');
       }else{
         const row=q('[data-list-country="'+c.id+'"]');
         if(row){row.classList.toggle('active',this.selected===c.id);row.setAttribute('aria-pressed',String(this.mode==='explorer'?this.selected===c.id:revealed.has(c.id)));if(this.mode!=='explorer'){const known=revealed.has(c.id);row.setAttribute('aria-pressed',String(known));row.querySelector('.list-name').textContent=known?c.name:'Hidden '+this.terms.singular;row.setAttribute('aria-label',known?'Hide '+c.name:'Reveal hidden '+this.terms.singular);}}
@@ -361,6 +365,8 @@ class CountryMaps {
       q('[data-action="toggle-panel"]').hidden=true;
       if(!this.isPuzzle)return;
       if(!q('[data-action="skip-piece"]'))side.querySelector('.panel-title').insertAdjacentHTML('beforeend','<button type="button" class="icon-control" data-action="skip-piece" aria-label="Skip country" title="Skip country">Skip</button>');
+      if(!q('#phone-piece-filter'))side.querySelector('.panel-title').insertAdjacentHTML('beforeend','<select id="phone-piece-filter" aria-label="Puzzle practice set" title="Puzzle practice set">'+Object.entries(learningFilters(this.config)).map(([id,f])=>'<option value="'+id+'">'+esc(id==='az'?'All Africa':f.name)+'</option>').join('')+'</select>');
+      q('#phone-piece-filter').value=this.pieceFilter;
       const remaining=this.phoneQueue.remaining(this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed);
       q('[data-action="skip-piece"]').disabled=remaining.length<2;
       if(!q('.phone-subset-complete'))side.insertAdjacentHTML('beforeend','<p class="phone-subset-complete" role="status">Set complete. Choose another filter.</p>');
@@ -373,7 +379,7 @@ class CountryMaps {
       if(side.parentElement!==workspace)workspace.append(side);
       side.style.left='';side.style.top='';side.hidden=this.panelHidden;
       q('[data-action="toggle-panel"]').hidden=false;
-      q('[data-action="phone-fit"]')?.remove();q('[data-action="skip-piece"]')?.remove();q('.phone-subset-complete')?.remove();
+      q('#phone-piece-filter')?.remove();q('[data-action="phone-fit"]')?.remove();q('[data-action="skip-piece"]')?.remove();q('.phone-subset-complete')?.remove();
     }
   }
   positionPhonePiece(){
@@ -744,7 +750,7 @@ class CountryMaps {
   cancelRewards(){this.rewards.cancel();this.rewardFinishing=false;}
   place(c,correct){
     this.mnemonics.clear();this.armed=null;
-    const placed=this.engines.puzzle.place(c.id,correct);
+    const placed=this.engines.puzzle.place(c.id,correct);this.incorrectPiece=placed?null:c.id;
     const complete=placed&&this.engines.puzzle.placed.size===this.data.units.length;
     if(complete)this.rewardFinishing=true;
     if(placed){
@@ -752,7 +758,7 @@ class CountryMaps {
       this.selected=c.id;
       this.message=this.engines.puzzle.placed.size===this.data.units.length?'Complete! All '+this.data.units.length+' '+this.terms.plural+' are placed.':c.name+' placed.';
       const next=this.phonePuzzle?this.byId.get(this.phoneQueue.next(this.puzzleUnits.map(n=>n.id),this.engines.puzzle.placed)):this.puzzleUnits.find(n=>!this.engines.puzzle.placed.has(n.id));if(next){this.currentId=next.id;if(this.phonePuzzle&&['islands','small'].includes(this.pieceFilter))this.fitPhonePractice();}
-    }else this.message='Not quite. '+c.name+' returned to the tray.';
+    }else this.message=this.phonePuzzle?'Not quite. Try another location for '+c.name+'.':'Not quite. '+c.name+' returned to the tray.';
     this.paint();
     if(placed)this.rewards.placed(this.svg.querySelector('path[data-country="'+c.id+'"]'),c,{
       complete,paths:this.data.units.map(unit=>({unit,node:this.svg.querySelector('path[data-country="'+unit.id+'"]')})),center:[this.fullData.width/2,this.fullData.height/2],
@@ -761,6 +767,7 @@ class CountryMaps {
     });
   }
   reset(){
+    this.incorrectPiece=null;
     this.cancelRewards();this.phoneNav.cancel();this.phoneQueue.reset(this.puzzleUnits.map(c=>c.id));
     this.lastLearning[this.mode]=null;
     this.mnemonics.reset();this.clearClue();this.pan.cancel();this.drag.cancel();this.suppressClick=false;this.armed=null;this.selected=null;this.query='';this.view={...this.fitView};
@@ -769,16 +776,17 @@ class CountryMaps {
     this.renderSide();this.paint();
   }
   setPieceFilter(id){
+    this.incorrectPiece=null;
     if(!this.isPuzzle||!Object.hasOwn(learningFilters(this.config),id))return;
     this.mnemonics.clear();this.drag.cancel();this.clearClue();this.armed=null;this.suppressClick=false;this.pieceFilter=id;this.phoneQueue.reset(this.puzzleUnits.map(c=>c.id));
     if(this.phonePuzzle)this.currentId=this.phoneQueue.next(this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed)||this.puzzleUnits[0].id;
     if(!this.puzzleUnits.some(c=>c.id===this.currentId))this.currentId=(this.puzzleUnits.find(c=>!this.engines.puzzle.placed.has(c.id))||this.puzzleUnits[0]).id;
-    this.fitPhonePractice();this.renderSide();this.paint();q('[popovertarget="piece-filter-menu"]').focus({preventScroll:true});
+    this.fitPhonePractice();this.renderSide();this.paint();q(this.phonePuzzle?'#phone-piece-filter':'[popovertarget="piece-filter-menu"]').focus({preventScroll:true});
   }
   action(action){
     this.pan.cancel();this.phoneNav.cancel();
     if(action==='phone-fit'){this.drag.cancel();this.fitPhonePractice();this.paint();return;}
-    if(action==='skip-piece'&&this.phonePuzzle&&this.isPuzzle){this.drag.cancel();this.mnemonics.clear();this.clearClue();this.armed=null;this.suppressClick=false;this.currentId=this.phoneQueue.skip(this.currentId,this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed)||this.currentId;if(['islands','small'].includes(this.pieceFilter))this.fitPhonePractice();this.paint();return;}
+    if(action==='skip-piece'&&this.phonePuzzle&&this.isPuzzle){this.incorrectPiece=null;this.drag.cancel();this.mnemonics.clear();this.clearClue();this.armed=null;this.suppressClick=false;this.currentId=this.phoneQueue.skip(this.currentId,this.puzzleUnits.map(c=>c.id),this.engines.puzzle.placed)||this.currentId;if(['islands','small'].includes(this.pieceFilter))this.fitPhonePractice();this.paint();return;}
     if(action==='toggle-panel'){this.panelHidden=!this.panelHidden;this.paint();return;}
     if(this.phoneReveal&&['zoom-in','zoom-out','fit','left','right','up','down'].includes(action)){this.view={...this.fitView};this.paint();return;}
     if(action==='reset'){this.reset();return;}
@@ -879,6 +887,7 @@ document.addEventListener('click',event=>{
   const path=event.target.closest('[data-country],[data-territory]');if(path)app.select(app.byId.get(path.dataset.country||path.dataset.territory));
 });
 root.addEventListener('change',event=>{
+  if(event.target.id==='phone-piece-filter'){app.setPieceFilter(event.target.value);return;}
   if(event.target.id==='fact-sort'||event.target.id==='fact-order'){if(event.target.id==='fact-sort'){app.factSort=event.target.value;app.factOrder='first';}else app.factOrder=event.target.value;app.renderList();return;}
   if(event.target.id==='practice-region'){
     if(app.mode==='explorer'){app.focusRegion(event.target.value);return;}

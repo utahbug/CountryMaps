@@ -1654,3 +1654,11 @@ body:has(.africa-landing) main {margin-top:0;}
 .map-canvas {touch-action:none;}
 .capitals-map-hint {position:absolute;z-index:3;pointer-events:none;margin:0;padding:4px 6px;color:#365347;background:#f5f8f2e8;border-radius:4px;font-size:.78rem;line-height:1.5;max-width:150px;}
 .capital-country-label[data-strategy='inside'] {background:transparent;border-color:transparent;box-shadow:none;}
+
+@media(max-width:650px){
+ .phone-single-piece .panel-title [popovertarget="piece-filter-menu"]{display:none;}
+ .phone-single-piece .panel-title{right:3px;}
+ #phone-piece-filter{width:100%;min-width:0;min-height:44px;padding:2px 0;border:0;border-radius:4px;background-color:transparent;color:var(--ink,#243d32);font:inherit;font-size:.7rem;}
+}
+
+.phone-single-piece .piece.incorrect-piece::after{content:"Try again";position:absolute;top:2px;right:2px;font-size:.7rem;font-weight:600;color:#783d2a;background:#fff4e9;padding:2px 4px;border-radius:3px;pointer-events:none;}
