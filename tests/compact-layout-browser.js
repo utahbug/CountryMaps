@@ -22,7 +22,7 @@ document.querySelector('#run').onclick=async()=>{let n=0;const ok=(v,m)=>{if(!v)
  const send=(t,target,x,y,id=1)=>target.dispatchEvent(new w.PointerEvent(t,{bubbles:true,cancelable:true,pointerType:'touch',pointerId:id,isPrimary:id===1,button:0,clientX:x,clientY:y}));
  const x=b.x+b.width*.6,y=b.y+b.height*.4;
  send('pointerdown',svg,x,y);send('pointermove',d,x+25,y+20);send('pointerup',d,x+25,y+20);ok(vb()!==fit,'touch pan');ok(!q('.capital-country-label'),'pan never selects');
- const moved=vb();send('pointerdown',svg,x-20,y);send('pointerdown',svg,x+20,y,2);send('pointermove',d,x+50,y,2);send('pointerup',d,x+50,y,2);send('pointerup',d,x-20,y);ok(vb()!==moved,'pinch zoom');
+ const moved=vb();send('pointerdown',svg,x-20,y);send('pointerdown',svg,x+20,y,2);send('pointermove',d,x+50,y,2);send('pointerup',d,x+50,y,2);send('pointerup',d,x-20,y);ok(vb()!==moved,'pinch zoom');ok(!q('[data-action="zoom-out"]').disabled,'zoom out available immediately after pinch');
  const pinched=vb();svg.dispatchEvent(new w.WheelEvent('wheel',{bubbles:true,cancelable:true,clientX:x,clientY:y,deltaY:-80}));ok(vb()!==pinched,'wheel zoom');
  svg.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Home',bubbles:true}));ok(vb()===fit,'keyboard fit');
  for(const id of ['DZA','COD','RWA','BDI','MUS','SYC']){q('[data-country="'+id+'"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));q('[data-country="'+id+'"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));await wait();const frame=q('.reveal-label-layer').getBoundingClientRect();for(const l of d.querySelectorAll('.capital-country-label')){const r=l.getBoundingClientRect();ok(r.left>=frame.left&&r.right<=frame.right&&r.top>=frame.top&&r.bottom<=frame.bottom,'label fits '+id);}}
