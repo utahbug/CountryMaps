@@ -1,6 +1,6 @@
 import {installAccessibility} from '../lib/accessibility.mjs';
 import {PuzzleRewards} from '../lib/puzzle-rewards.mjs';
-import {helperPlacement} from '../lib/helper-placement.mjs';
+import {helperPlacement} from '../lib/helper-placement.mjs?v=atlantic-notch';
 import {factSorts,sortFactUnits,selectedFacts} from '../lib/country-facts.mjs';
 import {CapitalsEngine as RevealEngine} from '../lib/engines/capitals.mjs';
 import {capitalLabelPositions} from '../lib/capital-labels.mjs?v=compact-layout';
@@ -548,7 +548,11 @@ class CountryMaps {
       const p=new DOMPoint(sx,sy).matrixTransform(inverse);
       return paths.some(({p:path,b})=>p.x>=b.x&&p.x<=b.x+b.width&&p.y>=b.y&&p.y<=b.y+b.height&&path.isPointInFill(p));
     };
-    const b=helperPlacement(box.width,box.height,blocked);
+    // Ignore remote islands when finding the mainland's visible Atlantic notch.
+    const visible=paths.filter(({p})=>!this.isIsland(this.byId.get(p.dataset.country))).map(({p})=>p.getBoundingClientRect()).filter(r=>r.right>box.left&&r.left<box.right&&r.bottom>box.top&&r.top<box.bottom);
+    let geography;
+    if(visible.length){const x=Math.max(box.left,Math.min(...visible.map(r=>r.left))),y=Math.max(box.top,Math.min(...visible.map(r=>r.top))),right=Math.min(box.right,Math.max(...visible.map(r=>r.right))),bottom=Math.min(box.bottom,Math.max(...visible.map(r=>r.bottom)));geography={x:x-box.left,y:y-box.top,w:right-x,h:bottom-y};}
+    const b=helperPlacement(box.width,box.height,blocked,geography);
     overlay.setAttribute('viewBox','0 0 '+box.width+' '+box.height);
     const g=overlay.querySelector('g');g.setAttribute('transform','translate('+b.x+' '+b.y+')');
     const rect=g.querySelector('rect');rect.setAttribute('width',b.w);rect.setAttribute('height',b.h);
