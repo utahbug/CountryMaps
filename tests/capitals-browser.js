@@ -3,6 +3,14 @@ document.querySelector('#run').onclick=async()=>{let n=0;const out=document.quer
 await click('[data-action="reset"]');const fit=view();ok(d.querySelectorAll('path[data-country]').length===54,'54 paths');
 const check=()=>{const v=q('.reveal-label-layer').getBoundingClientRect(),boxes=labels().map(l=>l.getBoundingClientRect());for(const b of boxes)ok(b.left>=v.left+7&&b.top>=v.top+7&&b.right<=v.right-7&&b.bottom<=v.bottom-7,'label fully inside');if(boxes.length===2){const[a,b]=boxes;ok(a.right<=b.left||b.right<=a.left||a.bottom<=b.top||b.bottom<=a.top,'no overlapping labels');}};
 for(const[id,c]of Object.entries(capitals.units)){await click('[data-country="'+id+'"]');let l=q('[data-reveal-country="'+id+'"]');ok(l&&w.getComputedStyle(l.querySelector('.capital-name')).visibility==='hidden','country only '+id);check();const pos=l.getBoundingClientRect();await click('[data-country="'+id+'"]');l=q('[data-reveal-country="'+id+'"]');ok(l.textContent.includes(c.name)&&w.getComputedStyle(l.querySelector('.capital-name')).visibility==='visible','capital '+id);ok(l.getBoundingClientRect().x===pos.x&&l.getBoundingClientRect().y===pos.y,'stable second click '+id);check();await click('[data-country="'+id+'"]');ok(!q('[data-reveal-country="'+id+'"]'),'empty third '+id);ok(view()===fit,'cycle preserves view');}
+await click('[data-action="clear-labels"]');await click('[data-country="COD"]');await click('[data-country="COD"]');
+if(w.innerWidth>=1100)ok(q('[data-reveal-country="COD"]').dataset.strategy==='inside','DRC text fits inside on desktop');
+for(const pair of [['COD','RWA'],['DZA','SDN'],['ZAF','ZMB'],['RWA','BDI'],['TGO','GHA'],['LSO','SWZ'],['CPV','STP'],['COM','MUS'],['SYC','MDG']]){
+ await click('[data-action="clear-labels"]');for(const id of pair){await click('[data-country="'+id+'"]');await click('[data-country="'+id+'"]');}check();
+ for(const l of labels())ok(parseFloat(w.getComputedStyle(l).fontSize)>=12,'readable label type');
+ for(const action of ['zoom-in','right','fit']){await click('[data-action="'+action+'"]');check();}
+}
+await click('[data-action="clear-labels"]');
 for(const id of ['RWA','BDI','ZAF'])await click('[data-country="'+id+'"]');ok(labels().length===2&&!q('[data-reveal-country="RWA"]'),'FIFO');for(const id of ['BDI','ZAF'])await click('[data-country="'+id+'"]');check();
 await click('[data-action="clear-labels"]');ok(labels().length===0&&view()===fit,'Clear preserves view');if(w.innerWidth>650){await click('[data-action="zoom-in"]');await click('[data-action="right"]');const moved=view();await click('[data-country="DZA"]');await click('[data-country="DZA"]');check();await click('[data-action="clear-labels"]');ok(view()===moved,'Clear retains manual navigation');}
 await click('[data-action="reset"]');ok(view()===fit&&labels().length===0,'Reset fits');

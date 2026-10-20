@@ -4,7 +4,7 @@ import {PuzzleRewards} from '../lib/puzzle-rewards.mjs';
 import {helperPlacement} from '../lib/helper-placement.mjs?v=atlantic-notch';
 import {factSorts,sortFactUnits,selectedFacts} from '../lib/country-facts.mjs';
 import {CapitalsEngine as RevealEngine} from '../lib/engines/capitals.mjs';
-import {capitalLabelPositions} from '../lib/capital-labels.mjs?v=map-navigation';
+import {capitalLabelPositions} from '../lib/capital-labels.mjs?v=proximity';
 import {PhoneMapNavigation} from '../lib/engines/phone-map-navigation.mjs';
 import {PieceQueue} from '../lib/piece-queue.mjs';
 import {referenceFilters,learningCard,historySection,activityLearningCard} from '../lib/learning-reference.mjs?v=country-facts';
@@ -437,15 +437,31 @@ class CountryMaps {
     const layer=q('.reveal-label-layer'),labels=[...layer.querySelectorAll('.capital-country-label')];if(!labels.length)return;
     const frame=layer.getBoundingClientRect(),matrix=this.svg.getScreenCTM();if(!matrix||!frame.width)return;
     const inverse=matrix.inverse(),viewport={w:frame.width,h:frame.height};
-    const items=labels.map(label=>{const c=this.byId.get(label.dataset.revealCountry),path=q('[data-country="'+c.id+'"]'),anchor=new DOMPoint(...c.anchor).matrixTransform(matrix),size=label.getBoundingClientRect();
-      const x=anchor.x-size.width/2,y=anchor.y-size.height/2;
-      const fitsInside=[0,.25,.5,.75,1].every(a=>[0,.25,.5,.75,1].every(b=>path.isPointInFill(new DOMPoint(x+a*size.width,y+b*size.height).matrixTransform(inverse))));
-      return {id:c.id,w:size.width,h:size.height,anchor:{x:anchor.x-frame.left,y:anchor.y-frame.top},country:{x:path.getBoundingClientRect().left-frame.left,y:path.getBoundingClientRect().top-frame.top,w:path.getBoundingClientRect().width,h:path.getBoundingClientRect().height},neighbors:[...this.svg.querySelectorAll('[data-country]')].filter(n=>n!==path).map(n=>{const b=n.getBoundingClientRect();return {x:b.left-frame.left,y:b.top-frame.top,w:b.width,h:b.height};}),fitsInside,slot:this.engines.reveal.slots.get(c.id)};
+    const paths=[...this.svg.querySelectorAll('path[data-country],path[data-territory]')].map(path=>({path,b:path.getBBox(),id:path.dataset.country||path.dataset.territory}));
+    const landAt=(x,y,exclude)=>{const point=new DOMPoint(x+frame.left,y+frame.top).matrixTransform(inverse);return paths.some(({path,b,id})=>id!==exclude&&point.x>=b.x&&point.x<=b.x+b.width&&point.y>=b.y&&point.y<=b.y+b.height&&path.isPointInFill(point));};
+    const items=labels.map(label=>{
+      const c=this.byId.get(label.dataset.revealCountry),path=q('[data-country="'+c.id+'"]'),anchor=new DOMPoint(...c.anchor).matrixTransform(matrix),bounds=path.getBoundingClientRect();
+      const country={x:bounds.left-frame.left,y:bounds.top-frame.top,w:bounds.width,h:bounds.height},insideCandidates=[];
+      // Wrap, never shrink, to find usable interior areas away from narrow extensions.
+      for(const width of [174,145,120,105,90]){
+        label.style.width=Math.min(width,viewport.w-16)+'px';const size=label.getBoundingClientRect();
+        if(size.width>country.w||size.height>country.h)continue;
+        const textBoxes=[],walker=document.createTreeWalker(label,NodeFilter.SHOW_TEXT);let text;
+        while(text=walker.nextNode()){if(!text.textContent.trim())continue;const range=document.createRange();range.selectNodeContents(text);for(const r of range.getClientRects())textBoxes.push({x:r.left-size.left,y:r.top-size.top,w:r.width,h:r.height});}
+        for(let row=0;row<=16;row++)for(let col=0;col<=16;col++){
+          const x=country.x+col*(country.w-size.width)/16,y=country.y+row*(country.h-size.height)/16;
+          let contained=true;
+          for(const t of textBoxes){for(let iy=0;iy<=2&&contained;iy++)for(let ix=0;ix<=4;ix++)if(!path.isPointInFill(new DOMPoint(frame.left+x+t.x+ix*t.w/4,frame.top+y+t.y+iy*t.h/2).matrixTransform(inverse))){contained=false;break;}if(!contained)break;}
+          if(contained)insideCandidates.push({x,y,w:size.width,h:size.height});
+        }
+      }
+      label.style.width=Math.min(120,viewport.w-16)+'px';const size=label.getBoundingClientRect();
+      return {id:c.id,w:size.width,h:size.height,anchor:{x:anchor.x-frame.left,y:anchor.y-frame.top},country,insideCandidates};
     });
     const tools=q('.map-tools').getBoundingClientRect();
-    const positions=capitalLabelPositions(viewport,items,{obstacles:[{x:tools.left-frame.left,y:tools.top-frame.top,w:tools.width,h:tools.height}]}),lines=[];
-    for(const item of items){const p=positions[item.id],label=labels.find(el=>el.dataset.revealCountry===item.id);label.style.left=p.x+'px';label.style.top=p.y+'px';label.dataset.strategy=p.strategy;
-      if(p.strategy!=='inside'){const x=Math.max(8,Math.min(viewport.w-8,item.anchor.x)),y=Math.max(8,Math.min(viewport.h-8,item.anchor.y));lines.push('<polyline points="'+x+','+y+' '+(p.x+p.w)+','+(p.y+p.h/2)+'"/>');}
+    const positions=capitalLabelPositions(viewport,items,{landAt,obstacles:[{x:tools.left-frame.left,y:tools.top-frame.top,w:tools.width,h:tools.height}]}),lines=[];
+    for(const item of items){const p=positions[item.id],label=labels.find(el=>el.dataset.revealCountry===item.id);label.style.width=p.w+'px';label.style.left=p.x+'px';label.style.top=p.y+'px';label.dataset.strategy=p.strategy;
+      if(p.leader)lines.push('<polyline points="'+p.leader.start.x+','+p.leader.start.y+' '+p.leader.end.x+','+p.leader.end.y+'"/>');
     }
     layer.querySelector('.reveal-connectors')?.remove();layer.insertAdjacentHTML('beforeend','<svg class="reveal-connectors" viewBox="0 0 '+viewport.w+' '+viewport.h+'" aria-hidden="true">'+lines.join('')+'</svg>');
   }
