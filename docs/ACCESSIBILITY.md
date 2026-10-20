@@ -45,3 +45,9 @@ Small island activation now starts a separate, temporary ocean-area pulse before
 
 Targeted fixtures: `tests/islands-browser.html` checks activation, actual rendered stroke visibility, expiry, replay gating, exclusions, Reset/reference/Skip cleanup and score preservation. `tests/phone-navigation-browser.html` additionally checks geographic ripple identity through synthetic pinch/pan and cleanup after transformed small-country/island placements. Hardware iPhone/Safari validation remains a separate device check; browser touch tests stub pointer capture.
 Verified: 90 Node tests; island timing/visibility fixture (48 assertions at 1440px, 50 at each of 390/430px); phone navigation fixture (173 assertions at each phone width). No scoring, placement tolerance, geometry or reward-animation logic changed.
+
+## Learn facts placement — October 20, 2026
+
+Selected facts use measured screen-space placement near the visible mainland's Atlantic notch, with selected-country proximity as a secondary preference. Bounds checks protect even tiny islands. Placement updates on selection, pan, zoom and resize; phone/crowded views put the same accessible card immediately below the map. Facts content, styles, selection and sorting remain shared and unchanged. No motion was introduced.
+
+Verified 92 Node tests; targeted Learn browser checks at 1440px (4903 assertions), 768px (2770), 430px and 390px (745 each), including all 54 countries, locator/search synchronization without page jumps, sorting, regional views, transformed geography clearance, viewport containment and doubled-text wrapping. Keyboard country activation and visible focus were inspected. Physical Safari/VoiceOver and actual browser zoom limitations remain as documented above.

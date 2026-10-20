@@ -1,3 +1,4 @@
+import {factsPlacement} from '../lib/facts-placement.mjs';
 import {installAccessibility} from '../lib/accessibility.mjs';
 import {PuzzleRewards} from '../lib/puzzle-rewards.mjs';
 import {helperPlacement} from '../lib/helper-placement.mjs?v=atlantic-notch';
@@ -57,7 +58,7 @@ class CountryMaps {
     this.phoneNav=new PhoneMapNavigation(()=>({view:{...this.view},inverse:this.svg.getScreenCTM().inverse()}),view=>{this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionInset();this.positionLabel();},(target,x,y)=>{if(this.armed)this.drop(this.byId.get(this.armed),x,y,false);else {const node=target.closest('[data-country],[data-territory]'),id=node?.dataset.country||node?.dataset.territory;if(id)this.select(this.byId.get(id));}},{width:data.width,height:data.height});
     this.rewards=new PuzzleRewards();this.rewardFinishing=false;this.phoneQueue=new PieceQueue();this.mnemonics=new MnemonicPlayer();this.pieceFilter='az';this.listOrder='az';this.factSort='name';this.factOrder='first';this.openRegion=null;this.mode='home';this.selected=null;this.armed=null;this.currentId=ids[0];this.panelHidden=false;
     this.lastLearning={reveal:null,puzzle:null};this.view={...this.fitView};this.suppressClick=false;this.query='';this.message='';
-    this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
+    this.pan=new PanController(view=>{if(this.phoneReveal)return;this.view=view;this.svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '));this.positionLabel();this.positionExplorerFacts();},id=>this.select(this.byId.get(id)),{width:data.width,height:data.height});
     this.drag=new DragController(state=>this.paintDrag(state),(c,x,y,stationary)=>this.drop(c,x,y,stationary));
   }
   // Madagascar is large enough for the existing geometry clue.
@@ -387,7 +388,28 @@ class CountryMaps {
     let panel=q('.explorer-facts');if(!panel){panel=document.createElement('aside');panel.className='explorer-facts';panel.setAttribute('aria-label','Selected country facts');panel.setAttribute('aria-live','polite');}
     const unit=this.data.units.find(c=>c.id===this.selected);panel.hidden=!unit;
     panel.innerHTML=unit?selectedFacts(unit,this.data.reference,countryRegion(unit.id,this.regions)?.name||'',esc):'';
-    const viewport=q('.map-viewport');if(matchMedia('(max-width:650px)').matches)viewport.insertAdjacentElement('afterend',panel);else viewport.append(panel);
+    if(!panel.isConnected)q('.map-viewport').append(panel);
+    this.positionExplorerFacts();
+  }
+  positionExplorerFacts(){
+    if(this.mode!=='explorer')return;
+    const panel=q('.explorer-facts'),viewport=q('.map-viewport');if(!panel||panel.hidden)return;
+    const below=()=>{panel.classList.add('facts-below');panel.style.removeProperty('left');panel.style.removeProperty('top');viewport.insertAdjacentElement('afterend',panel);};
+    if(matchMedia('(max-width:650px)').matches){below();return;}
+    panel.classList.remove('facts-below');viewport.append(panel);
+    const box=viewport.getBoundingClientRect(),size=panel.getBoundingClientRect(),matrix=this.svg.getScreenCTM();if(!matrix)return;
+    const inverse=matrix.inverse(),paths=[...this.svg.querySelectorAll('path[data-country],path[data-territory]')].map(p=>({p,b:p.getBBox()}));
+    const blocked=(x,y)=>{const point=new DOMPoint(box.left+x,box.top+y).matrixTransform(inverse);return paths.some(({p,b})=>point.x>=b.x&&point.x<=b.x+b.width&&point.y>=b.y&&point.y<=b.y+b.height&&p.isPointInFill(point));};
+    const visible=paths.filter(({p})=>!this.isIsland(this.byId.get(p.dataset.country))).map(({p})=>p.getBoundingClientRect()).filter(b=>b.right>box.left&&b.left<box.right&&b.bottom>box.top&&b.top<box.bottom);
+    const left=Math.max(box.left,Math.min(...visible.map(b=>b.left))),top=Math.max(box.top,Math.min(...visible.map(b=>b.top))),right=Math.min(box.right,Math.max(...visible.map(b=>b.right))),bottom=Math.min(box.bottom,Math.max(...visible.map(b=>b.bottom)));
+    const geography=visible.length?{x:left-box.left,y:top-box.top,w:right-left,h:bottom-top}:{x:0,y:0,w:box.width,h:box.height};
+    const unit=this.byId.get(this.selected),anchor=new DOMPoint(...unit.anchor).matrixTransform(matrix);
+    // Bounds also protect tiny islands that can fall between point samples.
+    const landBounds=paths.map(({p})=>p.getBoundingClientRect());
+    const overlaps=b=>landBounds.some(r=>b.x+box.left-4<r.right&&b.x+b.w+box.left+4>r.left&&b.y+box.top-4<r.bottom&&b.y+b.h+box.top+4>r.top);
+    const position=factsPlacement(box.width,box.height,size.width,size.height,geography,{x:anchor.x-box.left,y:anchor.y-box.top},blocked,overlaps);
+    if(!position){below();return;}
+    panel.style.left=position.x+'px';panel.style.top=position.y+'px';
   }
   paintActivityLearning(){
     const slot=q('.activity-learning-slot');if(!slot)return;
